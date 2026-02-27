@@ -167,8 +167,6 @@
 .hero-section {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
   padding: 10px 0rem 4rem;

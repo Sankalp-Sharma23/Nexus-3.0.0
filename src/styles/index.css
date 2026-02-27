@@ -1,45 +1,65 @@
 :root {
-  /* Core brand colors */
-  --brand-primary: #7C3AED;
-  /* Modern Violet */
-  --brand-secondary: #EC4899;
-  /* Pink/Fuchsia */
-  --brand-accent: #F59E0B;
-  /* Amber/Orange */
+  /* Core brand colors - Purple palette for creativity and premium feel */
+  --brand-primary: #8b5cf6;
+  /* Violet Primary */
+  --brand-secondary: #a855f7;
+  /* Violet Light */
+  --brand-tertiary: #10b981;
+  /* Emerald - Success/Growth */
+  --brand-accent: #c084fc;
+  /* Violet Accent */
+  --brand-premium: #8b5cf6;
+  /* Purple - Premium/Luxury */
+  --brand-critical: #ef4444;
+  /* Red - Important actions */
 
   /* Nexus Dark Theme Colors (Default) */
-  --bg-primary: #000000;
-  /* Pure Black */
-  --bg-secondary: #0a0a0a;
-  --bg-card: #121212;
-  --bg-card-hover: #1a1a1a;
+  --bg-primary: #0f172a;
+  /* Slate background */
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #334155;
 
-  --text-primary: #ffffff;
-  /* Pure White text */
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  --text-primary: #f1f5f9;
+  /* Soft white text */
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
 
   --accent-primary: var(--brand-primary);
   --accent-secondary: var(--brand-secondary);
-  --accent-tertiary: var(--brand-accent);
-  --accent-glow: rgba(124, 58, 237, 0.4);
+  --accent-tertiary: var(--brand-tertiary);
+  --accent-accent: var(--brand-accent);
+  --accent-premium: var(--brand-premium);
+  --accent-critical: var(--brand-critical);
+  --accent-glow: rgba(139, 92, 246, 0.4);
 
-  --border-subtle: rgba(124, 58, 237, 0.15);
-  --border-accent: rgba(124, 58, 237, 0.3);
+  --border-subtle: rgba(139, 92, 246, 0.15);
+  --border-accent: rgba(139, 92, 246, 0.3);
 
   --gradient-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
-  --gradient-secondary: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
-  --gradient-glow: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+  --gradient-secondary: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-success-light: #34d399;
+  --color-success-dark: #059669;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #d97706;
+  --color-danger: #ef4444;
+  --color-danger-light: #f87171;
+  --color-danger-dark: #dc2626;
 
   /* Glass effect */
-  --glass-bg: rgba(0, 0, 0, 0.6);
-  --glass-border: rgba(124, 58, 237, 0.1);
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(139, 92, 246, 0.1);
 
   /* Shadows */
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.3);
+  --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.3);
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -62,24 +82,27 @@
 [data-theme="light"] {
   --bg-primary: #ffffff;
   /* Pure White */
-  --bg-secondary: #f9fafb;
-  --bg-card: #f9fafb;
-  --bg-card-hover: #f3f4f6;
+  --bg-secondary: #f8fafc;
+  --bg-card: #f0f9ff;
+  --bg-card-hover: #dbeafe;
 
-  --text-primary: #09090b;
-  --text-secondary: #52525b;
-  --text-muted: #71717a;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
 
-  --gradient-secondary: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
-  --gradient-glow: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+  --border-subtle: rgba(139, 92, 246, 0.2);
+  --border-accent: rgba(139, 92, 246, 0.4);
+
+  --gradient-secondary: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
 
   --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(124, 58, 237, 0.1);
+  --glass-border: rgba(139, 92, 246, 0.1);
 
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.15);
+  --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
 }
 
 /* Smooth theme transition */

@@ -1,117 +1,42 @@
-import { useState, useEffect, useRef } from 'react';
-import './Navbar.css';
+import StaggeredMenu from './StaggeredMenu';
+import '../styles/Navbar.css';
 
-const Navbar = ({ theme, toggleTheme }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const navbarRef = useRef(null);
+const menuItems = [
+    { label: 'Home',             ariaLabel: 'Go to home',              link: '/'                  },
+    { label: 'Dashboard',        ariaLabel: 'Open dashboard',          link: '/dashboard'         },
+    { label: 'Whiteboard',       ariaLabel: 'Open whiteboard',         link: '/whiteboard'        },
+    { label: 'Practice Hub',     ariaLabel: 'Open practice hub',       link: '/practice-hub'      },
+    { label: 'Study Planner',    ariaLabel: 'Open study planner',      link: '/study-planner'     },
+    { label: 'Experience Hub',   ariaLabel: 'Open experience hub',     link: '/experience-hub'    },
+    { label: 'Aim',              ariaLabel: 'View aim page',           link: '/aim'               },
+    { label: 'Resume',           ariaLabel: 'Open resume builder',     link: '/resume'            },
+    { label: 'Guidance',         ariaLabel: 'Open guidance',           link: '/guidance'          },
+    { label: 'Placement Portal', ariaLabel: 'Open placement portal',   link: '/placement-portal'  },
+];
 
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
+const socialItems = [
+    { label: 'GitHub',   link: 'https://github.com'   },
+    { label: 'LinkedIn', link: 'https://linkedin.com' },
+    { label: 'Twitter',  link: 'https://twitter.com'  },
+];
 
-    // Close navbar when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (isOpen && navbarRef.current && !navbarRef.current.contains(event.target)) {
-                setIsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        document.addEventListener('touchstart', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('touchstart', handleClickOutside);
-        };
-    }, [isOpen]);
-
+const Navbar = () => {
     return (
-        <nav ref={navbarRef} className={`navbar ${isOpen ? 'navbar-open' : ''}`}>
-            <div className="navbar-container">
-                {/* Close/Menu Button */}
-                <button
-                    className={`menu-toggle ${isOpen ? 'open' : ''}`}
-                    onClick={toggleMenu}
-                    aria-label="Toggle menu"
-                >
-                    <span className="line line1"></span>
-                    <span className="line line2"></span>
-                </button>
-
-                {/* Logo/Title Section */}
-                <div className="navbar-header">
-                    <h1 className="navbar-logo">NEXUS</h1>
-                </div>
-
-                {/* Theme Toggle Button */}
-                <button
-                    className="theme-toggle"
-                    onClick={toggleTheme}
-                    aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                >
-                    <span className="material-symbols-rounded">
-                        {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-                    </span>
-                </button>
-
-                {/* Get Started Button */}
-                <a href="#" className="get-started-btn">Get Started</a>
-            </div>
-
-            {/* Dropdown Menu with Card Boxes */}
-            <div className={`navbar-dropdown ${isOpen ? 'open' : ''}`}>
-                <div className="navbar-cards">
-
-                    {/* Preferences Card */}
-                    <div className="nav-card card-preferences">
-                        <h3 className="card-title">Preferences</h3>
-                        <ul className="card-links">
-                            <li><a href="#"><span className="material-symbols-rounded">home</span> Home</a></li>
-                            <li><a href="#"><span className="material-symbols-rounded">settings</span> Settings</a></li>
-                        </ul>
-                    </div>
-                    {/* Learn Card */}
-                    <div className="nav-card card-learn">
-                        <h3 className="card-title">Learn</h3>
-                        <ul className="card-links">
-                            <li><a href="#"><span className="material-symbols-rounded">menu_book</span> Practice Hub</a></li>
-                            <li><a href="#"><span className="material-symbols-rounded">event_note</span> Study Planner</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Build Card */}
-                    <div className="nav-card card-build">
-                        <h3 className="card-title">Build</h3>
-                        <ul className="card-links">
-                            <li><a href="#"><span className="material-symbols-rounded">draw</span> Whiteboard</a></li>
-                            <li><a href="#"><span className="material-symbols-rounded">folder_open</span> Project Hub</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Career Card */}
-                    <div className="nav-card card-career">
-                        <h3 className="card-title">Career</h3>
-                        <ul className="card-links">
-                            <li><a href="#"><span className="material-symbols-rounded">description</span> Resume Builder</a></li>
-                            <li><a href="#"><span className="material-symbols-rounded">work</span> Job Board</a></li>
-                            <li><a href="#"><span className="material-symbols-rounded">smart_toy</span> Career Agents</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Community Card */}
-                    <div className="nav-card card-community">
-                        <h3 className="card-title">Community</h3>
-                        <ul className="card-links">
-                            <li><a href="#"><span className="material-symbols-rounded">groups</span> Showcase</a></li>
-                            <li><a href="#"><span className="material-symbols-rounded">dashboard</span> Dashboard</a></li>
-                        </ul>
-                    </div>
-
-
-                </div>
-            </div>
-        </nav>
+        <StaggeredMenu
+            position="right"
+            isFixed={true}
+            logoText="NEXUS"
+            items={menuItems}
+            socialItems={socialItems}
+            displaySocials={true}
+            displayItemNumbering={true}
+            menuButtonColor="#ffffff"
+            openMenuButtonColor="#000000"
+            changeMenuColorOnOpen={true}
+            colors={['#1e1340', '#5227FF']}
+            accentColor="#8b5cf6"
+            closeOnClickAway={true}
+        />
     );
 };
 

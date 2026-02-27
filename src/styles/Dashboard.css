@@ -1,0 +1,564 @@
+﻿/* ============================================================
+   NEXUS — BENTO DASHBOARD
+   ============================================================ */
+
+.demo-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d12;
+  color: #e2e8f0;
+}
+.demo-content { flex:1; padding-top:72px; }
+
+/* ── page wrapper ── */
+.bento-page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+
+/* ── top bar ── */
+.bento-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.bento-site-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #8b5cf6;
+  font-family: 'JetBrains Mono', monospace;
+}
+.bento-date {
+  margin-left: auto;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ════════════════════════════════════════
+   DASH GRID  (renamed from .bento-grid to avoid
+   collision with Home.css .bento-grid)
+   ════════════════════════════════════════ */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  grid-template-areas:
+    "hero    hero    canvas  canvas"
+    "hero    hero    study   study"
+    "hack    place   place   resume"
+    "hack    dbboard comp    comp"
+    "intern  intern  tracker tracker";
+  gap: 14px;
+}
+
+/* ── base tile ── */
+.bt {
+  position: relative;
+  border-radius: 18px;
+  padding: 20px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .22s, transform .22s, box-shadow .22s;
+  opacity: 0; /* GSAP will animate in */
+}
+.bt:hover {
+  border-color: rgba(255,255,255,0.16);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+}
+
+/* ── grid area assignments ── */
+.bt-hero        { grid-area: hero; }
+.bt-whiteboard  { grid-area: canvas; }
+.bt-study       { grid-area: study; }
+.bt-hack        { grid-area: hack; }
+.bt-placement   { grid-area: place; }
+.bt-resume      { grid-area: resume; }
+.bt-dbboard     { grid-area: dbboard; }
+.bt-component   { grid-area: comp; }
+.bt-internships { grid-area: intern; }
+.bt-tracker     { grid-area: tracker; }
+
+/* ── eyebrow label ── */
+.bt-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 14px;
+}
+
+/* ── go arrow ── */
+.bt-go {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.4);
+  transition: background .2s, color .2s, transform .2s;
+}
+.bt:hover .bt-go {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  transform: translate(2px,-2px);
+}
+
+/* ══════════════════════════
+   1. HERO TILE — image ◀ | text ▶
+   ══════════════════════════ */
+.bt-hero {
+  background: linear-gradient(145deg, rgba(139,92,246,0.10) 0%, rgba(15,15,22,1) 60%);
+  border-color: rgba(139,92,246,0.2);
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.bt-hero:hover { border-color: rgba(139,92,246,0.45); }
+
+/* ── image column ── */
+.bt-hero-img-wrap {
+  position: relative;
+  width: 42%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.bt-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.bt-hero:hover .bt-hero-img { transform: scale(1.05); }
+.bt-hero-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    transparent 40%,
+    rgba(13,13,18,0.85) 100%
+  ), linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(13,13,18,0.6) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── text column ── */
+.bt-hero-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 20px 20px 18px;
+  min-width: 0;
+}
+
+.bt-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bt-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(139,92,246,0.15);
+  border: 2px solid rgba(139,92,246,0.45);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800;
+  color: #a78bfa;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.bt-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #10b981;
+  font-weight: 600;
+}
+.bt-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100%{box-shadow:0 0 4px #10b981;}
+  50%{box-shadow:0 0 12px #10b981;}
+}
+
+/* welcome block */
+.bt-hero-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bt-hero-greeting {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  font-family: 'JetBrains Mono', monospace;
+}
+.bt-hero-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.1;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bt-hi { color: rgba(255,255,255,0.32); font-size: 15px; font-weight: 500; }
+
+.bt-hero-sub {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.38);
+  line-height: 1.55;
+}
+
+.bt-hero-stats {
+  display: flex;
+  gap: 0;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.bt-hstat {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 6px;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.bt-hstat:last-child { border-right: none; }
+.bt-hstat-n {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f1f5f9;
+  font-family: 'JetBrains Mono', monospace;
+}
+.bt-hstat-l {
+  font-size: 9px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-top: 2px;
+}
+
+.bt-tag-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: auto;
+}
+.bt-tag {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid rgba(139,92,246,0.3);
+  background: rgba(139,92,246,0.08);
+  color: rgba(255,255,255,0.55);
+}
+
+/* ── responsive: stack on smaller screens ── */
+@media (max-width:1050px) {
+  .bt-hero { flex-direction: column; }
+  .bt-hero-img-wrap { width: 100%; height: 140px; }
+  .bt-hero-img-overlay {
+    background: linear-gradient(to bottom, transparent 50%, rgba(13,13,18,0.9) 100%);
+  }
+}
+
+/* ══════════════════════════
+   TOOL TILES (Whiteboard, DB, Resume)
+   ══════════════════════════ */
+.bt-tool-icon {
+  width: 50px; height: 50px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.bt-tool-blue   { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.25); }
+.bt-tool-cyan   { background: rgba(6,182,212,0.15);  color: #06b6d4; border: 1px solid rgba(6,182,212,0.25); }
+.bt-tool-amber  { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+.bt-tool-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.25); }
+
+.bt-tool-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 6px;
+}
+.bt-tool-desc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.5;
+}
+
+/* ── Whiteboard accent ── */
+.bt-whiteboard { border-color: rgba(59,130,246,0.15); }
+.bt-whiteboard:hover { border-color: rgba(59,130,246,0.4); }
+
+/* ══════════════════════════
+   3. STUDY TILE
+   ══════════════════════════ */
+.bt-study { border-color: rgba(139,92,246,0.15); }
+.bt-study:hover { border-color: rgba(139,92,246,0.4); }
+
+.bt-study-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.bt-study-tasks { flex:1; display:flex; flex-direction:column; gap:6px; }
+.bt-task {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+}
+.bt-task.done { color: rgba(255,255,255,0.65); }
+.bt-task.done span { text-decoration: line-through; opacity:.6; }
+
+/* ══════════════════════════
+   5. HACKATHONS TILE
+   ══════════════════════════ */
+.bt-hack {
+  background: linear-gradient(170deg, rgba(139,92,246,0.08) 0%, rgba(13,13,18,1) 65%);
+  border-color: rgba(139,92,246,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bt-hack:hover { border-color: rgba(139,92,246,0.4); }
+
+.bt-hack-list { display:flex; flex-direction:column; gap:8px; flex:1; }
+.bt-hack-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 11px;
+  border-radius:9px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.05);
+}
+.bt-hack-bar { width:3px; height:32px; border-radius:3px; flex-shrink:0; }
+.bt-hack-info { flex:1; min-width:0; }
+.bt-hack-name {
+  font-size:12px; font-weight:600; color:#e2e8f0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.bt-hack-sub {
+  display:flex; align-items:center; gap:4px;
+  font-size:9px; color:rgba(255,255,255,0.3); margin-top:3px;
+}
+.bt-days {
+  font-size:10px; font-weight:700; padding:3px 7px;
+  border-radius:20px; border:1px solid; flex-shrink:0;
+  font-family:'JetBrains Mono',monospace;
+}
+.bt-hack-cta {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:11px; font-weight:600; color:rgba(255,255,255,0.3);
+  background:transparent; border:1px solid rgba(255,255,255,0.08);
+  padding:6px 12px; border-radius:7px; cursor:pointer;
+  transition:color .2s, border-color .2s;
+  width:fit-content;
+}
+.bt-hack-cta:hover { color:#a78bfa; border-color:rgba(139,92,246,0.4); }
+
+.bt-bg-icon {
+  position:absolute; bottom:-16px; right:-12px;
+  opacity:0.04; pointer-events:none; color:#8b5cf6;
+}
+
+/* ══════════════════════════
+   6. PLACEMENT TILE
+   ══════════════════════════ */
+.bt-placement {
+  background: linear-gradient(145deg, rgba(16,185,129,0.06) 0%, rgba(13,13,18,1) 65%);
+  border-color: rgba(16,185,129,0.15);
+}
+.bt-placement:hover { border-color: rgba(16,185,129,0.4); }
+
+.bt-placement-inner { display:flex; align-items:flex-start; gap:20px; }
+
+.bt-placement-breakdown { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:4px; }
+.bt-pb-row { display:flex; align-items:center; gap:8px; font-size:11px; }
+.bt-pb-lbl { width:80px; color:rgba(255,255,255,0.45); flex-shrink:0; }
+.bt-pb-track {
+  flex:1; height:4px; border-radius:99px;
+  background:rgba(255,255,255,0.06); overflow:hidden;
+}
+.bt-pb-fill { height:100%; border-radius:99px; transition:width 1s ease; }
+.bt-pb-val {
+  width:28px; text-align:right;
+  font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+}
+
+/* ══════════════════════════
+   7. RESUME TILE
+   ══════════════════════════ */
+.bt-resume { border-color: rgba(245,158,11,0.15); }
+.bt-resume:hover { border-color: rgba(245,158,11,0.4); }
+
+.bt-resume-pills { display:flex; flex-direction:column; gap:5px; margin-top:6px; }
+.bt-pill {
+  font-size:10px; padding:4px 10px;
+  border-radius:20px;
+  background:rgba(245,158,11,0.08);
+  border:1px solid rgba(245,158,11,0.2);
+  color:rgba(255,255,255,0.5);
+  width:fit-content;
+}
+
+/* ══════════════════════════
+   8. DATABASE TILE
+   ══════════════════════════ */
+.bt-dbboard { border-color: rgba(6,182,212,0.15); }
+.bt-dbboard:hover { border-color: rgba(6,182,212,0.4); }
+
+/* ══════════════════════════
+   9. COMPONENT ARCHITECT TILE
+   ══════════════════════════ */
+.bt-component {
+  background: linear-gradient(145deg, rgba(139,92,246,0.06) 0%, rgba(13,13,18,1) 65%);
+  border-color: rgba(139,92,246,0.15);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.bt-component:hover { border-color: rgba(139,92,246,0.4); }
+.bt-component .bt-eyebrow { position: absolute; top: 20px; left: 20px; }
+
+.bt-comp-visual { flex-shrink: 0; padding-top: 20px; }
+
+.bt-comp-tree { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.bt-ct-root {
+  font-size:11px; font-weight:700;
+  padding:5px 14px; border-radius:8px;
+  background:rgba(139,92,246,0.15);
+  border:1px solid rgba(139,92,246,0.35);
+  color:#8b5cf6; font-family:'JetBrains Mono',monospace;
+}
+.bt-ct-children { display:flex; gap:6px; position:relative; }
+.bt-ct-children::before {
+  content:''; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
+  width:1px; height:8px; background:rgba(255,255,255,0.15);
+}
+.bt-ct-node {
+  font-size:9px; font-weight:600;
+  padding:4px 9px; border-radius:6px;
+}
+.bt-ct-blue   { background:rgba(59,130,246,0.15);  border:1px solid rgba(59,130,246,0.3);  color:#3b82f6; }
+.bt-ct-purple { background:rgba(139,92,246,0.15);  border:1px solid rgba(139,92,246,0.3);  color:#8b5cf6; }
+.bt-ct-green  { background:rgba(16,185,129,0.15);  border:1px solid rgba(16,185,129,0.3);  color:#10b981; }
+
+.bt-comp-meta {
+  font-size:12px; color:rgba(255,255,255,0.38); line-height:1.55;
+  max-width:200px; padding-top:20px;
+}
+
+/* ══════════════════════════
+   10. INTERNSHIPS TILE
+   ══════════════════════════ */
+.bt-internships { border-color: rgba(16,185,129,0.12); }
+.bt-internships:hover { border-color: rgba(16,185,129,0.35); }
+
+.bt-int-list { display:flex; flex-direction:column; gap:6px; }
+.bt-int-row {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 11px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);
+  transition:background .2s;
+}
+.bt-int-row:hover { background:rgba(255,255,255,0.05); }
+.bt-int-co { font-size:12px; font-weight:700; width:55px; flex-shrink:0; }
+.bt-int-role { flex:1; font-size:11px; color:rgba(255,255,255,0.4); }
+.bt-int-dead { display:flex; align-items:center; gap:3px; font-size:9px; color:rgba(255,255,255,0.25); }
+.bt-int-status {
+  font-size:9px; font-weight:600;
+  padding:3px 8px; border-radius:20px; border:1px solid;
+}
+
+/* ══════════════════════════
+   11. TRACKER TILE
+   ══════════════════════════ */
+.bt-tracker { border-color: rgba(245,158,11,0.12); }
+.bt-tracker:hover { border-color: rgba(245,158,11,0.3); }
+
+.bt-tracker-cols { display:flex; gap:10px; height:100%; padding-top:4px; }
+.bt-tcol { flex:1; display:flex; flex-direction:column; gap:6px; }
+.bt-tcol-head {
+  display:flex; align-items:center; gap:6px;
+  font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.07em; margin-bottom:4px;
+}
+.bt-tcol-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+.bt-tcol-count {
+  margin-left:auto;
+  background:rgba(255,255,255,0.06);
+  border-radius:20px; padding:1px 7px;
+  font-size:10px; color:rgba(255,255,255,0.4);
+}
+.bt-tcard {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px; padding:8px 10px;
+  font-size:11px; font-weight:600; color:rgba(255,255,255,0.7);
+}
+.bt-tcard-empty { color:rgba(255,255,255,0.18); text-align:center; }
+
+/* ════════════════
+   RESPONSIVE
+   ════════════════ */
+@media (max-width:1050px) {
+  .dash-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "hero   hero"
+      "canvas study"
+      "hack   place"
+      "resume dbboard"
+      "comp   comp"
+      "intern intern"
+      "tracker tracker";
+  }
+}
+
+@media (max-width:640px) {
+  .dash-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hero" "study" "hack"
+      "place" "canvas" "resume"
+      "dbboard" "comp" "intern" "tracker";
+  }
+  .bento-page { padding: 16px 14px 60px; }
+}

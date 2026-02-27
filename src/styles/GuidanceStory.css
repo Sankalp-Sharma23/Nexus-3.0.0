@@ -1,0 +1,548 @@
+/* ─────────────────────────────────────────────────────────────
+   GuidanceStory.css — Blueprint Skill-Tree Timeline
+   Design tokens: same as GuidancePage.css
+   ──────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+:root {
+  --gs-canvas:  #0A0F1A;
+  --gs-path:    #00F0FF;
+  --gs-green:   #39FF14;
+  --gs-amber:   #f59e0b;
+  --gs-purple:  #a78bfa;
+  --gs-glass:   rgba(15, 23, 42, 0.72);
+  --gs-border:  rgba(0, 240, 255, 0.18);
+  --gs-mono:    'JetBrains Mono', 'Courier New', monospace;
+  --gs-grid:    50px;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+.gs-page {
+  min-height: 100vh;
+  background: var(--gs-canvas);
+  font-family: var(--gs-mono);
+  color: #e2e8f0;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Grid background ───────────────────────────────────────── */
+.gs-grid-bg {
+  position: fixed;
+  inset: -20%;
+  background-image:
+    repeating-linear-gradient(0deg,   transparent, transparent calc(var(--gs-grid) - 1px), #1E293B var(--gs-grid)),
+    repeating-linear-gradient(90deg,  transparent, transparent calc(var(--gs-grid) - 1px), #1E293B var(--gs-grid));
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+.gs-scanlines {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.08) 3px,
+    rgba(0,0,0,0.08) 4px
+  );
+}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.gs-hero {
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 24px 60px;
+}
+
+.gs-hero-glass {
+  max-width: 800px; width: 100%;
+  background: var(--gs-glass);
+  border: 1px solid var(--gs-border);
+  border-radius: 4px;
+  padding: 48px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 60px rgba(0,240,255,0.06);
+  position: relative;
+}
+
+/* corner crosshairs */
+.gs-hero-glass::before,
+.gs-hero-glass::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  border-color: var(--gs-path);
+  border-style: solid;
+  opacity: 0.7;
+}
+.gs-hero-glass::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.gs-hero-glass::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+.gs-hero-eyebrow {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.gs-back-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 1px solid rgba(0,240,255,0.25);
+  color: var(--gs-path);
+  font-family: var(--gs-mono); font-size: 10px; letter-spacing: 0.08em;
+  padding: 6px 14px; border-radius: 2px; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.gs-back-btn:hover { background: rgba(0,240,255,0.08); border-color: var(--gs-path); }
+
+.gs-hero-batch {
+  font-size: 10px; letter-spacing: 0.12em;
+  color: rgba(0,240,255,0.5);
+}
+
+.gs-mission-label {
+  font-size: 11px; letter-spacing: 0.14em;
+  color: rgba(0,240,255,0.55);
+  margin-bottom: 14px;
+}
+
+.gs-hero-title {
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 700; line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: #fff;
+  margin: 0 0 20px;
+}
+
+.gs-hero-role { color: var(--gs-path); font-weight: 700; }
+.gs-hero-at   { color: rgba(255,255,255,0.4); margin: 0 4px; }
+.gs-hero-co   { font-weight: 700; }
+
+.gs-hero-mission {
+  font-family: var(--gs-mono);
+  font-size: 13px; line-height: 1.7;
+  color: rgba(226,232,240,0.6);
+  margin: 0 0 32px;
+  border-left: 2px solid var(--gs-border);
+  padding-left: 16px;
+}
+
+.gs-hero-stats {
+  display: flex; align-items: center; gap: 20px;
+  flex-wrap: wrap; margin-bottom: 32px;
+}
+
+.gs-hstat {
+  display: flex; align-items: center; gap: 8px;
+  flex-direction: column; align-items: flex-start;
+}
+.gs-hstat svg { opacity: 0.5; }
+.gs-hstat-val   { font-size: 18px; font-weight: 700; color: #fff; }
+.gs-hstat-label { font-size: 9px; letter-spacing: 0.12em; color: rgba(226,232,240,0.4); }
+.gs-hstat-sep   { width: 1px; height: 40px; background: var(--gs-border); }
+
+/* avatar */
+.gs-hero-avatar {
+  width: 68px; height: 68px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 4px;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: 48px; right: 48px;
+}
+.gs-hero-initials {
+  font-size: 22px; font-weight: 700; color: #fff; z-index: 2; position: relative;
+}
+.gs-avatar-scan {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 2px, rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 4px);
+}
+.gs-avatar-duotone {
+  position: absolute; inset: 0;
+}
+
+.gs-scroll-hint {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; letter-spacing: 0.1em;
+  color: rgba(0,240,255,0.4);
+  margin-top: 20px;
+}
+.gs-scroll-arrow { animation: gs-bounce 2s infinite; }
+@keyframes gs-bounce {
+  0%,100% { transform: translateY(0);   }
+  50%      { transform: translateY(4px); }
+}
+
+/* ── TIMELINE SECTION ──────────────────────────────────────── */
+.gs-timeline-section {
+  position: relative; z-index: 10;
+  max-width: 1100px; margin: 0 auto;
+  padding: 60px 24px 120px;
+}
+
+/* Central vertical line track */
+.gs-timeline-track {
+  position: absolute;
+  left: 50%; top: 0;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  pointer-events: none;
+}
+
+.gs-line-base {
+  position: absolute; inset: 0;
+  background: rgba(0,240,255,0.1);
+}
+
+.gs-line-glow {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--line-progress, 0%);
+  background: linear-gradient(to bottom, var(--gs-path), rgba(0,240,255,0.3));
+  box-shadow: 0 0 12px rgba(0,240,255,0.6);
+  transition: height 0.05s linear;
+}
+
+/* Nodes wrapper */
+.gs-nodes-wrap {
+  display: flex; flex-direction: column;
+  gap: 72px;
+  padding: 0 0 72px;
+}
+
+/* ── Base node ─────────────────────────────────────────────── */
+.gs-node {
+  position: relative;
+  width: calc(50% - 40px);
+}
+
+.gs-node--left  { align-self: flex-start; margin-right: auto; }
+.gs-node--right { align-self: flex-end;   margin-left: auto; }
+
+/* Timeline connector dot */
+.gs-timeline-dot {
+  position: absolute;
+  top: 24px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  z-index: 5;
+  transition: box-shadow 0.3s;
+  box-shadow: 0 0 0 transparent;
+}
+.gs-node--left  .gs-timeline-dot { right: -45px; }
+.gs-node--right .gs-timeline-dot { left: -45px; }
+
+.gs-timeline-dot.active {
+  box-shadow: 0 0 0 3px rgba(0,240,255,0.18), 0 0 12px currentColor;
+}
+
+/* Horizontal trace connector */
+.gs-h-trace {
+  position: absolute;
+  top: 28px;
+  height: 1px;
+  width: 0;
+  background: linear-gradient(to right, var(--gs-path), transparent);
+  transition: width 0.35s ease;
+  pointer-events: none; z-index: 4;
+}
+.gs-h-trace--left  { right: -40px; background: linear-gradient(to right, transparent, var(--gs-path)); }
+.gs-h-trace--right { left: -40px; }
+.gs-h-trace.active { width: 40px; }
+
+/* Node inner card */
+.gs-node-inner {
+  background: var(--gs-glass);
+  border: 1px solid var(--gs-border);
+  border-radius: 4px;
+  padding: 24px 28px;
+  backdrop-filter: blur(14px);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.gs-node:hover .gs-node-inner {
+  border-color: rgba(0,240,255,0.35);
+  box-shadow: 0 0 30px rgba(0,240,255,0.06);
+}
+
+/* Type label */
+.gs-node-type {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+  margin-bottom: 6px; opacity: 0.9;
+}
+
+/* Course code badge */
+.gs-node-course-code {
+  font-size: 10px; letter-spacing: 0.12em;
+  color: rgba(0,240,255,0.45);
+  margin-bottom: 6px;
+}
+
+.gs-node-title {
+  font-size: 16px; font-weight: 700;
+  color: #fff; margin: 0 0 4px;
+  letter-spacing: 0.01em;
+}
+.gs-node-sub {
+  font-size: 11px; color: rgba(226,232,240,0.5);
+  margin: 0 0 14px; letter-spacing: 0.04em;
+}
+.gs-node-body {
+  font-size: 12px; line-height: 1.75;
+  color: rgba(226,232,240,0.7);
+  margin: 12px 0 16px;
+}
+.gs-node-meta-row {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.gs-tag {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; letter-spacing: 0.08em;
+  color: rgba(0,240,255,0.6);
+  border: 1px solid rgba(0,240,255,0.2);
+  border-radius: 2px; padding: 2px 8px;
+}
+
+/* ── Foundation ────────────────────────────────────────────── */
+.gs-foundation .gs-node-inner {
+  border-style: dashed;
+  border-color: rgba(167,139,250,0.25);
+}
+.gs-foundation:hover .gs-node-inner {
+  border-color: rgba(167,139,250,0.5);
+  box-shadow: 0 0 24px rgba(167,139,250,0.08);
+}
+
+/* Resources */
+.gs-resource-list {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 8px;
+}
+.gs-resource-label {
+  font-size: 9px; letter-spacing: 0.15em;
+  color: rgba(0,240,255,0.4);
+  margin-bottom: 4px; display: block;
+}
+.gs-resource-link {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--gs-path);
+  text-decoration: none; letter-spacing: 0.04em;
+  opacity: 0.75; transition: opacity 0.2s;
+}
+.gs-resource-link:hover { opacity: 1; }
+
+/* ── Grind ─────────────────────────────────────────────────── */
+.gs-lc-stats {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,240,255,0.1);
+  border-radius: 3px; padding: 14px 16px; margin: 12px 0;
+}
+.gs-lc-streak {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+}
+.gs-lc-streak-num   { font-size: 22px; font-weight: 700; color: #f59e0b; }
+.gs-lc-streak-label { font-size: 10px; color: rgba(226,232,240,0.45); letter-spacing: 0.1em; }
+
+.gs-lc-bars { display: flex; flex-direction: column; gap: 6px; }
+.gs-lc-bar-row {
+  display: grid; grid-template-columns: 50px 1fr 30px;
+  align-items: center; gap: 8px;
+}
+.gs-lc-bar-label { font-size: 10px; color: rgba(226,232,240,0.5); letter-spacing: 0.06em; }
+.gs-lc-bar-track {
+  height: 4px; background: rgba(255,255,255,0.07);
+  border-radius: 2px; overflow: hidden;
+}
+.gs-lc-bar-fill { height: 100%; border-radius: 2px; }
+.gs-lc-bar-num  { font-size: 10px; color: rgba(226,232,240,0.5); text-align: right; }
+
+/* ── Build / Terminal ──────────────────────────────────────── */
+.gs-terminal-window .gs-node-inner {
+  padding: 0; overflow: hidden;
+  border-color: rgba(57,255,20,0.2);
+}
+.gs-build:hover .gs-node-inner {
+  border-color: rgba(57,255,20,0.4);
+  box-shadow: 0 0 24px rgba(57,255,20,0.06);
+}
+
+.gs-term-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(57,255,20,0.12);
+}
+.gs-term-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+}
+.gs-term-dot--r { background: #ef4444; }
+.gs-term-dot--y { background: #f59e0b; }
+.gs-term-dot--g { background: #22c55e; }
+.gs-term-title {
+  font-size: 10px; letter-spacing: 0.06em;
+  color: rgba(57,255,20,0.5); margin-left: 6px;
+}
+
+.gs-term-body { padding: 20px 24px 24px; }
+
+.gs-stack-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 16px; }
+.gs-stack-pill {
+  font-size: 9px; letter-spacing: 0.1em; font-weight: 600;
+  color: var(--gs-green); border: 1px solid rgba(57,255,20,0.3);
+  padding: 3px 9px; border-radius: 2px;
+  background: rgba(57,255,20,0.05);
+}
+
+.gs-arch { margin: 12px 0; }
+.gs-arch-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px;
+}
+.gs-arch-arrow { color: var(--gs-green); font-size: 13px; }
+.gs-arch-step  { font-size: 11px; color: rgba(226,232,240,0.55); }
+
+.gs-github-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 14px;
+  font-size: 11px; font-family: var(--gs-mono); letter-spacing: 0.08em;
+  color: var(--gs-green);
+  border: 1px solid rgba(57,255,20,0.3);
+  padding: 7px 16px; border-radius: 2px;
+  text-decoration: none;
+  background: rgba(57,255,20,0.04);
+  transition: background 0.25s, border-color 0.25s;
+}
+.gs-github-btn:hover {
+  background: rgba(57,255,20,0.1);
+  border-color: var(--gs-green);
+}
+
+/* ── Execution ─────────────────────────────────────────────── */
+.gs-execution .gs-node-inner {
+  border-color: rgba(245,158,11,0.22);
+}
+.gs-execution:hover .gs-node-inner {
+  border-color: rgba(245,158,11,0.45);
+  box-shadow: 0 0 24px rgba(245,158,11,0.07);
+}
+
+.gs-exec-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.gs-outcome-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  border: 1px solid; border-radius: 2px;
+  padding: 2px 8px;
+}
+.gs-round-code {
+  font-size: 10px; letter-spacing: 0.12em;
+  color: rgba(245,158,11,0.5);
+  margin-bottom: 4px;
+}
+
+/* Questions */
+.gs-questions { margin-top: 14px; }
+.gs-q-item { border-top: 1px solid rgba(245,158,11,0.1); }
+.gs-q-item:last-child { border-bottom: 1px solid rgba(245,158,11,0.1); }
+
+.gs-q-toggle {
+  width: 100%; display: flex; align-items: flex-start; gap: 10px;
+  background: none; border: none; color: inherit;
+  font-family: var(--gs-mono); font-size: 11px;
+  text-align: left; cursor: pointer;
+  padding: 10px 2px;
+  transition: color 0.2s;
+}
+.gs-q-toggle:hover { color: var(--gs-amber); }
+
+.gs-q-idx {
+  color: var(--gs-amber); font-weight: 700;
+  min-width: 22px;
+  font-size: 10px; letter-spacing: 0.1em;
+}
+.gs-q-text {
+  flex: 1; color: rgba(226,232,240,0.75);
+  line-height: 1.55;
+}
+.gs-q-chevron {
+  color: rgba(245,158,11,0.5);
+  transition: transform 0.3s;
+  flex-shrink: 0; margin-top: 2px;
+}
+.gs-q-chevron.open { transform: rotate(180deg); }
+
+.gs-q-hint {
+  overflow: hidden;
+  padding: 0 2px 14px 32px;
+}
+.gs-hint-label {
+  font-size: 9px; letter-spacing: 0.14em;
+  color: rgba(245,158,11,0.4);
+  display: block; margin-bottom: 6px;
+}
+.gs-q-hint p {
+  font-size: 11px; line-height: 1.7;
+  color: rgba(226,232,240,0.55);
+  margin: 0;
+}
+
+/* ── End Node ─────────────────────────────────────────────── */
+.gs-end-node {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; padding: 20px 0 40px;
+}
+
+.gs-end-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--gs-green);
+  box-shadow: 0 0 0 4px rgba(57,255,20,0.15), 0 0 20px rgba(57,255,20,0.4);
+}
+
+.gs-end-card {
+  display: flex; align-items: center; gap: 18px;
+  background: rgba(57,255,20,0.05);
+  border: 1px solid rgba(57,255,20,0.25);
+  border-radius: 4px; padding: 20px 32px;
+  max-width: 480px; width: 100%;
+}
+.gs-end-label {
+  display: block; font-size: 9px; letter-spacing: 0.14em;
+  color: rgba(57,255,20,0.5); margin-bottom: 6px;
+}
+.gs-end-title {
+  font-size: 18px; font-weight: 700; color: #fff;
+  margin: 0 0 4px;
+}
+.gs-end-offer {
+  font-size: 11px; color: rgba(226,232,240,0.45); margin: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .gs-hero-glass { padding: 32px 22px; }
+  .gs-hero-avatar { position: static; margin-bottom: 20px; }
+  .gs-hero-eyebrow { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  .gs-timeline-track { left: 24px; }
+  .gs-node { width: calc(100% - 52px); margin-left: 52px !important; }
+  .gs-node--left,
+  .gs-node--right { align-self: flex-end; margin-right: 0; }
+
+  .gs-node--left  .gs-timeline-dot,
+  .gs-node--right .gs-timeline-dot { left: -40px; right: auto; }
+
+  .gs-h-trace { display: none; }
+}

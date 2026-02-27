@@ -1,0 +1,662 @@
+/* ══════════════════════════════════════════════════════════
+   HACKATHONS PAGE — Premium Redesign
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Material Icons import ──────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0');
+
+/* ── Base ──────────────────────────────────────────────────── */
+.hack-page {
+  min-height: 100vh;
+  background: #06080f;
+  color: rgba(255,255,255,0.9);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Neural Grid canvas (Three.js) ──────────────────────── */
+.hack-neural-grid {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+}
+
+/* ── Mesh blobs ─────────────────────────────────────────────── */
+.hack-mesh-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hack-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+}
+
+.hack-blob-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(217,119,6,0.16) 0%, transparent 70%);
+  top: -180px; right: -180px;
+  animation: hack-blob-f 13s ease-in-out infinite;
+}
+
+.hack-blob-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+  top: 45%; left: -130px;
+  animation: hack-blob-f 10s ease-in-out infinite 4s reverse;
+}
+
+.hack-blob-3 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%);
+  bottom: 0; right: 30%;
+  animation: hack-blob-f 11s ease-in-out infinite 2s;
+}
+
+@keyframes hack-blob-f {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-38px) scale(1.07); }
+}
+
+/* ── Custom scrollbar ───────────────────────────────────────── */
+.hack-page ::-webkit-scrollbar       { width: 4px; }
+.hack-page ::-webkit-scrollbar-track { background: #06080f; }
+.hack-page ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b, #a78bfa);
+  border-radius: 4px;
+}
+
+/* ── HERO ───────────────────────────────────────────────────── */
+.hack-hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 2rem 6rem;
+  text-align: center;
+}
+
+.hack-hero-content {
+  max-width: 800px;
+  will-change: transform, opacity;
+}
+
+.hack-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1.1rem;
+  background: linear-gradient(135deg, rgba(217,119,6,0.18), rgba(236,72,153,0.1));
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fbbf24;
+  margin-bottom: 1.6rem;
+}
+
+.hack-hero-title {
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  margin: 0 0 1.3rem;
+  color: rgba(255,255,255,0.96);
+}
+
+.hack-gradient-text {
+  background: linear-gradient(135deg, #fbbf24 0%, #f472b6 55%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hack-hero-sub {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #fff;
+  margin: 0 0 1.8rem;
+}
+
+/* Live banner */
+.hack-live-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.7rem 1.4rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.hack-live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fff;
+}
+
+.hack-prize-total {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fff;
+}
+
+/* Live dot pulse */
+.hack-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: #f87171;
+  border-radius: 50%;
+  animation: live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.6); opacity: 0.5; }
+}
+
+/* filter row */
+.hack-filter-row {
+  display: flex;
+  gap: 0.55rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hack-filter-pill {
+  padding: 0.32rem 0.95rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.hack-filter-pill:hover {
+  border-color: rgba(245,158,11,0.3);
+  color: #fbbf24;
+}
+
+.hack-filter-pill.active {
+  background: linear-gradient(135deg, rgba(217,119,6,0.2), rgba(236,72,153,0.12));
+  border-color: rgba(245,158,11,0.4);
+  color: #fbbf24;
+  box-shadow: 0 0 14px rgba(245,158,11,0.15);
+}
+
+/* ── Section structure ──────────────────────────────────────── */
+/* ── Cards body — black bg wrapping all sections + filters ── */
+.hack-cards-body {
+  position: relative;
+  z-index: 2;
+  background: #000;
+  border-radius: 32px 32px 0 0;
+  padding-top: 2rem;
+  margin-top: -40px;         /* slight overlap with hero so there's no gap */
+}
+
+.hack-filter-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 0.5rem;
+}
+
+.hack-section {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 5rem;
+}
+
+.hack-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.hack-section-header h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hack-section-icon { color: #fbbf24; }
+
+/* ── Featured bento grid ────────────────────────────────────── */
+.hack-bento-featured {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 1.3rem;
+}
+
+/* First featured card spans 2 cols */
+.hack-card-hero {
+  grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+  .hack-bento-featured { grid-template-columns: 1fr 1fr; }
+  .hack-card-hero      { grid-column: span 2; }
+}
+
+@media (max-width: 600px) {
+  .hack-bento-featured { grid-template-columns: 1fr; }
+  .hack-card-hero      { grid-column: span 1; }
+}
+
+/* ── Rest grid ──────────────────────────────────────────────── */
+.hack-grid-rest {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.3rem;
+}
+
+@media (max-width: 900px) { .hack-grid-rest { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .hack-grid-rest { grid-template-columns: 1fr;     } }
+
+/* ── Card ───────────────────────────────────────────────────── */
+.hack-card {
+  position: relative;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 1.8rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.35s, box-shadow 0.35s;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.hack-card:hover {
+  border-color: rgba(var(--accent-rgb, 245,158,11), 0.3);
+  box-shadow:
+    0 30px 70px -20px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.hack-card-featured {
+  background: rgba(255,255,255,0.03);
+}
+
+/* Animated border */
+.hack-card-border-anim {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    color-mix(in srgb, var(--accent, #f59e0b) 80%, white) 10%,
+    transparent 20%
+  );
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+  animation: hack-border-spin 3s linear infinite paused;
+}
+
+.hack-card:hover .hack-card-border-anim {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes hack-border-spin { to { --border-angle: 360deg; } }
+
+/* ── Card internals ─────────────────────────────────────────── */
+.hack-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.hack-emoji-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent, #f59e0b) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #f59e0b) 25%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.hack-emoji-wrap .material-symbols-rounded {
+  font-size: 22px;
+  color: var(--accent, #f59e0b);
+}
+
+.hack-card-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.hack-card-name { font-size: 0.95rem; font-weight: 700; color: rgba(255,255,255,0.9);  }
+.hack-card-org  { font-size: 0.74rem; color: rgba(255,255,255,0.35); }
+
+.hack-live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #f87171;
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 100px;
+  padding: 0.22rem 0.6rem;
+  flex-shrink: 0;
+}
+
+.hack-days-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 100px;
+  padding: 0.22rem 0.6rem;
+  flex-shrink: 0;
+}
+
+.hack-card-prize {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent, #fbbf24);
+  margin-bottom: 0.9rem;
+}
+
+.hack-card-stats {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.hack-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.74rem;
+  color: rgba(255,255,255,0.36);
+}
+
+/* Glassmorphism pills */
+.hack-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+  margin-bottom: 1.2rem;
+}
+
+.hack-glass-pill {
+  padding: 0.26rem 0.7rem;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 100px;
+  font-size: 0.71rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  transition: all 0.2s;
+}
+
+.hack-glass-pill:hover {
+  background: color-mix(in srgb, var(--accent, #f59e0b) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #f59e0b) 30%, transparent);
+  color: var(--accent, #fbbf24);
+}
+
+.hack-diff-pill {
+  padding: 0.26rem 0.7rem;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.18);
+  border-radius: 100px;
+  font-size: 0.71rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+/* ── Neon register button ───────────────────────────────────── */
+.hack-neon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.72rem 1.35rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.84rem;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.hack-reg-btn {
+  background: linear-gradient(135deg, #d97706, #ec4899);
+  color: #fff;
+  box-shadow: 0 4px 22px rgba(217,119,6,0.38);
+  transform-style: preserve-3d;
+}
+
+.hack-reg-btn:hover {
+  box-shadow: 0 8px 36px rgba(217,119,6,0.6), 0 0 40px rgba(236,72,153,0.2);
+  transform: translateZ(20px) translateY(-2px);
+}
+
+.hack-reg-live {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  box-shadow: 0 4px 22px rgba(239,68,68,0.4);
+}
+
+.hack-reg-live:hover {
+  box-shadow: 0 8px 36px rgba(239,68,68,0.6), 0 0 40px rgba(249,115,22,0.2);
+}
+
+/* ── Detail Overlay ─────────────────────────────────────────── */
+.hack-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(6,8,15,0.82);
+  backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.hack-overlay-card {
+  width: 100%;
+  max-width: 640px;
+  background: linear-gradient(160deg, #110e1f 0%, #0a0c18 100%);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 24px;
+  padding: 2.4rem;
+  position: relative;
+  box-shadow: 0 60px 120px -20px rgba(217,119,6,0.28);
+}
+
+.hack-overlay-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.hack-overlay-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.hack-overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+.hack-overlay-emoji {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent, #f59e0b) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #f59e0b) 28%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.hack-overlay-emoji .material-symbols-rounded {
+  font-size: 28px;
+  color: var(--accent, #fbbf24);
+}
+
+.hack-overlay-name { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 0.2rem; }
+.hack-overlay-org  { font-size: 0.88rem; color: rgba(255,255,255,0.4); margin: 0; }
+
+.hack-live-pill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #f87171;
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 100px;
+  padding: 0.3rem 0.75rem;
+}
+
+.hack-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+  padding: 1.3rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+}
+
+.hack-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.hack-detail-icon { color: var(--accent, #fbbf24); margin-top: 2px; flex-shrink: 0; }
+
+.hack-detail-label {
+  display: block;
+  font-size: 0.67rem;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 2px;
+}
+
+.hack-detail-val {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+}
+
+.hack-overlay-section { margin-bottom: 1.5rem; }
+
+.hack-overlay-section h4 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.28);
+  margin: 0 0 0.75rem;
+}
+
+.hack-overlay-desc {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+.hack-register-neon {
+  width: 100%;
+  justify-content: center;
+  background: linear-gradient(135deg, #d97706, #ec4899);
+  color: #fff;
+  box-shadow: 0 6px 28px rgba(217,119,6,0.4);
+  padding: 0.9rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+.hack-register-neon:hover {
+  box-shadow: 0 10px 40px rgba(217,119,6,0.6), 0 0 60px rgba(236,72,153,0.2);
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hack-hero { padding: 100px 1.25rem 5rem; }
+  .hack-hero-title { font-size: 2.4rem; }
+  .hack-section { padding: 0 1.25rem 4rem; }
+  .hack-detail-grid { grid-template-columns: 1fr; }
+  .hack-overlay-card { padding: 1.6rem; }
+}
