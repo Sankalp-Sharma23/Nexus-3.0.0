@@ -384,7 +384,7 @@ const Home = ({ theme, toggleTheme }) => {
           </div>
 
           {/* 2 · Practice Hub – top col 3 (1×1) */}
-          <div className="bento-card bento-practice" onClick={(e) => handleBentoClick(e, '/project-workspace')}>
+          <div className="bento-card bento-practice" onClick={(e) => handleBentoClick(e, '/practice')}>
             <div className="bento-card-icon"><Target size={26} /></div>
             <h3 className="bento-card-title">Practice Hub</h3>
             <p className="bento-card-desc">DSA tracks, company filters &amp; persistent logic notes.</p>

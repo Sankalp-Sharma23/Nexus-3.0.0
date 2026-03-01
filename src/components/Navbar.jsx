@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import StaggeredMenu from './StaggeredMenu';
 import '../styles/Navbar.css';
 
@@ -5,7 +6,7 @@ const menuItems = [
     { label: 'Home',             ariaLabel: 'Go to home',              link: '/'                  },
     { label: 'Dashboard',        ariaLabel: 'Open dashboard',          link: '/dashboard'         },
     { label: 'Whiteboard',       ariaLabel: 'Open whiteboard',         link: '/whiteboard'        },
-    { label: 'Practice Hub',     ariaLabel: 'Open practice hub',       link: '/practice-hub'      },
+    { label: 'Practice Hub',     ariaLabel: 'Open practice hub',       link: '/practice'          },
     { label: 'Study Planner',    ariaLabel: 'Open study planner',      link: '/study-planner'     },
     { label: 'Experience Hub',   ariaLabel: 'Open experience hub',     link: '/experience-hub'    },
     { label: 'Aim',              ariaLabel: 'View aim page',           link: '/aim'               },
@@ -21,6 +22,9 @@ const socialItems = [
 ];
 
 const Navbar = () => {
+    const location = useLocation();
+    const currentPath = location.pathname;
+
     return (
         <StaggeredMenu
             position="right"
@@ -36,6 +40,7 @@ const Navbar = () => {
             colors={['#1e1340', '#5227FF']}
             accentColor="#8b5cf6"
             closeOnClickAway={true}
+            activePath={currentPath}
         />
     );
 };

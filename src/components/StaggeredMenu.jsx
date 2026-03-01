@@ -17,6 +17,7 @@ export const StaggeredMenu = ({
   isFixed = false,
   accentColor = '#5227FF',
   closeOnClickAway = true,
+  activePath,
   onMenuOpen,
   onMenuClose,
 }) => {
@@ -414,18 +415,24 @@ export const StaggeredMenu = ({
               data-numbering={displayItemNumbering || undefined}
             >
               {items && items.length ? (
-                items.map((it, idx) => (
-                  <li className="sm-panel-itemWrap" key={it.label + idx}>
-                    <a
-                      className="sm-panel-item"
-                      href={it.link}
-                      aria-label={it.ariaLabel}
-                      data-index={idx + 1}
-                    >
-                      <span className="sm-panel-itemLabel">{it.label}</span>
-                    </a>
-                  </li>
-                ))
+                items.map((it, idx) => {
+                  const isActive = activePath && (
+                    it.link === '/' ? activePath === '/' : activePath.startsWith(it.link)
+                  );
+                  return (
+                    <li className="sm-panel-itemWrap" key={it.label + idx}>
+                      <a
+                        className={`sm-panel-item${isActive ? ' sm-panel-item--active' : ''}`}
+                        href={it.link}
+                        aria-label={it.ariaLabel}
+                        aria-current={isActive ? 'page' : undefined}
+                        data-index={idx + 1}
+                      >
+                        <span className="sm-panel-itemLabel">{it.label}</span>
+                      </a>
+                    </li>
+                  );
+                })
               ) : (
                 <li className="sm-panel-itemWrap" aria-hidden="true">
                   <span className="sm-panel-item">
@@ -679,6 +686,22 @@ export const StaggeredMenu = ({
         }
         .sm-scope .sm-panel-item:hover {
           color: var(--sm-accent, #5227FF);
+        }
+        .sm-scope .sm-panel-item--active {
+          color: var(--sm-accent, #5227FF);
+        }
+        .sm-scope .sm-panel-item--active .sm-panel-itemLabel {
+          position: relative;
+        }
+        .sm-scope .sm-panel-item--active .sm-panel-itemLabel::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: var(--sm-accent, #5227FF);
+          border-radius: 2px;
         }
         .sm-scope .sm-panel-itemLabel {
           display: inline-block;

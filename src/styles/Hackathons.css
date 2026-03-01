@@ -16,6 +16,27 @@
   position: relative;
 }
 
+/* ── Back button ─────────────────────────────────────────── */
+.exp-back-btn {
+  position: fixed;
+  top: 5rem;
+  left: 1.5rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  background: rgba(6, 8, 15, 0.8);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 100px;
+  color: rgba(167, 139, 250, 0.9);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
 /* ── Neural Grid canvas (Three.js) ──────────────────────── */
 .hack-neural-grid {
   position: fixed;

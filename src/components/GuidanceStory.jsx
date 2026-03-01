@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import Dither from './Dither';
 import '../styles/GuidanceStory.css';
 
 /* ─── Story data ─────────────────────────────────────────────── */
@@ -418,6 +419,35 @@ const TimelineNode = ({ node }) => {
   }
 };
 
+/* ─── Floating binary bits ───────────────────────────────────── */
+const BITS = Array.from({ length: 22 }, (_, i) => ({
+  id: i,
+  char: i % 2 === 0 ? '1' : '0',
+  x: (i * 4.7 + 2.3) % 100,
+  dur: 9 + (i * 2.3) % 15,
+  delay: (i * 3.7) % 12,
+  size: 10 + (i * 1.1) % 8,
+}));
+
+function FloatingBits() {
+  return (
+    <div className="gs-float-bits" aria-hidden>
+      {BITS.map(b => (
+        <span
+          key={b.id}
+          className="gs-bit"
+          style={{
+            left: `${b.x}%`,
+            fontSize: `${b.size}px`,
+            animationDuration: `${b.dur}s`,
+            animationDelay: `-${b.delay}s`,
+          }}
+        >{b.char}</span>
+      ))}
+    </div>
+  );
+}
+
 /* ─── Central drawing line ───────────────────────────────────── */
 const DrawingLine = ({ nodeCount }) => {
   const lineRef = useRef(null);
@@ -458,62 +488,132 @@ const GuidanceStory = () => {
     <div className="gs-page">
       <Navbar />
 
+      {/* Persistent floating back button */}
+      <motion.button
+        className="gs-fab-back"
+        onClick={() => navigate('/guidance')}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={{ scale: 1.08, x: -3 }}
+        whileTap={{ scale: 0.94 }}
+      >
+        <ArrowLeft size={16} />
+        <span>Back</span>
+      </motion.button>
+
+      {/* Dither WebGL background */}
+      <div className="gs-dither-bg" aria-hidden>
+        <Dither
+          waveColor={[0.18, 0.04, 0.65]}
+          disableAnimation={false}
+          enableMouseInteraction
+          mouseRadius={0.3}
+          colorNum={4}
+          waveAmplitude={0.35}
+          waveFrequency={4}
+          waveSpeed={0.08}
+        />
+      </div>
+
       {/* Parallax grid */}
       <motion.div className="gs-grid-bg" style={{ y: gridY }} aria-hidden />
       <div className="gs-scanlines" aria-hidden />
 
+      {/* Floating binary bits */}
+      <FloatingBits />
+
       {/* ── HERO "MISSION BRIEFING" ─────────────────────────── */}
       <motion.section className="gs-hero" style={{ y: heroY }}>
-        <motion.div className="gs-hero-glass" style={{ opacity: heroOp }}>
-          <div className="gs-hero-eyebrow">
-            <button className="gs-back-btn" onClick={() => navigate('/guidance')}>
-              <ArrowLeft size={14} /> BACK_TO_DIRECTORY
-            </button>
-            <span className="gs-hero-batch">BATCH_{story.batch}</span>
-          </div>
+        {/* Entrance animation outer wrapper */}
+        <motion.div
+          initial={{ opacity: 0, y: 52, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {/* Scroll-fade glass */}
+          <motion.div className="gs-hero-glass" style={{ opacity: heroOp }}>
 
-          <div className="gs-mission-label">// MISSION BRIEFING</div>
-          <h1 className="gs-hero-title">
-            TARGET ACQUIRED:<br />
-            <span className="gs-hero-role">{story.role}</span>
-            <span className="gs-hero-at"> @ </span>
-            <span className="gs-hero-co" style={{ color: story.hue,
-              textShadow: `0 0 30px ${story.hue}66` }}>{story.company}</span>
-          </h1>
+            <motion.div className="gs-hero-eyebrow"
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+            >
+              <button className="gs-back-btn" onClick={() => navigate('/guidance')}>
+                <ArrowLeft size={14} /> BACK_TO_DIRECTORY
+              </button>
+              <span className="gs-hero-batch">BATCH_{story.batch}</span>
+            </motion.div>
 
-          <p className="gs-hero-mission">{story.mission}</p>
+            <motion.div className="gs-mission-label"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >// MISSION BRIEFING<span className="gs-cursor" /></motion.div>
 
-          <div className="gs-hero-stats">
-            <div className="gs-hstat">
-              <Clock      size={15} />
-              <span className="gs-hstat-val">{story.totalTime}</span>
-              <span className="gs-hstat-label">TIME_TO_EXECUTE</span>
-            </div>
-            <div className="gs-hstat-sep" />
-            <div className="gs-hstat">
-              <Layers     size={15} />
-              <span className="gs-hstat-val">{story.timeline.length}</span>
-              <span className="gs-hstat-label">MILESTONES</span>
-            </div>
-            <div className="gs-hstat-sep" />
-            <div className="gs-hstat">
-              <CheckCircle size={15} style={{ color: '#39FF14' }} />
-              <span className="gs-hstat-val" style={{ color: '#39FF14' }}>{story.status}</span>
-              <span className="gs-hstat-label">FINAL_STATUS</span>
-            </div>
-          </div>
+            <motion.h1 className="gs-hero-title"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.62, ease: [0.22, 1, 0.36, 1] }}
+            >
+              TARGET ACQUIRED:<br />
+              <span className="gs-hero-role">{story.role}</span>
+              <span className="gs-hero-at"> @ </span>
+              <span className="gs-hero-co" style={{ color: story.hue,
+                textShadow: `0 0 30px ${story.hue}66` }}>{story.company}</span>
+            </motion.h1>
 
-          {/* avatar */}
-          <div className="gs-hero-avatar" style={{ '--accent': story.hue }}>
-            <span className="gs-hero-initials">{story.initials}</span>
-            <div className="gs-avatar-scan" />
-            <div className="gs-avatar-duotone" style={{ background: `linear-gradient(145deg, ${story.hue}33, transparent)` }} />
-          </div>
+            <motion.p className="gs-hero-mission"
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.55, delay: 0.76 }}
+            >{story.mission}</motion.p>
 
-          <div className="gs-scroll-hint">
-            <span>SCROLL_TO_LOAD_PATH</span>
-            <ChevronDown size={14} className="gs-scroll-arrow" />
-          </div>
+            <motion.div className="gs-hero-stats"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.88 }}
+            >
+              <div className="gs-hstat">
+                <Clock size={15} />
+                <span className="gs-hstat-val">{story.totalTime}</span>
+                <span className="gs-hstat-label">TIME_TO_EXECUTE</span>
+              </div>
+              <div className="gs-hstat-sep" />
+              <div className="gs-hstat">
+                <Layers size={15} />
+                <span className="gs-hstat-val">{story.timeline.length}</span>
+                <span className="gs-hstat-label">MILESTONES</span>
+              </div>
+              <div className="gs-hstat-sep" />
+              <div className="gs-hstat">
+                <CheckCircle size={15} style={{ color: '#39FF14' }} />
+                <span className="gs-hstat-val gs-hstat-val--hired" style={{ color: '#39FF14' }}>{story.status}</span>
+                <span className="gs-hstat-label">FINAL_STATUS</span>
+              </div>
+            </motion.div>
+
+            {/* avatar */}
+            <motion.div className="gs-hero-avatar" style={{ '--accent': story.hue }}
+              initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 0.75, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span className="gs-hero-initials">{story.initials}</span>
+              <div className="gs-avatar-scan" />
+              <div className="gs-avatar-duotone" style={{ background: `linear-gradient(145deg, ${story.hue}33, transparent)` }} />
+            </motion.div>
+
+            <motion.div className="gs-scroll-hint"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+            >
+              <span>SCROLL_TO_LOAD_PATH</span>
+              <ChevronDown size={14} className="gs-scroll-arrow" />
+            </motion.div>
+
+          </motion.div>
         </motion.div>
       </motion.section>
 

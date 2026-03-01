@@ -1,4 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react';
+import boyImg  from '../assets/image/boy.jpg';
+import girlImg from '../assets/image/girl.png';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,7 +15,6 @@ import {
 } from 'lucide-react';
 import '../styles/Navbar.css';
 import '../styles/Dashboard.css';
-import heroImg from '../assets/image/b54e19e9241b3c2997a3534d93c6612e.jpg';
 
 /* ── mock data ── */
 const STUDY_TASKS = [
@@ -80,6 +81,7 @@ export default function Dashboard({ children }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const name = user?.name || 'Engineer';
+  const heroImg = user?.gender === 'female' ? girlImg : boyImg;
   const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const studyDone = STUDY_TASKS.filter(t=>t.done).length;
   const readiness = Math.round((studyDone/STUDY_TASKS.length)*70 + 30);

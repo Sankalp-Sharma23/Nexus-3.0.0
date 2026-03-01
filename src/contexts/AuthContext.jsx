@@ -15,7 +15,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({
     name: 'Alex Rivera',
     email: 'alex.rivera@example.com',
-    id: '1'
+    id: '1',
+    gender: 'male',   // 'male' | 'female'
   });
 
   const login = (userData) => {

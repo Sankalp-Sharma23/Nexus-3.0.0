@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   Zap, Trophy, Users, Calendar, MapPin, Clock,
-  Rocket, Star, X, ArrowRight, ExternalLink, Code, Target
+  Rocket, Star, X, ArrowRight, ExternalLink, Code, Target, ArrowLeft
 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -296,6 +297,7 @@ const DetailOverlay = ({ hack, onClose }) => {
    MAIN PAGE
    ───────────────────────────────────────────────────────────── */
 const Hackathons = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [activeHack, setActiveHack]             = useState(null);
   const [hoveredCardRect, setHoveredCardRect]   = useState(null);
@@ -343,6 +345,19 @@ const Hackathons = () => {
     <div className="hack-page">
       <Navbar />
       <NeuralGrid hoveredCardRect={hoveredCardRect} />
+
+      {/* ── Back to Experience Hub ── */}
+      <motion.button
+        className="exp-back-btn"
+        onClick={() => navigate('/experience-hub')}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        whileHover={{ x: -3 }}
+      >
+        <ArrowLeft size={16} />
+        Experience Hub
+      </motion.button>
 
       {/* Mesh blobs */}
       <div className="hack-mesh-bg">

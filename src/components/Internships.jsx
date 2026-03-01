@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   Building2, MapPin, Clock, DollarSign, Briefcase,
   Search, Filter, ChevronRight, TrendingUp, Award,
-  Users, Calendar, X, ArrowRight, Zap, Star, ExternalLink
+  Users, Calendar, X, ArrowRight, Zap, Star, ExternalLink, ArrowLeft
 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -153,6 +154,7 @@ const DetailOverlay = ({ internship, onClose }) => {
    MAIN PAGE
    ───────────────────────────────────────────────────────────── */
 const Internships = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery]         = useState('');
   const [selectedFilter, setSelectedFilter]   = useState('all');
   const [activeInternship, setActiveInternship] = useState(null);
@@ -208,6 +210,19 @@ const Internships = () => {
   return (
     <div className="int-page">
       <Navbar />
+
+      {/* ── Back to Experience Hub ── */}
+      <motion.button
+        className="exp-back-btn"
+        onClick={() => navigate('/experience-hub')}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        whileHover={{ x: -3 }}
+      >
+        <ArrowLeft size={16} />
+        Experience Hub
+      </motion.button>
 
       {/* LightRays background */}
       <LightRays
