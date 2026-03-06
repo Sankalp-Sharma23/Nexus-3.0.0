@@ -19,6 +19,7 @@ import GuidancePage from './components/GuidancePage.jsx';
 import GuidanceStory from './components/GuidanceStory.jsx';
 import PathBuilder from './components/PathBuilder.jsx';
 import PracticeHub from './components/PracticeHub.jsx';
+import ResumeBuilder from './components/ResumeBuilder.jsx';
 
 function App() {
   const [theme, setTheme] = useState('dark');
@@ -47,6 +48,7 @@ function App() {
         <Route path="/guidance/:id" element={<GuidanceStory />} />
         <Route path="/practice" element={<PracticeHub />} />
         <Route path="/practice-hub" element={<Navigate to="/practice" replace />} />
+        <Route path="/resume" element={<ResumeBuilder />} />
       </Routes>
     </>
   );
