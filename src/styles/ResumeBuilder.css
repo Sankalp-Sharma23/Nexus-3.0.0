@@ -4,32 +4,62 @@
 ═══════════════════════════════════════════════════════════ */
 
 /* ── PAGE SHELL ─────────────────────────────────────────── */
-/* ── PAGE SHELL ─────────────────────────────────────────── */
+@keyframes rb-bg-pulse {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(2%, 2%) scale(1.1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+}
+
+.rb-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.15), transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(139, 92, 246, 0.05), transparent 30%);
+  animation: rb-bg-pulse 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .rb-page {
   min-height: 100vh;
   background: var(--bg-primary);
   display: flex;
   flex-direction: column;
   font-family: var(--font-sans);
+  padding-top: 60px;
+  /* Reduced offset for fixed Navbar */
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* ── TOP NAV BAR ─────────────────────────────────────────── */
 .rb-topbar {
   position: sticky;
-  top: 0;
-  z-index: 100;
+  top: 0.5px;
+  /* Sit strictly below Navbar logo area */
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
   padding: 0.75rem 2.5rem;
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border-subtle);
-  margin-top: 60px;
-  /* offset for fixed Navbar */
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .rb-topbar-left {
@@ -66,11 +96,12 @@
 }
 
 .rb-brand-text {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-display);
   letter-spacing: -0.01em;
+  text-transform: uppercase;
 }
 
 .rb-brand-tag {
@@ -142,7 +173,7 @@
 }
 
 .rb-ats-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   font-weight: 600;
 }
