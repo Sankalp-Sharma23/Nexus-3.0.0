@@ -644,7 +644,13 @@ export default function ResumeBuilder() {
   ═════════════════════════════════════════════════════ */
   return (
     <div className="rb-page">
+<<<<<<< HEAD
       <Navbar />
+=======
+      <div style={{ position: 'relative', zIndex: 1000 }}>
+        <Navbar />
+      </div>
+>>>>>>> 7106ba6d9e621709ca6cf9ef709dcaf47cba7d58
 
       {/* ── TOP NAV BAR ────────────────────────────────── */}
       <div className="rb-topbar">
@@ -892,6 +898,10 @@ export default function ResumeBuilder() {
       </AnimatePresence>
 
       <Footer />
+<<<<<<< HEAD
     </div>
+=======
+    </div >
+>>>>>>> 7106ba6d9e621709ca6cf9ef709dcaf47cba7d58
   );
 }

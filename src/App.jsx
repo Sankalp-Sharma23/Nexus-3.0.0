@@ -17,11 +17,14 @@ import GuidancePage from './components/GuidancePage.jsx';
 import GuidanceStory from './components/GuidanceStory.jsx';
 import PathBuilder from './components/PathBuilder.jsx';
 import PracticeHub from './components/PracticeHub.jsx';
+<<<<<<< HEAD
 import LoginPage from './components/LoginPage.jsx';
 import SignupPage from './components/SignupPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+=======
+>>>>>>> 7106ba6d9e621709ca6cf9ef709dcaf47cba7d58
 import ResumeBuilder from './components/ResumeBuilder.jsx';
 
 function App() {
@@ -31,6 +34,7 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
+<<<<<<< HEAD
         <Route path="/login"  element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
@@ -56,6 +60,29 @@ function App() {
 
         {/* 404 catch-all */}
         <Route path="*" element={<NotFoundPage />} />
+=======
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/placement-portal" element={<PlacementPortal />} />
+        <Route path="/whiteboard" element={<Whiteboard />} />
+        <Route path="/whiteboard/:canvasId" element={<WhiteboardCanvas />} />
+        <Route path="/experience-radar" element={<ExperienceRadar />} />
+        <Route path="/study-planner" element={
+          <PomodoroProvider>
+            <StudyPlanner />
+          </PomodoroProvider>
+        } />
+        <Route path="/experience-hub" element={<ExperiencePage />} />
+        <Route path="/internships" element={<Internships />} />
+        <Route path="/hackathons" element={<Hackathons />} />
+        <Route path="/aim" element={<AimPage />} />
+        <Route path="/project-workspace" element={<ProjectWorkspace />} />
+        <Route path="/guidance" element={<GuidancePage />} />
+        <Route path="/guidance/build" element={<PathBuilder />} />
+        <Route path="/guidance/:id" element={<GuidanceStory />} />
+        <Route path="/practice" element={<PracticeHub />} />
+        <Route path="/practice-hub" element={<Navigate to="/practice" replace />} />
+        <Route path="/resume" element={<ResumeBuilder />} />
+>>>>>>> 7106ba6d9e621709ca6cf9ef709dcaf47cba7d58
       </Routes>
     </ErrorBoundary>
   );
