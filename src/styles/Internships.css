@@ -724,3 +724,54 @@
   .int-detail-grid { grid-template-columns: 1fr; }
   .int-overlay-card { padding: 1.6rem; }
 }
+/* ── Loading Skeleton ────────────────────────────────────────── */
+.int-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1rem 0 3rem;
+}
+
+.int-skeleton-card {
+  height: 240px;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #0d1224 25%, #141929 50%, #0d1224 75%);
+  background-size: 200% 100%;
+  animation: int-shimmer 1.5s infinite;
+}
+
+@keyframes int-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty / Error State ─────────────────────────────────────── */
+.int-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 5rem 2rem;
+  text-align: center;
+  color: #4a5568;
+}
+
+.int-empty-icon {
+  opacity: 0.35;
+  color: #a78bfa;
+}
+
+.int-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #718096;
+  margin: 0;
+}
+
+.int-empty-state p {
+  font-size: 0.9rem;
+  color: #4a5568;
+  max-width: 340px;
+  margin: 0;
+}

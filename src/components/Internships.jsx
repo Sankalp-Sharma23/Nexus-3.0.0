@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   Building2, MapPin, Clock, DollarSign, Briefcase,
@@ -78,6 +78,7 @@ const NeonButton = ({ children, className, onClick }) => {
    ───────────────────────────────────────────────────────────── */
 const DetailOverlay = ({ internship, onClose }) => {
   if (!internship) return null;
+  const fmtDeadline = (d, opts) => { try { return d ? new Date(d).toLocaleDateString('en-US', opts) : 'Rolling'; } catch { return 'Rolling'; } };
   return (
     <AnimatePresence>
       <motion.div className="int-overlay-backdrop"
@@ -110,8 +111,8 @@ const DetailOverlay = ({ internship, onClose }) => {
                 { icon: MapPin,     label: 'Location',  val: internship.location  },
                 { icon: Clock,      label: 'Duration',  val: internship.duration  },
                 { icon: DollarSign, label: 'Stipend',   val: internship.stipend   },
-                { icon: Users,      label: 'Applicants',val: internship.applicants + ' applied' },
-                { icon: Calendar,   label: 'Deadline',  val: new Date(internship.deadline).toLocaleDateString('en-US',{ month:'long', day:'numeric', year:'numeric' }) },
+              { icon: Users,     label: 'Applicants',val: internship.applicants ? internship.applicants + ' applied' : 'N/A' },
+                { icon: Calendar,   label: 'Deadline',  val: fmtDeadline(internship.deadline, { month:'long', day:'numeric', year:'numeric' }) },
                 { icon: Briefcase,  label: 'Type',      val: internship.type      },
               ].map(({ icon: Icon, label, val }) => (
                 <div key={label} className="int-detail-item">
@@ -140,7 +141,7 @@ const DetailOverlay = ({ internship, onClose }) => {
               </p>
             </div>
 
-            <NeonButton className="int-apply-neon">
+            <NeonButton className="int-apply-neon" onClick={() => internship.url && internship.url !== '#' && window.open(internship.url, '_blank')}>
               Apply Now <ExternalLink size={15} />
             </NeonButton>
           </motion.div>
@@ -153,50 +154,79 @@ const DetailOverlay = ({ internship, onClose }) => {
 /* ─────────────────────────────────────────────────────────────
    MAIN PAGE
    ───────────────────────────────────────────────────────────── */
+/* ── Normalise API response → card-compatible shape ─────── */
+function normalizeApiInternship(i, idx) {
+  const fmtApplicants = n => {
+    const num = parseInt(String(n).replace(/[^0-9]/g, ''), 10);
+    if (!num || num <= 0) return null;
+    return num >= 1000 ? `${(num / 1000).toFixed(1)}k` : String(num);
+  };
+  return {
+    id:         i._id || i.uid || `api-${idx}`,
+    company:    i.organizer || 'Company',
+    position:   i.title    || 'Internship',
+    location:   i.location || 'India',
+    type:       i.mode === 'Online' ? 'Remote' : i.mode === 'Hybrid' ? 'Hybrid' : 'On-Site',
+    duration:   i.duration || null,
+    stipend:    i.stipend  || null,
+    deadline:   i.deadline || null,
+    tags:       Array.isArray(i.tags) ? i.tags : [],
+    applicants: i.applicants ? fmtApplicants(i.applicants) : null,
+    featured:   !!(i.featured),
+    category:   i.category || 'general',
+    url:        i.url      || '#',
+    logo:       i.logo     || null,
+    source:     i.source   || 'unknown',
+  };
+}
+
 const Internships = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery]         = useState('');
-  const [selectedFilter, setSelectedFilter]   = useState('all');
+  const location = useLocation();
+  const deepLinkDone = useRef(false);
+  const [searchQuery, setSearchQuery]           = useState('');
+  const [selectedFilter, setSelectedFilter]     = useState('all');
   const [activeInternship, setActiveInternship] = useState(null);
+  const [apiInternships, setApiInternships]     = useState([]);
+  const [loading, setLoading]                   = useState(true);
+  const [totalCompanies, setTotalCompanies]     = useState(0);
 
   const { scrollY } = useScroll();
   const heroY  = useTransform(scrollY, [0, 500], [0, 130]);
   const heroOp = useTransform(scrollY, [0, 350], [1, 0]);
 
-  const internships = [
-    /* ── FEATURED ───────────────────────────────────────────── */
-    { id:  1, company: 'Google',        position: 'Software Engineering Intern',      location: 'Mountain View, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$8,000/mo',  deadline: '2026-03-15', tags: ['ML', 'Python', 'TensorFlow'],         applicants: 12400, featured: true,  category: 'engineering' },
-    { id:  2, company: 'Microsoft',     position: 'Cloud Infrastructure Intern',      location: 'Redmond, WA',        type: 'Full-Time', duration: '12 weeks', stipend: '$7,500/mo',  deadline: '2026-03-20', tags: ['Azure', 'DevOps', 'Cloud'],           applicants: 9800,  featured: true,  category: 'engineering' },
-    { id:  3, company: 'Apple',         position: 'iOS Development Intern',           location: 'Cupertino, CA',      type: 'Full-Time', duration: '12 weeks', stipend: '$8,200/mo',  deadline: '2026-03-18', tags: ['Swift', 'iOS', 'Mobile'],             applicants: 8900,  featured: true,  category: 'engineering' },
-    { id:  4, company: 'Stripe',        position: 'Backend Engineer Intern',          location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$8,500/mo',  deadline: '2026-04-01', tags: ['Go', 'APIs', 'Payments'],             applicants: 7200,  featured: true,  category: 'engineering' },
-    { id:  5, company: 'Figma',         position: 'Product Design Intern',            location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$7,200/mo',  deadline: '2026-03-28', tags: ['Design Systems', 'Figma', 'Prototyping'], applicants: 5100, featured: true,  category: 'design'      },
-    { id:  6, company: 'Notion',        position: 'Product Manager Intern',           location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$6,800/mo',  deadline: '2026-03-22', tags: ['Roadmapping', 'Agile', 'User Research'], applicants: 4200, featured: true,  category: 'product'     },
-    { id:  7, company: 'OpenAI',        position: 'Research Engineer Intern',         location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$9,500/mo',  deadline: '2026-03-10', tags: ['LLMs', 'PyTorch', 'Research'],        applicants: 15600, featured: true,  category: 'engineering' },
-    { id:  8, company: 'Anthropic',     position: 'AI Safety Research Intern',        location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$9,000/mo',  deadline: '2026-03-12', tags: ['AI Safety', 'Python', 'ML'],           applicants: 11200, featured: true,  category: 'data'        },
+  useEffect(() => {
+    fetch('/api/internships?limit=500')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        const items = (data.internships || []).map(normalizeApiInternship);
+        setApiInternships(items);
+        const companies = new Set(items.map(i => i.company).filter(Boolean));
+        setTotalCompanies(companies.size);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-    /* ── REST ───────────────────────────────────────────────── */
-    { id:  9, company: 'Meta',          position: 'Product Design Intern',            location: 'Menlo Park, CA',     type: 'Full-Time', duration: '12 weeks', stipend: '$7,800/mo',  deadline: '2026-03-10', tags: ['UI/UX', 'Figma', 'Design'],           applicants: 7560,  featured: false, category: 'design'      },
-    { id: 10, company: 'Amazon',        position: 'Data Science Intern',              location: 'Seattle, WA',        type: 'Full-Time', duration: '12 weeks', stipend: '$7,200/mo',  deadline: '2026-03-25', tags: ['Python', 'AWS', 'Analytics'],         applicants: 11000, featured: false, category: 'data'        },
-    { id: 11, company: 'Tesla',         position: 'Robotics Engineering Intern',      location: 'Austin, TX',         type: 'Full-Time', duration: '12 weeks', stipend: '$6,800/mo',  deadline: '2026-03-22', tags: ['Robotics', 'C++', 'ROS'],             applicants: 6540,  featured: false, category: 'engineering' },
-    { id: 12, company: 'Netflix',       position: 'Data Engineering Intern',          location: 'Los Gatos, CA',      type: 'Full-Time', duration: '12 weeks', stipend: '$7,600/mo',  deadline: '2026-04-05', tags: ['Spark', 'Kafka', 'Scala'],            applicants: 5900,  featured: false, category: 'data'        },
-    { id: 13, company: 'Airbnb',        position: 'Full-Stack Engineering Intern',    location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$7,400/mo',  deadline: '2026-04-08', tags: ['React', 'Node.js', 'Ruby'],           applicants: 6100,  featured: false, category: 'engineering' },
-    { id: 14, company: 'Coinbase',      position: 'Blockchain Engineer Intern',       location: 'Remote',             type: 'Remote',    duration: '12 weeks', stipend: '$8,000/mo',  deadline: '2026-03-30', tags: ['Solidity', 'Web3', 'Ethereum'],        applicants: 4800,  featured: false, category: 'engineering' },
-    { id: 15, company: 'Spotify',       position: 'UX Research Intern',               location: 'New York, NY',       type: 'Full-Time', duration: '12 weeks', stipend: '$6,500/mo',  deadline: '2026-04-10', tags: ['User Research', 'Quant', 'Figma'],    applicants: 3300,  featured: false, category: 'design'      },
-    { id: 16, company: 'Palantir',      position: 'Forward Deployed Intern',          location: 'New York, NY',       type: 'Full-Time', duration: '12 weeks', stipend: '$8,800/mo',  deadline: '2026-03-05', tags: ['Gotham', 'Data', 'Consulting'],       applicants: 9200,  featured: false, category: 'data'        },
-    { id: 17, company: 'Vercel',        position: 'Developer Experience Intern',      location: 'Remote',             type: 'Remote',    duration: '12 weeks', stipend: '$6,000/mo',  deadline: '2026-04-15', tags: ['Next.js', 'Docs', 'TypeScript'],      applicants: 2800,  featured: false, category: 'engineering' },
-    { id: 18, company: 'Linear',        position: 'Product Management Intern',        location: 'San Francisco, CA',  type: 'Full-Time', duration: '12 weeks', stipend: '$6,200/mo',  deadline: '2026-04-12', tags: ['PM', 'B2B SaaS', 'Roadmap'],          applicants: 1900,  featured: false, category: 'product'     },
-    { id: 19, company: 'Snowflake',     position: 'Data Analytics Intern',            location: 'Seattle, WA',        type: 'Full-Time', duration: '12 weeks', stipend: '$7,100/mo',  deadline: '2026-03-28', tags: ['SQL', 'Cloud DW', 'dbt'],             applicants: 4500,  featured: false, category: 'data'        },
-    { id: 20, company: 'Canva',         position: 'Brand & Visual Design Intern',     location: 'Remote',             type: 'Remote',    duration: '12 weeks', stipend: '$5,800/mo',  deadline: '2026-04-18', tags: ['Branding', 'Illustration', 'Design'], applicants: 3100,  featured: false, category: 'design'      },
-  ];
+  /* Deep-link: open a specific internship card when navigated from Dashboard */
+  useEffect(() => {
+    if (!location.state?.openId || !apiInternships.length || deepLinkDone.current) return;
+    const target = apiInternships.find(i => String(i._id || i.id) === String(location.state.openId));
+    if (target) { setActiveInternship(target); deepLinkDone.current = true; }
+  }, [apiInternships, location.state]);
 
+  // ── REAL DATA ONLY ──────────────────────────────────────────────────────
+  const internships = apiInternships;
+
+  const openCount   = apiInternships.filter(i => !i.deadline || new Date(i.deadline) >= new Date()).length;
   const stats = [
-    { icon: Briefcase, label: 'Active Openings',   value: '3,200+', trend: '+18%' },
-    { icon: Building2, label: 'Partner Companies', value: '480',    trend: '+11%' },
-    { icon: Users,     label: 'Students Placed',   value: '24K+',   trend: '+31%' },
-    { icon: Award,     label: 'Avg Stipend',        value: '$7.6K',  trend: '+19%' },
+    { icon: Briefcase, label: 'Active Openings',   value: loading ? '…' : (openCount  > 0 ? `${openCount.toLocaleString()}+`  : '3,200+'), trend: '+18%' },
+    { icon: Building2, label: 'Partner Companies', value: loading ? '…' : (totalCompanies > 0 ? String(totalCompanies) : '480'),           trend: '+11%' },
+    { icon: Users,     label: 'Students Placed',   value: '24K+',                                                                           trend: '+31%' },
+    { icon: Award,     label: 'Avg Stipend',        value: '₹15k+/mo',                                                                      trend: '+19%' },
   ];
 
-  const filters = ['all', 'engineering', 'design', 'data', 'product'];
+  const filters = ['all', 'engineering', 'data', 'design', 'product', 'marketing', 'finance', 'general'];
 
   const filtered = internships.filter(i => {
     const matchFilter = selectedFilter === 'all' || i.category === selectedFilter;
@@ -331,8 +361,35 @@ const Internships = () => {
           </h2>
         </motion.div>
 
+        {/* Loading skeletons */}
+        {loading && (
+          <div className="int-skeleton-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="int-skeleton-card" />
+            ))}
+          </div>
+        )}
+
+        {/* No data from server */}
+        {!loading && internships.length === 0 && (
+          <div className="int-empty-state">
+            <Briefcase size={40} className="int-empty-icon" />
+            <h3>No internships found</h3>
+            <p>The server couldn&apos;t load data. Make sure the backend is running.</p>
+          </div>
+        )}
+
+        {/* No filter matches */}
+        {!loading && internships.length > 0 && filtered.length === 0 && (
+          <div className="int-empty-state">
+            <Search size={40} className="int-empty-icon" />
+            <h3>No matches</h3>
+            <p>Try a different search term or category filter.</p>
+          </div>
+        )}
+
         <div className="int-bento-grid">
-          {filtered.map((intern, idx) => (
+          {!loading && filtered.map((intern, idx) => (
             <TiltCard
               key={intern.id}
               layoutId={`card-${intern.id}`}
@@ -347,12 +404,12 @@ const Internships = () => {
               )}
 
               <div className="int-card-top">
-                <div className="int-company-avatar">{intern.company[0]}</div>
+                <div className="int-company-avatar">{intern.company?.[0] || '?'}</div>
                 <div className="int-card-meta">
                   <span className="int-company-name">{intern.company}</span>
                   <span className="int-location"><MapPin size={12} />{intern.location}</span>
                 </div>
-                <span className="int-stipend-badge">{intern.stipend}</span>
+                {intern.stipend && <span className="int-stipend-badge">{intern.stipend}</span>}
               </div>
 
               <h3 className="int-card-position">{intern.position}</h3>
@@ -362,14 +419,12 @@ const Internships = () => {
               </div>
 
               <div className="int-card-row">
-                <span className="int-card-info"><Clock size={13} />{intern.duration}</span>
-                <span className="int-card-info"><Users size={13} />{intern.applicants}</span>
-                <span className="int-card-info"><Calendar size={13} />
-                  {new Date(intern.deadline).toLocaleDateString('en-US',{ month:'short', day:'numeric' })}
-                </span>
+                {intern.duration  && <span className="int-card-info"><Clock size={13} />{intern.duration}</span>}
+                {intern.applicants && <span className="int-card-info"><Users size={13} />{intern.applicants}</span>}
+                {intern.deadline  && <span className="int-card-info"><Calendar size={13} />{(() => { try { return new Date(intern.deadline).toLocaleDateString('en-US',{ month:'short', day:'numeric' }); } catch { return '—'; } })()}</span>}
               </div>
 
-              <NeonButton className="int-apply-btn">
+              <NeonButton className="int-apply-btn" onClick={e => { e.stopPropagation(); if (intern.url && intern.url !== '#') window.open(intern.url, '_blank'); }}>
                 Apply Now <ArrowRight size={15} style={{ display: 'inline', marginLeft: 4 }} />
               </NeonButton>
             </TiltCard>

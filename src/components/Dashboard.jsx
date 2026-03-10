@@ -16,26 +16,32 @@ import {
 import '../styles/Navbar.css';
 import '../styles/Dashboard.css';
 
-/* ── mock data ── */
-const STUDY_TASKS = [
-  { id: 1, label: 'Binary Trees LC#104', done: true },
-  { id: 2, label: 'DP: Coin Change', done: true },
-  { id: 3, label: 'Graph BFS Review', done: false },
-  { id: 4, label: 'System Design: CDN', done: false },
-  { id: 5, label: 'Mock Interview Prep', done: false },
+/* ── fallback data (shown when API is unreachable) ── */
+const STUDY_UPCOMING_FB = [
+  { id: 1, label: 'Graph BFS Review', done: false, dueDate: null },
+  { id: 2, label: 'System Design: CDN', done: false, dueDate: null },
+  { id: 3, label: 'Mock Interview Prep', done: false, dueDate: null },
+];
+const STUDY_DONE_COUNT_FB = 2;
+const STUDY_TOTAL_FB      = 5;
+
+const HACKATHONS_FB = [
+  { id:1, name:'MLH Global Hack Week', date:'Feb 28', daysUntil:2,  prize:'$50k', featured:true,  color:'#8b5cf6' },
+  { id:2, name:'HackMIT 2026',         date:'Mar 7',  daysUntil:9,  prize:'$25k', featured:false, color:'#3b82f6' },
+  { id:3, name:'ETHGlobal Waterloo',   date:'Mar 14', daysUntil:16, prize:'$30k', featured:true,  color:'#8b5cf6' },
 ];
 
-const HACKATHONS = [
-  { id:1, name:'MLH Global Hack Week', date:'Feb 28', daysUntil:2, prize:'$50k', color:'#8b5cf6' },
-  { id:2, name:'HackMIT 2026',         date:'Mar 7',  daysUntil:9, prize:'$25k', color:'#3b82f6' },
-  { id:3, name:'ETHGlobal Waterloo',   date:'Mar 14', daysUntil:16,prize:'$30k', color:'#8b5cf6' },
+const INTERNSHIPS_FB = [
+  { id:1, company:'Google',   role:'SWE Intern',  deadline:'Mar 1',  status:'Open', color:'#10b981' },
+  { id:2, company:'Meta',     role:'ML Intern',   deadline:'Mar 10', status:'Open', color:'#f59e0b' },
+  { id:3, company:'Stripe',   role:'Backend Eng', deadline:'Mar 18', status:'Open', color:'#3b82f6' },
+  { id:4, company:'Notion',   role:'FE Intern',   deadline:'Mar 22', status:'Open', color:'#8b5cf6' },
 ];
 
-const INTERNSHIPS = [
-  { id:1, company:'Google',   role:'SWE Intern',  deadline:'Mar 1',  daysUntil:3,  status:'Applied',  color:'#10b981' },
-  { id:2, company:'Meta',     role:'ML Intern',   deadline:'Mar 10', daysUntil:12, status:'OA Sent',   color:'#f59e0b' },
-  { id:3, company:'Stripe',   role:'Backend Eng', deadline:'Mar 18', daysUntil:20, status:'Wishlist',  color:'#3b82f6' },
-  { id:4, company:'Notion',   role:'FE Intern',   deadline:'Mar 22', daysUntil:24, status:'Interview', color:'#8b5cf6' },
+const JOBS_FB = [
+  { id:1, title:'Software Engineer', company:'Airbnb',  type:'Full-time', level:'Mid-level', color:'#f59e0b' },
+  { id:2, title:'Frontend Developer', company:'Stripe', type:'Full-time', level:'Junior',    color:'#3b82f6' },
+  { id:3, title:'Backend Engineer',   company:'Notion', type:'Full-time', level:'Mid-level', color:'#10b981' },
 ];
 
 
@@ -80,20 +86,143 @@ export default function Dashboard({ children }) {
   const [theme] = useState('dark');
   const { user } = useAuth();
   const navigate = useNavigate();
+  const gridRef = useRef(null);
+
+  const userId = user?._id || user?.id || user?.username
+                 || localStorage.getItem('nexus_guest_id') || 'guest';
+
+  const [dashData, setDashData] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/dashboard/${userId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setDashData(d); })
+      .catch(() => {});
+  }, [userId]);
+
   const name = user?.name || 'Engineer';
   const heroImg = user?.gender === 'female' ? girlImg : boyImg;
   const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const studyDone = STUDY_TASKS.filter(t=>t.done).length;
-  const readiness = Math.round((studyDone/STUDY_TASKS.length)*70 + 30);
-  const gridRef = useRef(null);
+
+  const hasStudyData  = (dashData?.study?.tasksTotal ?? 0) > 0;
+  const upcomingTasks = dashData?.study?.upcomingTasks?.length ? dashData.study.upcomingTasks : STUDY_UPCOMING_FB;
+  const overdueTasks  = dashData?.study?.overdueTasks || [];
+  const studyDone     = hasStudyData ? dashData.study.tasksDone   : STUDY_DONE_COUNT_FB;
+  const studyTotal    = hasStudyData ? dashData.study.tasksTotal  : STUDY_TOTAL_FB;
+  const readiness     = dashData?.aim?.hireReadiness ?? Math.round((studyDone / (studyTotal||1)) * 70 + 30);
+  const nexusScore    = dashData?.aim?.nexusScore   || 0;
+  const aimEta        = dashData?.aim?.eta          || null;
+  const aimRole       = dashData?.aim?.role         || '';
+  const hackathons    = dashData?.hackathons?.length  ? dashData.hackathons   : HACKATHONS_FB;
+  const featuredHacks = hackathons.filter(h => h.featured).slice(0, 3);
+  const displayHacks  = featuredHacks.length ? featuredHacks : hackathons.slice(0, 3);
+  const internships   = dashData?.internships?.length ? dashData.internships  : INTERNSHIPS_FB;
+  const jobs          = dashData?.jobs?.length        ? dashData.jobs         : JOBS_FB;
+
+  const FOCUS_TAGS = {
+    swe:    ['React','Node.js','DSA','System Design'],
+    ml:     ['Python','TensorFlow','NLP','ML Ops'],
+    data:   ['SQL','Python','Tableau','Statistics'],
+    devops: ['Docker','K8s','CI/CD','AWS'],
+    mobile: ['React Native','Swift','Kotlin','Flutter'],
+  };
+  const skillTags = user?.focusLabel
+    ? [user.focusLabel, 'DSA', 'System Design', 'Git']
+    : (FOCUS_TAGS[user?.focus] || FOCUS_TAGS.swe);
 
   useEffect(()=>{
-    if(!gridRef.current) return;
-    const tiles = gridRef.current.querySelectorAll('.bt');
-    gsap.fromTo(tiles,
-      { opacity:0, y:28, scale:0.96 },
-      { opacity:1, y:0, scale:1, duration:0.5, stagger:0.06, ease:'power3.out', delay:0.05 }
-    );
+    const grid = gridRef.current;
+    if(!grid) return;
+
+    const ctx = gsap.context(()=>{
+      const tiles   = grid.querySelectorAll('.bt');
+      const icons   = grid.querySelectorAll('.bt-tool-icon');
+      const tags    = grid.querySelectorAll('.bt-tag');
+      const badges  = grid.querySelectorAll('.bt-days, .bt-int-status');
+      const bars    = grid.querySelectorAll('.bt-hack-bar');
+
+      /* reset so Strict-Mode double-run doesn't leave opacity:0 */
+      gsap.set(tiles,  { opacity:1, y:0, scale:1, clearProps:'all' });
+      gsap.set(icons,  { clearProps:'all' });
+      gsap.set(tags,   { clearProps:'all' });
+      gsap.set(badges, { clearProps:'all' });
+      gsap.set(bars,   { clearProps:'all' });
+
+      const tl = gsap.timeline({ delay: 0.05 });
+
+      /* ── Stage 1: tile entrance ── */
+      tl.fromTo(tiles,
+        { opacity:0, y:32, scale:0.95 },
+        { opacity:1, y:0,  scale:1, duration:0.55, stagger:0.06, ease:'power3.out' }
+      )
+
+      /* ── Stage 2: tool icons spin-pop ── */
+      .fromTo(icons,
+        { rotation:-18, scale:0.5, opacity:0 },
+        { rotation:0,   scale:1,   opacity:1, duration:0.45, stagger:0.1,
+          ease:'back.out(2.2)', clearProps:'rotation,transform' },
+        '-=0.35'
+      )
+
+      /* ── Stage 3: hero tags slide in ── */
+      .fromTo(tags,
+        { x:-12, opacity:0 },
+        { x:0,   opacity:1, duration:0.3, stagger:0.06, ease:'power2.out' },
+        '-=0.28'
+      )
+
+      /* ── Stage 4: badges bounce in ── */
+      .fromTo(badges,
+        { scale:0.3, opacity:0 },
+        { scale:1,   opacity:1, duration:0.4, stagger:0.05, ease:'back.out(2.5)' },
+        '-=0.22'
+      )
+
+      /* ── Stage 5: hack bar colour accents ── */
+      .fromTo(bars,
+        { scaleY:0 },
+        { scaleY:1, duration:0.32, stagger:0.06, ease:'power2.out', transformOrigin:'top center' },
+        '-=0.28'
+      )
+
+      /* ── Stage 6: data-driven counters + bars (after tiles visible) ── */
+      .call(()=>{
+        /* progress bar fills */
+        grid.querySelectorAll('.bt-pb-fill').forEach(fill => {
+          const target = fill.style.width || '0%';
+          gsap.fromTo(fill, { width:'0%' }, { width:target, duration:1.0, ease:'power2.out' });
+        });
+
+        /* hero stat counters */
+        grid.querySelectorAll('.bt-hstat-n').forEach(el => {
+          const raw   = el.textContent.trim();
+          const isPct = raw.includes('%');
+          const end   = parseInt(raw, 10);
+          if (!isNaN(end) && end > 0) {
+            const proxy = { val:0 };
+            gsap.to(proxy, {
+              val:end, duration:1.4, ease:'power2.out',
+              onUpdate(){ el.textContent = Math.round(proxy.val) + (isPct ? '%' : ''); }
+            });
+          }
+        });
+
+        /* tracker column counts */
+        grid.querySelectorAll('.bt-tcol-count').forEach(el => {
+          const end = parseInt(el.textContent.trim(), 10);
+          if (!isNaN(end) && end > 0) {
+            const proxy = { val:0 };
+            gsap.to(proxy, {
+              val:end, duration:0.8, ease:'power2.out',
+              onUpdate(){ el.textContent = Math.round(proxy.val); }
+            });
+          }
+        });
+      }, '-=0.4');
+
+    }, grid);
+
+    return () => ctx.revert();
   },[]);
 
   return (
@@ -142,12 +271,12 @@ export default function Dashboard({ children }) {
 
                 <div className="bt-hero-stats">
                   <div className="bt-hstat"><span className="bt-hstat-n">{studyDone}</span><span className="bt-hstat-l">Tasks Done</span></div>
-                  <div className="bt-hstat"><span className="bt-hstat-n">{HACKATHONS.length}</span><span className="bt-hstat-l">Hackathons</span></div>
+                  <div className="bt-hstat"><span className="bt-hstat-n">{hackathons.length}</span><span className="bt-hstat-l">Hackathons</span></div>
                   <div className="bt-hstat"><span className="bt-hstat-n">{readiness}%</span><span className="bt-hstat-l">Readiness</span></div>
                 </div>
 
                 <div className="bt-tag-row">
-                  {['React','Node.js','DSA','System Design'].map(t=>(
+                  {skillTags.map(t=>(
                     <span key={t} className="bt-tag">{t}</span>
                   ))}
                 </div>
@@ -167,63 +296,82 @@ export default function Dashboard({ children }) {
             <div className="bt bt-study" onClick={()=>navigate('/study-planner')}>
               <div className="bt-eyebrow"><BookOpen size={12}/>Study Planner</div>
               <div className="bt-study-row">
-                <Ring done={studyDone} total={STUDY_TASKS.length} color="#8b5cf6" size={68}/>
+                <Ring done={studyDone} total={studyTotal} color="#8b5cf6" size={68}/>
                 <div className="bt-study-tasks">
-                  {STUDY_TASKS.slice(0,4).map(t=>(
-                    <div key={t.id} className={`bt-task${t.done?' done':''}`}>
-                      {t.done?<CheckCircle2 size={11} style={{color:'#8b5cf6'}}/>:<Circle size={11} style={{color:'rgba(255,255,255,0.2)'}}/>}
+                  {overdueTasks.length > 0 && overdueTasks.slice(0,2).map((t,i)=>(
+                    <div key={t._id||t.id||`od${i}`} className="bt-task bt-task-overdue">
+                      <Circle size={11} style={{color:'#ef4444'}}/>
                       <span>{t.label}</span>
+                      <span className="bt-task-due-badge">Due</span>
                     </div>
                   ))}
+                  {upcomingTasks.slice(0, overdueTasks.length > 0 ? 2 : 4).map((t,i)=>(
+                    <div key={t._id||t.id||`up${i}`} className={`bt-task${t.done?' done':''}`}>
+                      {t.done?<CheckCircle2 size={11} style={{color:'#8b5cf6'}}/>:<Circle size={11} style={{color:'rgba(255,255,255,0.2)'}}/>}
+                      <span>{t.label}</span>
+                      {t.dueDate && <span className="bt-task-date">{new Date(t.dueDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>}
+                    </div>
+                  ))}
+                  {(overdueTasks.length + upcomingTasks.length) === 0 && (
+                    <div className="bt-task" style={{opacity:0.4}}><Circle size={11}/><span>No tasks yet — add in Planner</span></div>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* 5. HACKATHONS — col 1, row 3-4 */}
             <div className="bt bt-hack" onClick={()=>navigate('/hackathons')}>
-              <div className="bt-eyebrow"><Trophy size={12}/>Hackathons</div>
-              <div className="bt-hack-list">
-                {HACKATHONS.map(h=>(
-                  <div key={h.id} className="bt-hack-item">
-                    <div className="bt-hack-bar" style={{background:h.color}}/>
-                    <div className="bt-hack-info">
-                      <div className="bt-hack-name">{h.name}</div>
-                      <div className="bt-hack-sub">
-                        <Clock size={9}/> {h.date} &nbsp;·&nbsp; <Star size={9}/> {h.prize}
+              <div className="bt-eyebrow"><Trophy size={12}/>Hackathons{featuredHacks.length>0&&<span className="bt-featured-badge">Featured</span>}</div>
+              {displayHacks.length > 0 ? (
+                <div className="bt-hack-list">
+                  {displayHacks.map((h,i)=>(
+                    <div key={h._id||h.id||i} className="bt-hack-item" onClick={e=>{e.stopPropagation();navigate('/hackathons',{state:{openId:h._id||h.id}});}}>
+                      <div className="bt-hack-bar" style={{background:h.color}}/>
+                      <div className="bt-hack-info">
+                        <div className="bt-hack-name">{h.name}</div>
+                        <div className="bt-hack-sub">
+                          <Clock size={9}/> {h.date}
+                          {h.prize && <>&nbsp;·&nbsp;<Star size={9}/> {h.prize}</>}
+                        </div>
                       </div>
+                      {h.daysUntil != null && <span className="bt-days" style={{color:h.color,borderColor:`${h.color}50`,background:`${h.color}15`}}>{h.daysUntil}d</span>}
                     </div>
-                    <span className="bt-days" style={{color:h.color,borderColor:`${h.color}50`,background:`${h.color}15`}}>{h.daysUntil}d</span>
-                  </div>
-                ))}
-              </div>
-              <div className="bt-hack-cta">
-                View all <ChevronRight size={12}/>
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bt-hack-empty">
+                  <Trophy size={28} style={{opacity:0.2,margin:'0 auto 8px'}}/>
+                  <p>No featured hackathons right now</p>
+                  <button className="bt-hack-empty-btn" onClick={e=>{e.stopPropagation();navigate('/hackathons');}}>Browse All <ChevronRight size={12}/></button>
+                </div>
+              )}
+              <div className="bt-hack-cta">View all <ChevronRight size={12}/></div>
               <div className="bt-bg-icon"><Trophy size={80}/></div>
             </div>
 
             {/* 6. PLACEMENT PORTAL — col 2-3, row 3 */}
             <div className="bt bt-placement" onClick={()=>navigate('/placement-portal')}>
-              <div className="bt-eyebrow"><Briefcase size={12}/>Placement Portal</div>
-              <div className="bt-placement-inner">
-                <ScoreArc pct={readiness} color="#10b981" size={110}/>
-                <div className="bt-placement-breakdown">
-                  {[
-                    {l:'Resume',      v:30,                                            c:'#8b5cf6'},
-                    {l:'Study Tasks', v:Math.round((studyDone/STUDY_TASKS.length)*70), c:'#8b5cf6'},
-                  ].map(it=>(
-                    <div key={it.l} className="bt-pb-row">
-                      <span className="bt-pb-lbl">{it.l}</span>
-                      <div className="bt-pb-track"><div className="bt-pb-fill" style={{width:`${it.v}%`,background:it.c}}/></div>
-                      <span className="bt-pb-val" style={{color:it.c}}>{it.v}%</span>
+              <div className="bt-eyebrow"><Briefcase size={12}/>Jobs{aimRole&&<span className="bt-role-badge">{aimRole}</span>}</div>
+              <div className="bt-jobs-list">
+                {jobs.map((j,i)=>(
+                  <div key={j._id||j.id||i} className="bt-job-row" onClick={e=>{e.stopPropagation();navigate('/placement-portal',{state:{openJobId:j._id||j.id}});}}>
+                    <div className="bt-job-left">
+                      <div className="bt-job-title">{j.title}</div>
+                      <div className="bt-job-company">{j.company}</div>
                     </div>
-                  ))}
-                </div>
+                    <div className="bt-job-right">
+                      <span className="bt-job-type">{j.type}</span>
+                      {j.salary && <span className="bt-job-salary">{j.salary}</span>}
+                    </div>
+                    <ChevronRight size={12} style={{opacity:0.3,flexShrink:0}}/>
+                  </div>
+                ))}
+                {jobs.length===0&&<div className="bt-job-empty">No jobs found — set your role in AIM</div>}
               </div>
             </div>
 
             {/* 7. RESUME BUILDER — col 4, row 3 */}
-            <div className="bt bt-resume" onClick={()=>navigate('/experience')}>
+            <div className="bt bt-resume" onClick={()=>navigate('/experience-hub')}>
               <div className="bt-eyebrow"><FileText size={12}/>Resume Builder</div>
               <div className="bt-tool-icon bt-tool-amber"><FileText size={28}/></div>
               <div className="bt-tool-name">Resume</div>
@@ -236,7 +384,7 @@ export default function Dashboard({ children }) {
             </div>
 
             {/* 8. DATABASE BOARD — col 2, row 4 */}
-            <div className="bt bt-dbboard" onClick={()=>navigate('/whiteboard')}>
+            <div className="bt bt-dbboard" onClick={()=>navigate('/whiteboard',{state:{autoTemplate:'schema'}})}>
               <div className="bt-eyebrow"><Database size={12}/>Database Board</div>
               <div className="bt-tool-icon bt-tool-cyan"><Database size={26}/></div>
               <div className="bt-tool-name">DB Designer</div>
@@ -245,7 +393,7 @@ export default function Dashboard({ children }) {
             </div>
 
             {/* 9. COMPONENT ARCHITECT — col 3-4, row 4 */}
-            <div className="bt bt-component" onClick={()=>navigate('/whiteboard')}>
+            <div className="bt bt-component" onClick={()=>navigate('/whiteboard',{state:{autoTemplate:'react'}})}>
               <div className="bt-eyebrow"><GitBranch size={12}/>Component Architect</div>
               <div className="bt-comp-visual">
                 <div className="bt-comp-tree">
@@ -262,42 +410,18 @@ export default function Dashboard({ children }) {
             </div>
 
             {/* 10. INTERNSHIPS — col 1-2, row 5 */}
-            <div className="bt bt-internships" onClick={()=>navigate('/internships')}>
-              <div className="bt-eyebrow"><Briefcase size={12}/>Internships</div>
+            <div className="bt bt-internships">
+              <div className="bt-eyebrow" onClick={()=>navigate('/internships')} style={{cursor:'pointer'}}><Briefcase size={12}/>Internships <ChevronRight size={10}/></div>
               <div className="bt-int-list">
-                {INTERNSHIPS.map(i=>(
-                  <div key={i.id} className="bt-int-row">
+                {internships.map((i,idx)=>(
+                  <div key={i._id||i.id||idx} className="bt-int-row" onClick={()=>navigate('/internships',{state:{openId:String(i._id||i.id)}})}>
                     <div className="bt-int-co" style={{color:i.color}}>{i.company}</div>
                     <div className="bt-int-role">{i.role}</div>
                     <div className="bt-int-dead"><Calendar size={9}/> {i.deadline}</div>
-                    <span className="bt-int-status" style={{color:i.color,borderColor:`${i.color}50`,background:`${i.color}12`}}>{i.status}</span>
+                    <span className="bt-int-status" style={{color:i.color,borderColor:`${i.color}50`,background:`${i.color}12`}}>{i.status||'Open'}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* 11. APPLICATION TRACKER — col 3-4, row 5 */}
-            <div className="bt bt-tracker" onClick={()=>navigate('/placement-portal')}>
-              <div className="bt-eyebrow"><Layers size={12}/>Application Tracker</div>
-              <div className="bt-tracker-cols">
-                {[
-                  {label:'Wishlist', count:1, color:'rgba(255,255,255,0.3)', items:['Stripe']},
-                  {label:'Applied',  count:2, color:'#3b82f6', items:['Google','Meta']},
-                  {label:'Interview',count:1, color:'#10b981', items:['Notion']},
-                  {label:'Offer',    count:0, color:'#8b5cf6', items:[]},
-                ].map(col=>(
-                  <div key={col.label} className="bt-tcol">
-                    <div className="bt-tcol-head" style={{color:col.color}}>
-                      <span className="bt-tcol-dot" style={{background:col.color}}/>
-                      {col.label}
-                      <span className="bt-tcol-count">{col.count}</span>
-                    </div>
-                    {col.items.map(item=>(
-                      <div key={item} className="bt-tcard">{item}</div>
-                    ))}
-                    {col.items.length===0 && <div className="bt-tcard bt-tcard-empty">—</div>}
-                  </div>
-                ))}
+                {internships.length===0&&<div style={{opacity:0.4,fontSize:'12px',padding:'8px 0'}}>No open internships right now</div>}
               </div>
             </div>
 

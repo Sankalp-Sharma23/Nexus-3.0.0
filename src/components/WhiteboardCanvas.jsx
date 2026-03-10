@@ -5,10 +5,13 @@ import {
   Download, Trash2, Undo, Redo,
   ChevronLeft, ChevronRight, ArrowLeft, Hand,
   ZoomIn, ZoomOut, Maximize2, MousePointer2,
+  Copy, Check, Users, Link2,
 } from 'lucide-react';
 import '../styles/WhiteboardCanvas.css';
 import DatabaseBoard from './DatabaseBoard';
 import ComponentTree from './ComponentTree';
+import socket from '../socket';
+import { useAuth } from '../contexts/AuthContext';
 
 /* ─── Template painters ──────────────────────────────── */
 const TEMPLATE_LABEL = {
@@ -229,7 +232,84 @@ const TEMPLATE_DRAWERS = { blank: drawBlank, schema: drawSchema, react: drawReac
 const WhiteboardCanvas = () => {
   const { canvasId }   = useParams();
   const [searchParams] = useSearchParams();
-  const template       = searchParams.get('template') || 'blank';
+  const navigate       = useNavigate();
+  const { user }       = useAuth();
+  const templateParam  = searchParams.get('template');
+
+  // If no template in URL yet, probe the server for the room's real template
+  const [probing,    setProbing]    = useState(!templateParam);
+  const [joinError,  setJoinError]  = useState(null); // null | string
+
+  useEffect(() => {
+    if (templateParam) return; // template already known — skip probe
+    const userId      = user?._id || user?.id || user?.username
+                        || localStorage.getItem('nexus_guest_id') || 'guest';
+    const displayName = user?.name || user?.username
+                        || user?.email?.split('@')[0] || userId;
+
+    socket.emit('register_user', { userId, displayName });
+
+    const onConfirmed = ({ template: tpl }) => {
+      socket.off('error_msg', onError);
+      navigate(`/whiteboard/${canvasId}?template=${tpl || 'blank'}`, { replace: true });
+      setProbing(false);
+    };
+    const onError = (msg) => {
+      socket.off('join_confirmed', onConfirmed);
+      setJoinError(msg || `Room "${canvasId}" not found.`);
+      setProbing(false);
+    };
+
+    socket.once('join_confirmed', onConfirmed);
+    socket.once('error_msg',      onError);
+    socket.emit('join_room', { roomCode: canvasId });
+
+    return () => {
+      socket.off('join_confirmed', onConfirmed);
+      socket.off('error_msg',      onError);
+    };
+  }, [canvasId, templateParam, navigate, user]);
+
+  // ── Error state: room not found ──────────────────────────────────── //
+  if (joinError) {
+    return (
+      <div style={{ height:'100vh', background:'#0a0f1a', display:'flex', flexDirection:'column',
+                    alignItems:'center', justifyContent:'center', color:'#f1f5f9',
+                    fontFamily:'Inter,sans-serif', gap:16, textAlign:'center', padding:'0 24px' }}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+        </svg>
+        <h2 style={{ margin:0, fontSize:20, color:'#f1f5f9' }}>Room Not Found</h2>
+        <p style={{ margin:0, fontSize:14, color:'#94a3b8', maxWidth:360 }}>{joinError}</p>
+        <p style={{ margin:0, fontSize:13, color:'#64748b' }}>
+          The room may have expired — rooms are reset when the server restarts.
+        </p>
+        <button
+          onClick={() => navigate('/whiteboard')}
+          style={{ marginTop:8, padding:'10px 24px', background:'#7c3aed', color:'#fff',
+                   border:'none', borderRadius:8, cursor:'pointer', fontSize:14, fontWeight:600 }}>
+          ← Back to Lobby
+        </button>
+      </div>
+    );
+  }
+
+  // ── Probing spinner ──────────────────────────────────────────────── //
+  if (probing) {
+    return (
+      <div style={{ height:'100vh', background:'#0a0f1a', display:'flex',
+                    alignItems:'center', justifyContent:'center', color:'#8b5cf6',
+                    fontFamily:'Inter,sans-serif', gap:12 }}>
+        <svg style={{animation:'spin 1s linear infinite'}} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+        </svg>
+        Joining room…
+      </div>
+    );
+  }
+
+  const template = templateParam || 'blank';
   if (template === 'schema') return <DatabaseBoard canvasId={canvasId} />;
   if (template === 'react')  return <ComponentTree  canvasId={canvasId} />;
   return <WhiteboardCanvasInner canvasId={canvasId} template={template} />;
@@ -240,17 +320,35 @@ export default WhiteboardCanvas;
 /* ── Main canvas (non-schema templates) ── */
 function WhiteboardCanvasInner({ canvasId, template }) {
   const navigate = useNavigate();
+  const { user }  = useAuth();
   const canvasRef    = useRef(null);
   const containerRef = useRef(null);
 
   /* sidebar */
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [rightOpen,   setRightOpen]   = useState(true);
 
   /* drawing */
   const [selectedTool, setSelectedTool] = useState('pencil');
   const [color, setColor]               = useState('#8b5cf6');
   const [lineWidth, setLineWidth]       = useState(4);
   const isDrawing = useRef(false);
+
+  /* ── socket / collab ── */
+  const [remoteCursors, setRemoteCursors] = useState({});   // { userId: { x, y, displayName, color } }
+  const [roomMembers,   setRoomMembers]   = useState([]);   // [{ userId, displayName, color, isHost }]
+  const currentStrokeRef = useRef(null);    // { tool, color, lineWidth, points:[], start, end }
+  const cursorThrottleRef = useRef(0);
+  const roomCodeRef = useRef(canvasId);
+
+  /* share */
+  const [copiedCode, setCopiedCode] = useState(false);
+  const copyRoomCode = () => {
+    if (!canvasId) return;
+    navigator.clipboard.writeText(canvasId);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
 
   /* view */
   const zoomRef = useRef(1);
@@ -316,14 +414,18 @@ function WhiteboardCanvasInner({ canvasId, template }) {
     if (!pos || !val) return;
     const lw = lineWidthRef.current;
     const fontSize = Math.max(14, lw * 4 + 12);
-    setTextElements(prev => [...prev, {
+    const element = {
       id: Date.now(),
       cx: pos.cx,
       cy: pos.cy,
       text: val,
       color: colorRef.current,
       fontSize,
-    }]);
+    };
+    setTextElements(prev => [...prev, element]);
+    if (roomCodeRef.current) {
+      socket.emit('add_text_element', { roomCode: roomCodeRef.current, element });
+    }
   }, []);
 
   const cancelText = useCallback(() => {
@@ -458,6 +560,166 @@ function WhiteboardCanvasInner({ canvasId, template }) {
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
+  /* ── replay a remote stroke on the canvas ── */
+  const replayStroke = useCallback((stroke) => {
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    ctx.save();
+    if (stroke.tool === 'pencil') {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth   = stroke.lineWidth;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+      ctx.beginPath();
+      (stroke.points || []).forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      });
+      ctx.stroke();
+    } else if (stroke.tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = stroke.lineWidth * 4;
+      ctx.lineCap   = 'round';
+      ctx.lineJoin  = 'round';
+      ctx.beginPath();
+      (stroke.points || []).forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      });
+      ctx.stroke();
+    } else if (stroke.tool === 'line') {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth   = stroke.lineWidth;
+      ctx.lineCap     = 'round';
+      ctx.beginPath();
+      ctx.moveTo(stroke.start.x, stroke.start.y);
+      ctx.lineTo(stroke.end.x, stroke.end.y);
+      ctx.stroke();
+    } else if (stroke.tool === 'rectangle') {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth   = stroke.lineWidth;
+      ctx.beginPath();
+      ctx.strokeRect(stroke.start.x, stroke.start.y,
+        stroke.end.x - stroke.start.x, stroke.end.y - stroke.start.y);
+    } else if (stroke.tool === 'circle') {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth   = stroke.lineWidth;
+      const rx = Math.abs(stroke.end.x - stroke.start.x) / 2;
+      const ry = Math.abs(stroke.end.y - stroke.start.y) / 2;
+      const cx = stroke.start.x + (stroke.end.x - stroke.start.x) / 2;
+      const cy = stroke.start.y + (stroke.end.y - stroke.start.y) / 2;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }, []);
+
+  /* ── socket: join room + real-time event listeners ── */
+  useEffect(() => {
+    if (!canvasId) return;
+    // Solo canvases are local-only — skip all server socket operations
+    if (canvasId.startsWith('solo_')) { roomCodeRef.current = null; return; }
+
+    const userId        = user?._id || user?.id || user?.username
+                          || localStorage.getItem('nexus_guest_id') || 'guest';
+    const displayName   = user?.name || user?.username || user?.email?.split('@')[0] || userId;
+
+    socket.emit('register_user', { userId, displayName });
+    socket.emit('join_room', { roomCode: canvasId });
+    roomCodeRef.current = canvasId;
+
+    // Re-register + re-join if socket reconnects while canvas is open
+    const onReconnect = () => {
+      socket.emit('register_user', { userId, displayName });
+      socket.emit('join_room', { roomCode: canvasId });
+    };
+    socket.on('connect', onReconnect);
+
+    const onJoinConfirmed = ({ members, strokes, textEls, template: roomTemplate, yourColor }) => {
+      // If we landed here without a template param, the wrapper already handled the redirect.
+      // But if somehow the template still differs (e.g. direct URL with wrong template), fix it.
+      if (roomTemplate && roomTemplate !== template) {
+        navigate(`/whiteboard/${canvasId}?template=${roomTemplate}`, { replace: true });
+        return;
+      }
+      if (yourColor) setRemoteCursors(prev => prev); // colour available for future use
+      setRoomMembers(members || []);
+      // Replay historical strokes (drawn by others before we joined)
+      (strokes || []).forEach(s => replayStroke(s));
+      // Add historical text elements
+      if (textEls?.length) {
+        setTextElements(prev => {
+          const existingIds = new Set(prev.map(t => t.id));
+          const newEls = (textEls || []).filter(t => !existingIds.has(t.id));
+          return [...prev, ...newEls];
+        });
+      }
+    };
+
+    const onRemoteStroke = ({ stroke }) => replayStroke(stroke);
+
+    const onRemoteTextElement = ({ element }) => {
+      setTextElements(prev =>
+        prev.find(t => t.id === element.id) ? prev : [...prev, element]
+      );
+    };
+
+    const onRemoteCursor = ({ userId: uid, displayName: dn, color: c, x, y }) => {
+      setRemoteCursors(prev => ({ ...prev, [uid]: { displayName: dn, color: c, x, y } }));
+      // Auto-remove cursor after 4 s of inactivity
+      setTimeout(() => {
+        setRemoteCursors(prev => {
+          const next = { ...prev };
+          delete next[uid];
+          return next;
+        });
+      }, 4000);
+    };
+
+    const onUserJoined = ({ members: ms }) => setRoomMembers(ms || []);
+    const onUserLeft   = ({ userId: uid, members: ms }) => {
+      setRoomMembers(ms || []);
+      setRemoteCursors(prev => { const n = { ...prev }; delete n[uid]; return n; });
+    };
+    const onYouWereRemoved = () => navigate('/whiteboard');
+    const onErrorMsg = (msg) => console.warn('[WB socket]', msg);
+    const onCanvasCleared = () => {
+      const ctx = canvasRef.current?.getContext('2d');
+      if (ctx) (TEMPLATE_DRAWERS[template] || drawBlank)(ctx, CANVAS_W, CANVAS_H);
+      setTextElements([]);
+      setSelectedTextId(null);
+      undoStack.current = [];
+      redoStack.current = [];
+    };
+
+    socket.on('join_confirmed',      onJoinConfirmed);
+    socket.on('remote_stroke',       onRemoteStroke);
+    socket.on('remote_text_element', onRemoteTextElement);
+    socket.on('remote_cursor',       onRemoteCursor);
+    socket.on('user_joined',         onUserJoined);
+    socket.on('user_left',           onUserLeft);
+    socket.on('you_were_removed',    onYouWereRemoved);
+    socket.on('error_msg',           onErrorMsg);
+    socket.on('canvas_cleared',      onCanvasCleared);
+
+    return () => {
+      socket.emit('leave_room', { roomCode: canvasId });
+      socket.off('connect',            onReconnect);
+      socket.off('join_confirmed',      onJoinConfirmed);
+      socket.off('remote_stroke',       onRemoteStroke);
+      socket.off('remote_text_element', onRemoteTextElement);
+      socket.off('remote_cursor',       onRemoteCursor);
+      socket.off('user_joined',         onUserJoined);
+      socket.off('user_left',           onUserLeft);
+      socket.off('you_were_removed',    onYouWereRemoved);
+      socket.off('error_msg',           onErrorMsg);
+      socket.off('canvas_cleared',      onCanvasCleared);
+    };
+  }, [canvasId, navigate, user, replayStroke]);
+
   /* canvas → world coordinates */
   const getCanvasPos = (e) => {
     const canvas = canvasRef.current;
@@ -502,12 +764,14 @@ function WhiteboardCanvasInner({ canvasId, template }) {
     const ctx    = canvas.getContext('2d');
 
     if (selectedTool === 'line' || selectedTool === 'rectangle' || selectedTool === 'circle') {
-      snapshotRef.current = ctx.getImageData(0, 0, CANVAS_W, CANVAS_H);
-      drawStart.current   = pos;
+      snapshotRef.current   = ctx.getImageData(0, 0, CANVAS_W, CANVAS_H);
+      drawStart.current     = pos;
+      currentStrokeRef.current = { tool: selectedTool, color, lineWidth, start: pos };
       return;
     }
 
     // pencil / eraser
+    currentStrokeRef.current = { tool: selectedTool, color, lineWidth, points: [pos] };
     if (selectedTool === 'eraser') {
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
@@ -527,6 +791,18 @@ function WhiteboardCanvasInner({ canvasId, template }) {
   }, [selectedTool, color, lineWidth, saveSnapshot, commitText]);
 
   const onMouseMove = useCallback((e) => {
+    // Throttled cursor broadcast
+    const _now = Date.now();
+    if (roomCodeRef.current && _now - cursorThrottleRef.current > 50) {
+      cursorThrottleRef.current = _now;
+      const _el = containerRef.current;
+      if (_el) {
+        const _r = _el.getBoundingClientRect();
+        const _cx = (e.clientX - _r.left - panRef.current.x) / zoomRef.current;
+        const _cy = (e.clientY - _r.top  - panRef.current.y) / zoomRef.current;
+        socket.emit('cursor_move', { roomCode: roomCodeRef.current, x: _cx, y: _cy });
+      }
+    }
     if (isPanning.current) {
       const s = panStart.current;
       setPan({ x: s.px + (e.clientX - s.x), y: s.py + (e.clientY - s.y) });
@@ -545,6 +821,8 @@ function WhiteboardCanvasInner({ canvasId, template }) {
       ctx.lineWidth   = lineWidth;
       ctx.lineCap     = 'round';
       ctx.lineJoin    = 'round';
+      // track live end for emission on mouseUp
+      if (currentStrokeRef.current) currentStrokeRef.current.end = { x, y };
       if (selectedTool === 'line') {
         ctx.beginPath();
         ctx.moveTo(sx, sy);
@@ -567,16 +845,29 @@ function WhiteboardCanvasInner({ canvasId, template }) {
 
     ctx.lineTo(x, y);
     ctx.stroke();
+    // track point for broadcasting
+    if (currentStrokeRef.current?.points) currentStrokeRef.current.points.push({ x, y });
   }, [selectedTool, color, lineWidth]);
 
+  /* throttled cursor broadcast (emit at most every 50 ms) */
+
   const onMouseUp = useCallback(() => {
+    const wasDrawing = isDrawing.current;
     isDrawing.current   = false;
     isPanning.current   = false;
-    snapshotRef.current = null;
-    drawStart.current   = null;
-    // always restore composite operation
     const canvas = canvasRef.current;
     if (canvas) canvas.getContext('2d').globalCompositeOperation = 'source-over';
+
+    // Emit completed stroke to room
+    if (wasDrawing && roomCodeRef.current && currentStrokeRef.current) {
+      const stroke = currentStrokeRef.current;
+      // For shapes where user just clicked (no drag), use start as end
+      if (drawStart.current && !stroke.end) stroke.end = { ...drawStart.current };
+      socket.emit('draw_stroke', { roomCode: roomCodeRef.current, stroke });
+    }
+    currentStrokeRef.current = null;
+    snapshotRef.current = null;
+    drawStart.current   = null;
   }, []);
 
   /* zoom helpers */
@@ -608,6 +899,10 @@ function WhiteboardCanvasInner({ canvasId, template }) {
     setSelectedTextId(null);
     undoStack.current = [];
     redoStack.current = [];
+    // Broadcast canvas clear to all collaborators in the room
+    if (roomCodeRef.current) {
+      socket.emit('clear_canvas', { roomCode: roomCodeRef.current });
+    }
   };
 
   const downloadCanvas = () => {
@@ -764,6 +1059,33 @@ function WhiteboardCanvasInner({ canvasId, template }) {
               </div>
             ))}
           </div>
+
+        </div>
+
+        {/* ── Remote cursors: screen-space overlay so they never scale with zoom ── */}
+        <div className="wbc-remote-cursors" style={{ pointerEvents: 'none' }}>
+          {Object.entries(remoteCursors).map(([uid, cur]) => {
+            // Convert canvas-space coords → screen-space
+            const sx = cur.x * zoom + pan.x;
+            const sy = cur.y * zoom + pan.y;
+            const raw = cur.displayName || 'Guest';
+            const label = raw.length > 12 ? raw.slice(0, 11) + '…' : raw;
+            return (
+              <div key={uid} className="wbc-remote-cursor" style={{ left: sx, top: sy }}>
+                <svg
+                  width="16" height="20"
+                  viewBox="0 0 24 28"
+                  fill={cur.color}
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.55))' }}
+                >
+                  <path d="M4 2 L4 22 L9 17 L13 26 L16 24.5 L12 15.5 L18 15.5 Z"/>
+                  <path d="M4 2 L4 22 L9 17 L13 26 L16 24.5 L12 15.5 L18 15.5 Z"
+                    fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
+                </svg>
+                <span className="wbc-remote-name" style={{ background: cur.color }}>{label}</span>
+              </div>
+            );
+          })}
         </div>
 
         {/* text tool overlay */}
@@ -786,13 +1108,85 @@ function WhiteboardCanvasInner({ canvasId, template }) {
         {/* HUD */}
         <div className="wbc-hud-tl">
           <span className="wbc-badge">{TEMPLATE_LABEL[template] || 'Canvas'}</span>
-          {canvasId && <span className="wbc-badge dim">{canvasId}</span>}
+          {canvasId && !canvasId.startsWith('solo_') && (
+            <button className="wbc-badge wbc-badge-btn" onClick={copyRoomCode} title="Click to copy room code">
+              <Link2 size={10}/>&nbsp;{canvasId}&nbsp;
+              {copiedCode ? <Check size={10}/> : <Copy size={10}/>}
+            </button>
+          )}
         </div>
-        <div className="wbc-hud-br">
-          <span className="wbc-badge">{Math.round(zoom * 100)}%</span>
-          <span className="wbc-hint">Ctrl+scroll to zoom · Space+drag to pan</span>
-        </div>
+
+        {/* Participants HUD (top-right) */}
+        {roomMembers.length > 0 && (
+          <div className="wbc-hud-tr">
+            {roomMembers.slice(0, 6).map(m => (
+              <div key={m.userId} className="wbc-hud-avatar" style={{ background: m.color }}
+                title={`${m.displayName}${m.isHost ? ' (Host)' : ''}`}>
+                {(m.displayName || '?')[0].toUpperCase()}
+              </div>
+            ))}
+            {roomMembers.length > 6 && (
+              <div className="wbc-hud-avatar wbc-hud-more">+{roomMembers.length - 6}</div>
+            )}
+          </div>
+        )}
+
       </div>
+
+      {/* ── RIGHT SIDEBAR: Room Code + Participants ── */}
+      {canvasId && !canvasId.startsWith('solo_') && (
+        <aside className={`wbc-rsidebar ${rightOpen ? 'open' : ''}`}>
+          {/* toggle tab on the left edge */}
+          <button className="wbc-rtoggle" onClick={() => setRightOpen(v => !v)}
+            title={rightOpen ? 'Collapse' : 'Expand'}>
+            {rightOpen ? <ChevronRight size={15}/> : <ChevronLeft size={15}/>}
+          </button>
+
+          {rightOpen && (
+            <div className="wbc-rsb-scroll">
+              {/* Room Code */}
+              <p className="wbc-label" style={{ marginTop: 8 }}>
+                <Link2 size={11}/>&nbsp;Room Code
+              </p>
+              <div className="wbc-room-code-box">
+                <span className="wbc-room-code-text">{canvasId}</span>
+                <button className="wbc-room-code-copy" onClick={copyRoomCode} title="Copy room code">
+                  {copiedCode ? <><Check size={12}/>&nbsp;Copied!</> : <><Copy size={12}/>&nbsp;Copy</>}
+                </button>
+              </div>
+              <p className="wbc-room-hint">Share this code so others can join</p>
+
+              <div className="wbc-sep" style={{ margin: '8px 0' }}/>
+
+              {/* Participants */}
+              <p className="wbc-label">
+                <Users size={11}/>&nbsp;Participants
+                <span className="wbc-rsb-count">{roomMembers.length}</span>
+              </p>
+
+              <ul className="wbc-sb-members" style={{ marginTop: 4 }}>
+                {roomMembers.map(m => (
+                  <li key={m.userId} className="wbc-sb-member">
+                    <span className="wbc-rsb-avatar" style={{ background: m.color }}>
+                      {(m.displayName || '?')[0].toUpperCase()}
+                    </span>
+                    <div className="wbc-rsb-info">
+                      <span className="wbc-sb-name">
+                        {m.displayName.length > 14 ? m.displayName.slice(0, 13) + '…' : m.displayName}
+                      </span>
+                      {m.isHost && <span className="wbc-rsb-host">Host 👑</span>}
+                    </div>
+                    <span className="wbc-rsb-online"/>
+                  </li>
+                ))}
+                {roomMembers.length === 0 && (
+                  <li className="wbc-rsb-empty">No one here yet</li>
+                )}
+              </ul>
+            </div>
+          )}
+        </aside>
+      )}
 
     </div>
   );

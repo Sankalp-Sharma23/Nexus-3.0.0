@@ -1,20 +1,421 @@
-﻿{
-    "users":  [
-                  {
-                      "id":  1,
-                      "nexus_username":  "user_ydu03e28",
-                      "leetcode_username":  "sankalp_sharma23",
-                      "last_synced_at":  "2026-03-01T11:52:03.454Z"
-                  },
-                  {
-                      "id":  2,
-                      "nexus_username":  "test",
-                      "leetcode_username":  null,
-                      "last_synced_at":  null
-                  }
-              ],
-    "user_solved_problems":  [
-
-                             ],
-    "_nextUserId":  3
+{
+  "users": [
+    {
+      "id": 1,
+      "nexus_username": "user_ydu03e28",
+      "leetcode_username": null,
+      "last_synced_at": null
+    },
+    {
+      "id": 2,
+      "nexus_username": "user_s4bzlcs6",
+      "leetcode_username": null,
+      "last_synced_at": null
+    },
+    {
+      "id": 3,
+      "nexus_username": "1772476508848",
+      "leetcode_username": "sankalp_sharma23",
+      "last_synced_at": "2026-03-03T07:19:39.362Z",
+      "lc_total_solved": 38,
+      "lc_easy_solved": 23,
+      "lc_medium_solved": 14,
+      "lc_hard_solved": 1
+    },
+    {
+      "id": 4,
+      "nexus_username": "1772476246709",
+      "leetcode_username": "sankalp_sharma23",
+      "last_synced_at": "2026-03-03T08:03:29.059Z",
+      "lc_total_solved": 38,
+      "lc_easy_solved": 23,
+      "lc_medium_solved": 14,
+      "lc_hard_solved": 1
+    },
+    {
+      "id": 5,
+      "nexus_username": "1772610232910",
+      "leetcode_username": null,
+      "last_synced_at": null
+    },
+    {
+      "id": 6,
+      "nexus_username": "1772611478084",
+      "leetcode_username": "sankalp_sharma23",
+      "last_synced_at": "2026-03-05T13:58:28.854Z",
+      "lc_total_solved": 42,
+      "lc_easy_solved": 25,
+      "lc_medium_solved": 16,
+      "lc_hard_solved": 1
+    },
+    {
+      "id": 7,
+      "nexus_username": "1773151160348",
+      "leetcode_username": null,
+      "last_synced_at": null
+    }
+  ],
+  "user_solved_problems": [
+    {
+      "user_id": 3,
+      "problem_slug": "two-sum",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "max-consecutive-ones",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "shuffle-the-array",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "concatenation-of-array",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "check-if-a-string-contains-all-binary-codes-of-size-k",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "elimination-game",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "last-remaining-integer-after-alternating-deletion-operations",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "add-two-numbers",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "sort-list",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "remove-duplicates-from-sorted-list",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "rotate-list",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "swap-nodes-in-pairs",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "plus-one",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "rotate-array",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "remove-nth-node-from-end-of-list",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "monotonic-array",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 3,
+      "problem_slug": "valid-mountain-array",
+      "solved_at": "2026-03-03T07:00:05.105Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "two-sum",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "max-consecutive-ones",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "shuffle-the-array",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "concatenation-of-array",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "check-if-a-string-contains-all-binary-codes-of-size-k",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "elimination-game",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "last-remaining-integer-after-alternating-deletion-operations",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "add-two-numbers",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "sort-list",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "remove-duplicates-from-sorted-list",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "rotate-list",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "swap-nodes-in-pairs",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "plus-one",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "rotate-array",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "remove-nth-node-from-end-of-list",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "monotonic-array",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "valid-mountain-array",
+      "solved_at": "2026-03-03T07:52:40.860Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "delete-the-middle-node-of-a-linked-list",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "sign-of-the-product-of-an-array",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "find-lucky-integer-in-an-array",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "middle-of-the-linked-list",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "binary-search",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "odd-even-linked-list",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "palindrome-linked-list",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "reverse-linked-list",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "remove-linked-list-elements",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "reorder-list",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "linked-list-cycle-ii",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "linked-list-cycle",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "remove-duplicates-from-sorted-list-ii",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "search-insert-position",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "find-first-and-last-position-of-element-in-sorted-array",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "remove-duplicates-from-sorted-array",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "merge-two-sorted-lists",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "valid-parentheses",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "longest-common-prefix",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "roman-to-integer",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 4,
+      "problem_slug": "palindrome-number",
+      "solved_at": "2026-03-03T08:03:29.057Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "minimum-cost-to-split-into-ones",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "trim-trailing-vowels",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "special-positions-in-a-binary-matrix",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "reverse-integer",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "two-sum",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "max-consecutive-ones",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "shuffle-the-array",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "concatenation-of-array",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "check-if-a-string-contains-all-binary-codes-of-size-k",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "elimination-game",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "last-remaining-integer-after-alternating-deletion-operations",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "add-two-numbers",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "sort-list",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "remove-duplicates-from-sorted-list",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "rotate-list",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "swap-nodes-in-pairs",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    },
+    {
+      "user_id": 6,
+      "problem_slug": "plus-one",
+      "solved_at": "2026-03-05T13:58:28.853Z"
+    }
+  ],
+  "_nextUserId": 8
 }

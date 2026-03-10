@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Plus, Trash2, Download, ChevronLeft, ChevronRight,
   Link2, Database, Code2, Key, Hash, AlignLeft, ZoomIn, ZoomOut,
-  Maximize2, LayoutGrid, X, Check,
+  Maximize2, LayoutGrid, X, Check, Copy, Users,
 } from 'lucide-react';
 import '../styles/DatabaseBoard.css';
+import socket from '../socket';
+import { useAuth } from '../contexts/AuthContext';
 
 /* ─── constants ──────────────────────────────────────── */
 const GRID   = 20;
@@ -146,6 +148,18 @@ const INIT_RELS = [];
 ════════════════════════════════════════════════════════ */
 export default function DatabaseBoard({ canvasId }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  /* ── collab state ── */
+  const [roomMembers,   setRoomMembers]   = useState([]);
+  const [remoteCursors, setRemoteCursors] = useState({});
+  const [copiedCode,    setCopiedCode]    = useState(false);
+  const [sqlCopied,     setSqlCopied]     = useState(false);
+  const [rightOpen,     setRightOpen]     = useState(true);
+  const hasJoinedRef      = useRef(false);
+  const lastReceivedRef   = useRef(null);
+  const broadcastTimerRef = useRef(null);
+  const cursorThrottleRef = useRef(0);
 
   /* core state */
   const [tables,        setTables]        = useState(INIT_TABLES);
@@ -222,6 +236,67 @@ export default function DatabaseBoard({ canvasId }) {
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
+  /* ── socket: collab ── */
+  useEffect(() => {
+    if (!canvasId || canvasId.startsWith('solo_')) return;
+    const userId      = user?._id || user?.id || user?.username || localStorage.getItem('nexus_guest_id') || 'guest';
+    const displayName = user?.name || user?.username || user?.email?.split('@')[0] || userId;
+    socket.emit('register_user', { userId, displayName });
+    socket.emit('join_room', { roomCode: canvasId });
+    const onReconnect = () => { socket.emit('register_user', { userId, displayName }); socket.emit('join_room', { roomCode: canvasId }); };
+    socket.on('connect', onReconnect);
+    const onJoinConfirmed = ({ members, boardData }) => {
+      hasJoinedRef.current = true;
+      setRoomMembers(members || []);
+      if (boardData?.tables || boardData?.relationships) {
+        const snap = JSON.stringify({ tables: boardData.tables || [], relationships: boardData.relationships || [] });
+        lastReceivedRef.current = snap;
+        if (boardData.tables)         setTables(boardData.tables);
+        if (boardData.relationships)  setRelationships(boardData.relationships);
+      }
+    };
+    const onRemoteBoardState = ({ data }) => {
+      lastReceivedRef.current = JSON.stringify({ tables: data.tables || [], relationships: data.relationships || [] });
+      if (data.tables)        setTables(data.tables);
+      if (data.relationships) setRelationships(data.relationships);
+    };
+    const onRemoteCursor = ({ userId: uid, displayName: dn, color: c, x, y }) => {
+      setRemoteCursors(prev => ({ ...prev, [uid]: { displayName: dn, color: c, x, y } }));
+      setTimeout(() => setRemoteCursors(prev => { const n = {...prev}; delete n[uid]; return n; }), 4000);
+    };
+    const onUserJoined    = ({ members: ms }) => setRoomMembers(ms || []);
+    const onUserLeft      = ({ userId: uid, members: ms }) => { setRoomMembers(ms || []); setRemoteCursors(prev => { const n={...prev}; delete n[uid]; return n; }); };
+    const onYouWereRemoved = () => navigate('/whiteboard');
+    socket.on('join_confirmed',     onJoinConfirmed);
+    socket.on('remote_board_state', onRemoteBoardState);
+    socket.on('remote_cursor',      onRemoteCursor);
+    socket.on('user_joined',        onUserJoined);
+    socket.on('user_left',          onUserLeft);
+    socket.on('you_were_removed',   onYouWereRemoved);
+    return () => {
+      socket.emit('leave_room', { roomCode: canvasId });
+      socket.off('connect',           onReconnect);
+      socket.off('join_confirmed',    onJoinConfirmed);
+      socket.off('remote_board_state',onRemoteBoardState);
+      socket.off('remote_cursor',     onRemoteCursor);
+      socket.off('user_joined',       onUserJoined);
+      socket.off('user_left',         onUserLeft);
+      socket.off('you_were_removed',  onYouWereRemoved);
+    };
+  }, [canvasId, navigate, user]);
+
+  /* ── broadcast board state on change (debounced 200ms) ── */
+  useEffect(() => {
+    if (!canvasId || canvasId.startsWith('solo_') || !hasJoinedRef.current) return;
+    const current = JSON.stringify({ tables, relationships });
+    if (current === lastReceivedRef.current) { lastReceivedRef.current = null; return; }
+    if (broadcastTimerRef.current) clearTimeout(broadcastTimerRef.current);
+    broadcastTimerRef.current = setTimeout(() => {
+      socket.emit('board_state', { roomCode: canvasId, data: { tables, relationships } });
+    }, 200);
+    return () => clearTimeout(broadcastTimerRef.current);
+  }, [tables, relationships, canvasId]);
+
   /* ── board mousedown (pan / place table) ── */
   const onBoardMouseDown = useCallback(e => {
     if (e.button === 1 || spaceDown.current) {
@@ -255,6 +330,17 @@ export default function DatabaseBoard({ canvasId }) {
   }, [tool, tables.length]);
 
   const onBoardMouseMove = useCallback(e => {
+    // throttled cursor broadcast
+    const _now = Date.now();
+    if (canvasId && !canvasId.startsWith('solo_') && _now - cursorThrottleRef.current > 50) {
+      cursorThrottleRef.current = _now;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const cx = (e.clientX - rect.left - panRef.current.x) / zoomRef.current;
+        const cy = (e.clientY - rect.top  - panRef.current.y) / zoomRef.current;
+        socket.emit('cursor_move', { roomCode: canvasId, x: cx, y: cy });
+      }
+    }
     if (isPanning.current) {
       const s = panStart.current;
       setP({ x: s.px + (e.clientX - s.x), y: s.py + (e.clientY - s.y) });
@@ -517,6 +603,26 @@ export default function DatabaseBoard({ canvasId }) {
           ))}
         </div>
 
+        {/* ── Remote cursors (screen-space, never scaled) ── */}
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none', zIndex:25, overflow:'visible' }}>
+          {Object.entries(remoteCursors).map(([uid, cur]) => {
+            const sx = cur.x * zoom + pan.x;
+            const sy = cur.y * zoom + pan.y;
+            const label = (cur.displayName || 'Guest').length > 12
+              ? (cur.displayName || 'Guest').slice(0, 11) + '…'
+              : (cur.displayName || 'Guest');
+            return (
+              <div key={uid} style={{ position:'absolute', left:sx, top:sy, display:'flex', alignItems:'flex-start', gap:5, transform:'translate(-2px,-2px)', transition:'left .07s linear,top .07s linear', pointerEvents:'none' }}>
+                <svg width="16" height="20" viewBox="0 0 24 28" fill={cur.color} style={{ filter:'drop-shadow(0 2px 4px rgba(0,0,0,0.55))', flexShrink:0 }}>
+                  <path d="M4 2 L4 22 L9 17 L13 26 L16 24.5 L12 15.5 L18 15.5 Z"/>
+                  <path d="M4 2 L4 22 L9 17 L13 26 L16 24.5 L12 15.5 L18 15.5 Z" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
+                </svg>
+                <span style={{ fontSize:11, fontWeight:700, color:'#fff', padding:'2px 7px 3px', borderRadius:5, background:cur.color, whiteSpace:'nowrap', boxShadow:'0 2px 6px rgba(0,0,0,0.45)', fontFamily:'Inter,system-ui,sans-serif', marginTop:1 }}>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+
         {/* connect-from indicator */}
         {connectFrom && (
           <div className="dbb-connect-hint">
@@ -569,12 +675,62 @@ export default function DatabaseBoard({ canvasId }) {
         </div>
       </div>
 
+      {/* ──── RIGHT SIDEBAR: Room Code + Participants ──── */}
+      {canvasId && !canvasId.startsWith('solo_') && (
+        <aside className={`dbb-rsidebar ${rightOpen ? 'open' : ''}`}>
+          <button className="dbb-rtoggle" onClick={() => setRightOpen(v => !v)}
+            title={rightOpen ? 'Collapse' : 'Expand'}>
+            {rightOpen ? <ChevronRight size={15}/> : <ChevronLeft size={15}/>}
+          </button>
+          {rightOpen && (
+            <div className="dbb-rsb-scroll">
+              <p className="dbb-label" style={{ marginTop:8 }}><Link2 size={11}/>&nbsp;Room Code</p>
+              <div className="dbb-rsb-code-box">
+                <span className="dbb-rsb-code-text">{canvasId}</span>
+                <button className="dbb-rsb-copy-btn" onClick={() => { navigator.clipboard.writeText(canvasId); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 2000); }}>
+                  {copiedCode ? <><Check size={12}/>&nbsp;Copied!</> : <><Copy size={12}/>&nbsp;Copy</>}
+                </button>
+              </div>
+              <p className="dbb-rsb-hint">Share so others can join</p>
+              <div className="dbb-sep" style={{ margin:'8px 0' }}/>
+              <p className="dbb-label">
+                <Users size={11}/>&nbsp;Participants
+                <span className="dbb-rsb-count">{roomMembers.length}</span>
+              </p>
+              <ul className="dbb-rsb-members">
+                {roomMembers.map(m => (
+                  <li key={m.userId} className="dbb-rsb-member">
+                    <span className="dbb-rsb-avatar" style={{ background: m.color }}>
+                      {(m.displayName || '?')[0].toUpperCase()}
+                    </span>
+                    <div className="dbb-rsb-info">
+                      <span className="dbb-rsb-name">{m.displayName.length > 14 ? m.displayName.slice(0,13)+'…' : m.displayName}</span>
+                      {m.isHost && <span className="dbb-rsb-host">Host 👑</span>}
+                    </div>
+                    <span className="dbb-rsb-online"/>
+                  </li>
+                ))}
+                {roomMembers.length === 0 && <li className="dbb-rsb-empty">No one here yet</li>}
+              </ul>
+            </div>
+          )}
+        </aside>
+      )}
+
       {/* ──── LIVE SQL PANEL ──── */}
       {sqlOpen && (
         <aside className="dbb-sql-panel">
           <div className="dbb-sql-header">
             <Code2 size={13}/>
             <span>Live SQL</span>
+            <button
+              className={`dbb-sql-copy ${sqlCopied ? 'copied' : ''}`}
+              title="Copy SQL"
+              onClick={() => { navigator.clipboard.writeText(sql); setSqlCopied(true); setTimeout(() => setSqlCopied(false), 1500); }}
+            >
+              {sqlCopied ? <Check size={12}/> : <Copy size={12}/>}
+              <span>{sqlCopied ? 'Copied!' : 'Copy'}</span>
+            </button>
             <button className="dbb-sql-close" onClick={() => setSqlOpen(false)}><X size={13}/></button>
           </div>
           <pre className="dbb-sql-body">{sql}</pre>

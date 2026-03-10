@@ -226,6 +226,66 @@
   box-shadow: 0 0 14px rgba(245,158,11,0.15);
 }
 
+/* ── Location filter bar ───────────────────────────────────── */
+.hack-location-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 0.4rem 0.9rem;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.hack-location-bar:focus-within {
+  border-color: rgba(245,158,11,0.4);
+  box-shadow: 0 0 16px rgba(245,158,11,0.1);
+}
+
+.hack-location-icon {
+  color: #a1a1aa;
+  flex-shrink: 0;
+}
+
+.hack-location-bar:focus-within .hack-location-icon {
+  color: #fbbf24;
+}
+
+.hack-location-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  color: #fff;
+  caret-color: #fbbf24;
+}
+
+.hack-location-input::placeholder {
+  color: #52525b;
+}
+
+.hack-location-clear {
+  background: transparent;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.hack-location-clear:hover {
+  color: #fbbf24;
+}
+
 /* ── Section structure ──────────────────────────────────────── */
 /* ── Cards body — black bg wrapping all sections + filters ── */
 .hack-cards-body {
@@ -681,3 +741,362 @@
   .hack-detail-grid { grid-template-columns: 1fr; }
   .hack-overlay-card { padding: 1.6rem; }
 }
+/* ── Loading skeleton ────────────────────────────────────────── */
+.hack-loading-state {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  padding: 2rem 2rem 4rem;
+}
+
+.hack-skeleton-card {
+  height: 220px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #111 25%, #1a1a1a 50%, #111 75%);
+  background-size: 200% 100%;
+  animation: hack-shimmer 1.5s infinite;
+}
+
+@keyframes hack-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty / error state ─────────────────────────────────────── */
+.hack-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 5rem 2rem;
+  text-align: center;
+  color: #555;
+}
+
+.hack-empty-icon {
+  opacity: 0.4;
+  color: #f59e0b;
+}
+
+.hack-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #888;
+  margin: 0;
+}
+
+.hack-empty-state p {
+  font-size: 0.9rem;
+  color: #555;
+  max-width: 340px;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW FEATURES — Bookmark, Countdown, Live Section,
+   Sort, Calendar, Share, Team Finder, Difficulty Badge
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Feature 1: Bookmark / Save Heart ─────────────────────── */
+.hack-bookmark {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.25);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.25s, transform 0.2s, background 0.25s;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.hack-bookmark:hover {
+  color: #f87171;
+  background: rgba(248,113,113,0.08);
+  transform: scale(1.15);
+}
+.hack-bookmark.saved {
+  color: #f87171;
+}
+.hack-bookmark.saved:hover {
+  transform: scale(1.2);
+}
+
+.hack-saved-pill {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── Feature 2: Countdown Timer ────────────────────────────── */
+.hack-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.65rem;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.18);
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+.hack-cd-block {
+  letter-spacing: 0.02em;
+}
+.hack-cd-block small {
+  font-size: 0.58rem;
+  opacity: 0.6;
+  margin-left: 1px;
+}
+.hack-cd-sep {
+  opacity: 0.35;
+  font-weight: 400;
+}
+
+/* ── Feature 3: Happening Now / Live Section ──────────────── */
+.hack-live-section {
+  padding-bottom: 2rem !important;
+}
+
+.hack-live-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.3rem;
+}
+
+.hack-card-live {
+  border-color: rgba(248,113,113,0.2) !important;
+  background: rgba(248,113,113,0.03) !important;
+  animation: hack-live-glow 2.5s ease-in-out infinite;
+}
+
+@keyframes hack-live-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(248,113,113,0); }
+  50%      { box-shadow: 0 0 20px rgba(248,113,113,0.08), 0 0 60px rgba(248,113,113,0.04); }
+}
+
+.hack-live-pulse-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(248,113,113,0.12);
+  color: #f87171;
+  animation: hack-pulse-ring 1.8s ease-in-out infinite;
+}
+
+@keyframes hack-pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(248,113,113,0); }
+}
+
+.hack-live-count-badge {
+  margin-left: auto;
+  padding: 0.25rem 0.7rem;
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.22);
+  border-radius: 100px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #f87171;
+  letter-spacing: 0.05em;
+}
+
+/* ── Feature 4: Sort Dropdown ──────────────────────────────── */
+.hack-sort-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+.hack-sort-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.hack-sort-trigger:hover {
+  border-color: rgba(245,158,11,0.3);
+  color: #fbbf24;
+}
+.hack-sort-chevron-open {
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+.hack-sort-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17,14,31,0.96);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 0.5rem;
+  min-width: 200px;
+  backdrop-filter: blur(16px);
+  z-index: 20;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+
+.hack-sort-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.hack-sort-opt:hover {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
+.hack-sort-opt.active {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+/* ── Feature 5+6: Action buttons in overlay ────────────────── */
+.hack-overlay-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.hack-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.hack-action-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.hack-save-btn.saved {
+  color: #f87171;
+  border-color: rgba(248,113,113,0.25);
+  background: rgba(248,113,113,0.08);
+}
+
+/* ── Feature 7: Team Finder ────────────────────────────────── */
+.hack-team-finder {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 1.2rem;
+}
+
+.hack-team-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.hack-team-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  background: rgba(139,92,246,0.06);
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: 10px;
+  color: rgba(167,139,250,0.8);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  align-self: flex-start;
+}
+.hack-team-toggle:hover {
+  background: rgba(139,92,246,0.1);
+  border-color: rgba(139,92,246,0.35);
+  color: #a78bfa;
+}
+.hack-team-toggle.active {
+  background: rgba(139,92,246,0.15);
+  border-color: rgba(139,92,246,0.4);
+  color: #a78bfa;
+  box-shadow: 0 0 16px rgba(139,92,246,0.12);
+}
+
+.hack-team-hint {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Feature 8: Difficulty Badge ───────────────────────────── */
+.hack-difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.22rem 0.6rem;
+  background: color-mix(in srgb, var(--diff-color, #8b5cf6) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--diff-color, #8b5cf6) 25%, transparent);
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--diff-color, #8b5cf6);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.hack-card-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Responsive adjustments for new features ──────────────── */
+@media (max-width: 600px) {
+  .hack-live-grid {
+    grid-template-columns: 1fr;
+  }
+  .hack-overlay-actions {
+    flex-direction: column;
+  }
+  .hack-overlay-actions .hack-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .hack-sort-menu {
+    min-width: 180px;
+  }
+}
+
+/* (Feature 9 removed) */

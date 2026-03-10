@@ -8,6 +8,7 @@ import {
   RefreshCw, AlertCircle
 } from 'lucide-react';
 import Navbar from './Navbar';
+import Footer from './Footer';
 import '../styles/PathBuilder.css';
 
 /* ─── Constants ──────────────────────────────────────────────── */
@@ -822,6 +823,8 @@ const PathBuilder = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Footer />
     </div>
   );
 };

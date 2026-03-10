@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-01T11:51:24.605Z",
+  "fetched_at": "2026-03-02T18:10:43.589Z",
   "problems": [
     {
       "id": 1,
@@ -652,7 +652,7 @@
         "Greedy"
       ],
       "paid_only": false,
-      "ac_rate": 42,
+      "ac_rate": 43,
       "leetcode_url": "https://leetcode.com/problems/jump-game-ii/"
     },
     {
@@ -2794,7 +2794,7 @@
         "Two Pointers"
       ],
       "paid_only": false,
-      "ac_rate": 44,
+      "ac_rate": 45,
       "leetcode_url": "https://leetcode.com/problems/rotate-array/"
     },
     {
@@ -6716,7 +6716,7 @@
         "Topological Sort"
       ],
       "paid_only": true,
-      "ac_rate": 30,
+      "ac_rate": 31,
       "leetcode_url": "https://leetcode.com/problems/sequence-reconstruction/"
     },
     {
@@ -8501,7 +8501,7 @@
         "Counting Sort"
       ],
       "paid_only": false,
-      "ac_rate": 81,
+      "ac_rate": 82,
       "leetcode_url": "https://leetcode.com/problems/array-partition/"
     },
     {
@@ -9816,7 +9816,7 @@
         "Dynamic Programming"
       ],
       "paid_only": true,
-      "ac_rate": 56,
+      "ac_rate": 57,
       "leetcode_url": "https://leetcode.com/problems/4-keys-keyboard/"
     },
     {
@@ -19407,7 +19407,7 @@
         "Binary Search"
       ],
       "paid_only": false,
-      "ac_rate": 65,
+      "ac_rate": 66,
       "leetcode_url": "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/"
     },
     {
@@ -20743,7 +20743,7 @@
         "Binary Tree"
       ],
       "paid_only": false,
-      "ac_rate": 46,
+      "ac_rate": 47,
       "leetcode_url": "https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/"
     },
     {
@@ -22941,7 +22941,7 @@
         "Sorting"
       ],
       "paid_only": false,
-      "ac_rate": 41,
+      "ac_rate": 42,
       "leetcode_url": "https://leetcode.com/problems/maximum-number-of-non-overlapping-substrings/"
     },
     {
@@ -23174,7 +23174,7 @@
         "Matrix"
       ],
       "paid_only": false,
-      "ac_rate": 49,
+      "ac_rate": 69,
       "leetcode_url": "https://leetcode.com/problems/minimum-swaps-to-arrange-a-binary-grid/"
     },
     {
@@ -24551,7 +24551,7 @@
         "Binary Tree"
       ],
       "paid_only": true,
-      "ac_rate": 83,
+      "ac_rate": 82,
       "leetcode_url": "https://leetcode.com/problems/design-an-expression-tree-with-evaluate-function/"
     },
     {
@@ -24793,7 +24793,7 @@
         "Binary Tree"
       ],
       "paid_only": true,
-      "ac_rate": 70,
+      "ac_rate": 69,
       "leetcode_url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree-ii/"
     },
     {
@@ -29557,7 +29557,7 @@
         "Heap (Priority Queue)"
       ],
       "paid_only": false,
-      "ac_rate": 66,
+      "ac_rate": 65,
       "leetcode_url": "https://leetcode.com/problems/remove-stones-to-minimize-the-total/"
     },
     {
@@ -33889,7 +33889,7 @@
         "Enumeration"
       ],
       "paid_only": false,
-      "ac_rate": 56,
+      "ac_rate": 57,
       "leetcode_url": "https://leetcode.com/problems/count-lattice-points-inside-a-circle/"
     },
     {
@@ -41427,7 +41427,7 @@
       "category": "Uncategorized",
       "tags": [],
       "paid_only": true,
-      "ac_rate": 67,
+      "ac_rate": 68,
       "leetcode_url": "https://leetcode.com/problems/query-batching/"
     },
     {
@@ -41671,7 +41671,7 @@
         "Binary Tree"
       ],
       "paid_only": true,
-      "ac_rate": 75,
+      "ac_rate": 74,
       "leetcode_url": "https://leetcode.com/problems/height-of-special-binary-tree/"
     },
     {
@@ -42703,7 +42703,7 @@
         "Strongly Connected Component"
       ],
       "paid_only": false,
-      "ac_rate": 45,
+      "ac_rate": 46,
       "leetcode_url": "https://leetcode.com/problems/minimum-edge-weight-equilibrium-queries-in-a-tree/"
     },
     {
@@ -45252,7 +45252,7 @@
         "String"
       ],
       "paid_only": false,
-      "ac_rate": 80,
+      "ac_rate": 81,
       "leetcode_url": "https://leetcode.com/problems/number-of-changing-keys/"
     },
     {
@@ -50464,7 +50464,7 @@
         "Sorting"
       ],
       "paid_only": false,
-      "ac_rate": 30,
+      "ac_rate": 31,
       "leetcode_url": "https://leetcode.com/problems/maximize-sum-of-weights-after-edge-removals/"
     },
     {
@@ -53422,7 +53422,7 @@
         "Depth-First Search"
       ],
       "paid_only": false,
-      "ac_rate": 60,
+      "ac_rate": 59,
       "leetcode_url": "https://leetcode.com/problems/number-of-ways-to-assign-edge-weights-ii/"
     },
     {
@@ -55071,7 +55071,7 @@
         "Sorting"
       ],
       "paid_only": true,
-      "ac_rate": 87,
+      "ac_rate": 86,
       "leetcode_url": "https://leetcode.com/problems/sort-array-by-absolute-value/"
     },
     {
@@ -55501,7 +55501,7 @@
         "String"
       ],
       "paid_only": true,
-      "ac_rate": 82,
+      "ac_rate": 83,
       "leetcode_url": "https://leetcode.com/problems/maximum-distance-between-unequal-words-in-array-i/"
     },
     {
@@ -55557,7 +55557,7 @@
         "Dynamic Programming"
       ],
       "paid_only": false,
-      "ac_rate": 58,
+      "ac_rate": 57,
       "leetcode_url": "https://leetcode.com/problems/number-of-zigzag-arrays-ii/"
     },
     {
@@ -57369,7 +57369,7 @@
         "Design"
       ],
       "paid_only": true,
-      "ac_rate": 81,
+      "ac_rate": 82,
       "leetcode_url": "https://leetcode.com/problems/design-order-management-system/"
     },
     {
@@ -57510,7 +57510,7 @@
         "Binary Tree"
       ],
       "paid_only": true,
-      "ac_rate": 91,
+      "ac_rate": 90,
       "leetcode_url": "https://leetcode.com/problems/median-of-a-binary-search-tree-level/"
     },
     {
@@ -57812,7 +57812,7 @@
         "Sorting"
       ],
       "paid_only": true,
-      "ac_rate": 71,
+      "ac_rate": 70,
       "leetcode_url": "https://leetcode.com/problems/maximum-requests-without-violating-the-limit/"
     },
     {
@@ -57834,7 +57834,7 @@
       "category": "Uncategorized",
       "tags": [],
       "paid_only": false,
-      "ac_rate": 53,
+      "ac_rate": 54,
       "leetcode_url": "https://leetcode.com/problems/merge-close-characters/"
     },
     {
@@ -57845,7 +57845,7 @@
       "category": "Uncategorized",
       "tags": [],
       "paid_only": false,
-      "ac_rate": 13,
+      "ac_rate": 14,
       "leetcode_url": "https://leetcode.com/problems/minimum-operations-to-make-array-parity-alternating/"
     },
     {
@@ -57889,7 +57889,7 @@
       "category": "Uncategorized",
       "tags": [],
       "paid_only": false,
-      "ac_rate": 20,
+      "ac_rate": 22,
       "leetcode_url": "https://leetcode.com/problems/minimum-bitwise-or-from-grid/"
     },
     {
@@ -57900,7 +57900,7 @@
       "category": "Uncategorized",
       "tags": [],
       "paid_only": false,
-      "ac_rate": 13,
+      "ac_rate": 16,
       "leetcode_url": "https://leetcode.com/problems/count-subarrays-with-k-distinct-integers/"
     }
   ]

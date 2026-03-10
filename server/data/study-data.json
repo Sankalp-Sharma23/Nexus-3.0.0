@@ -1,0 +1,35 @@
+{
+  "tasks": [
+    {
+      "_id": "e5a255950b61183b9096",
+      "userId": "test",
+      "title": "My Test Task",
+      "subject": "DSA",
+      "dueDate": null,
+      "status": "pending",
+      "priority": "high",
+      "estimatedPomodoros": 3,
+      "actualPomodoros": 0,
+      "fromAI": false,
+      "materialId": null,
+      "createdAt": "2026-03-03T15:10:46.820Z"
+    },
+    {
+      "_id": "2a7cc4e9cd617d29127c",
+      "userId": "1772476246709",
+      "title": "1",
+      "subject": "DSA",
+      "dueDate": null,
+      "status": "pending",
+      "priority": "medium",
+      "estimatedPomodoros": 2,
+      "actualPomodoros": 0,
+      "fromAI": false,
+      "materialId": null,
+      "createdAt": "2026-03-03T15:11:08.963Z"
+    }
+  ],
+  "sessions": [],
+  "analytics": {},
+  "materials": []
+}

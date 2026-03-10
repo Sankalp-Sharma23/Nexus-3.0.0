@@ -4,9 +4,11 @@ import {
   ArrowLeft, Plus, Trash2, Download, Link2, X, ChevronLeft, ChevronRight,
   Cpu, Monitor, Layers, RefreshCw, Eye, EyeOff, FolderPlus, FileCode,
   MousePointer2, ZoomIn, ZoomOut, Maximize2, GitBranch, Code2, Package,
-  CheckSquare,
+  CheckSquare, Copy, Users, Check,
 } from 'lucide-react';
 import '../styles/ComponentTree.css';
+import socket from '../socket';
+import { useAuth } from '../contexts/AuthContext';
 
 /* ─── constants ──────────────────────────────────── */
 const GRID   = 20;
@@ -180,6 +182,18 @@ function propLinePath(conn, allComps) {
 ════════════════════════════════════════════════ */
 export default function ComponentTree({ canvasId }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  /* ── collab state ── */
+  const [roomMembers,   setRoomMembers]   = useState([]);
+  const [remoteCursors, setRemoteCursors] = useState({});
+  const [copiedCode,    setCopiedCode]    = useState(false);
+  const [fileCopied,    setFileCopied]    = useState(false);
+  const [rightOpen,     setRightOpen]     = useState(true);
+  const hasJoinedRef      = useRef(false);
+  const lastReceivedRef   = useRef(null);
+  const broadcastTimerRef = useRef(null);
+  const cursorThrottleRef = useRef(0);
 
   /* core state */
   const [components,   setComponents]   = useState(INIT_COMPONENTS);
@@ -254,6 +268,69 @@ export default function ComponentTree({ canvasId }) {
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
+  /* ── socket: collab ── */
+  useEffect(() => {
+    if (!canvasId || canvasId.startsWith('solo_')) return;
+    const userId      = user?._id || user?.id || user?.username || localStorage.getItem('nexus_guest_id') || 'guest';
+    const displayName = user?.name || user?.username || user?.email?.split('@')[0] || userId;
+    socket.emit('register_user', { userId, displayName });
+    socket.emit('join_room', { roomCode: canvasId });
+    const onReconnect = () => { socket.emit('register_user', { userId, displayName }); socket.emit('join_room', { roomCode: canvasId }); };
+    socket.on('connect', onReconnect);
+    const onJoinConfirmed = ({ members, boardData }) => {
+      hasJoinedRef.current = true;
+      setRoomMembers(members || []);
+      if (boardData?.components || boardData?.connections) {
+        const snap = JSON.stringify({ components: boardData.components || [], connections: boardData.connections || [], providers: boardData.providers || [] });
+        lastReceivedRef.current = snap;
+        if (boardData.components)  setComponents(boardData.components);
+        if (boardData.connections) setConnections(boardData.connections);
+        if (boardData.providers)   setProviders(boardData.providers);
+      }
+    };
+    const onRemoteBoardState = ({ data }) => {
+      lastReceivedRef.current = JSON.stringify({ components: data.components || [], connections: data.connections || [], providers: data.providers || [] });
+      if (data.components)  setComponents(data.components);
+      if (data.connections) setConnections(data.connections);
+      if (data.providers)   setProviders(data.providers);
+    };
+    const onRemoteCursor = ({ userId: uid, displayName: dn, color: c, x, y }) => {
+      setRemoteCursors(prev => ({ ...prev, [uid]: { displayName: dn, color: c, x, y } }));
+      setTimeout(() => setRemoteCursors(prev => { const n = {...prev}; delete n[uid]; return n; }), 4000);
+    };
+    const onUserJoined     = ({ members: ms }) => setRoomMembers(ms || []);
+    const onUserLeft       = ({ userId: uid, members: ms }) => { setRoomMembers(ms || []); setRemoteCursors(prev => { const n={...prev}; delete n[uid]; return n; }); };
+    const onYouWereRemoved = () => navigate('/whiteboard');
+    socket.on('join_confirmed',     onJoinConfirmed);
+    socket.on('remote_board_state', onRemoteBoardState);
+    socket.on('remote_cursor',      onRemoteCursor);
+    socket.on('user_joined',        onUserJoined);
+    socket.on('user_left',          onUserLeft);
+    socket.on('you_were_removed',   onYouWereRemoved);
+    return () => {
+      socket.emit('leave_room', { roomCode: canvasId });
+      socket.off('connect',           onReconnect);
+      socket.off('join_confirmed',    onJoinConfirmed);
+      socket.off('remote_board_state',onRemoteBoardState);
+      socket.off('remote_cursor',     onRemoteCursor);
+      socket.off('user_joined',       onUserJoined);
+      socket.off('user_left',         onUserLeft);
+      socket.off('you_were_removed',  onYouWereRemoved);
+    };
+  }, [canvasId, navigate, user]);
+
+  /* ── broadcast board state on change (debounced 200ms) ── */
+  useEffect(() => {
+    if (!canvasId || canvasId.startsWith('solo_') || !hasJoinedRef.current) return;
+    const current = JSON.stringify({ components, connections, providers });
+    if (current === lastReceivedRef.current) { lastReceivedRef.current = null; return; }
+    if (broadcastTimerRef.current) clearTimeout(broadcastTimerRef.current);
+    broadcastTimerRef.current = setTimeout(() => {
+      socket.emit('board_state', { roomCode: canvasId, data: { components, connections, providers } });
+    }, 200);
+    return () => clearTimeout(broadcastTimerRef.current);
+  }, [components, connections, providers, canvasId]);
+
   /* ── board mousedown ── */
   const onBoardMouseDown = useCallback(e => {
     if (e.button === 1 || spaceDown.current) {
@@ -277,6 +354,17 @@ export default function ComponentTree({ canvasId }) {
   }, [tool]);
 
   const onBoardMouseMove = useCallback(e => {
+    // throttled cursor broadcast
+    const _now = Date.now();
+    if (canvasId && !canvasId.startsWith('solo_') && _now - cursorThrottleRef.current > 50) {
+      cursorThrottleRef.current = _now;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const cx = (e.clientX - rect.left - panRef.current.x) / zoomRef.current;
+        const cy = (e.clientY - rect.top  - panRef.current.y) / zoomRef.current;
+        socket.emit('cursor_move', { roomCode: canvasId, x: cx, y: cy });
+      }
+    }
     if (isPanning.current) {
       const s = panStart.current;
       setP({ x: s.px + (e.clientX - s.x), y: s.py + (e.clientY - s.y) });
@@ -579,6 +667,26 @@ export default function ComponentTree({ canvasId }) {
           ))}
         </div>
 
+        {/* ── Remote cursors (screen-space) ── */}
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none', zIndex:25, overflow:'visible' }}>
+          {Object.entries(remoteCursors).map(([uid, cur]) => {
+            const sx = cur.x * zoom + pan.x;
+            const sy = cur.y * zoom + pan.y;
+            const label = (cur.displayName || 'Guest').length > 12
+              ? (cur.displayName || 'Guest').slice(0, 11) + '…'
+              : (cur.displayName || 'Guest');
+            return (
+              <div key={uid} style={{ position:'absolute', left:sx, top:sy, display:'flex', alignItems:'flex-start', gap:5, transform:'translate(-2px,-2px)', transition:'left .07s linear,top .07s linear', pointerEvents:'none' }}>
+                <svg width="16" height="20" viewBox="0 0 24 28" fill={cur.color} style={{ filter:'drop-shadow(0 2px 4px rgba(0,0,0,0.55))', flexShrink:0 }}>
+                  <path d="M4 2 L4 22 L9 17 L13 26 L16 24.5 L12 15.5 L18 15.5 Z"/>
+                  <path d="M4 2 L4 22 L9 17 L13 26 L16 24.5 L12 15.5 L18 15.5 Z" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
+                </svg>
+                <span style={{ fontSize:11, fontWeight:700, color:'#fff', padding:'2px 7px 3px', borderRadius:5, background:cur.color, whiteSpace:'nowrap', boxShadow:'0 2px 6px rgba(0,0,0,0.45)', fontFamily:'Inter,system-ui,sans-serif', marginTop:1 }}>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+
         {/* connect hint */}
         {connectFrom && (
           <div className="ct-hint">
@@ -600,6 +708,48 @@ export default function ComponentTree({ canvasId }) {
           {folderFilter && <span className="ct-badge folder">{folderFilter}</span>}
         </div>
       </div>
+
+      {/* ──── RIGHT SIDEBAR: Room Code + Participants ──── */}
+      {canvasId && !canvasId.startsWith('solo_') && (
+        <aside className={`ct-rsidebar ${rightOpen ? 'open' : ''}`}>
+          <button className="ct-rtoggle" onClick={() => setRightOpen(v => !v)}
+            title={rightOpen ? 'Collapse' : 'Expand'}>
+            {rightOpen ? <ChevronRight size={15}/> : <ChevronLeft size={15}/>}
+          </button>
+          {rightOpen && (
+            <div className="ct-rsb-scroll">
+              <p className="ct-label" style={{ marginTop:8 }}><Link2 size={11}/>&nbsp;Room Code</p>
+              <div className="ct-rsb-code-box">
+                <span className="ct-rsb-code-text">{canvasId}</span>
+                <button className="ct-rsb-copy-btn" onClick={() => { navigator.clipboard.writeText(canvasId); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 2000); }}>
+                  {copiedCode ? <><Check size={12}/>&nbsp;Copied!</> : <><Copy size={12}/>&nbsp;Copy</>}
+                </button>
+              </div>
+              <p className="ct-rsb-hint">Share so others can join</p>
+              <div className="ct-sep" style={{ margin:'8px 0' }}/>
+              <p className="ct-label">
+                <Users size={11}/>&nbsp;Participants
+                <span className="ct-rsb-count">{roomMembers.length}</span>
+              </p>
+              <ul className="ct-rsb-members">
+                {roomMembers.map(m => (
+                  <li key={m.userId} className="ct-rsb-member">
+                    <span className="ct-rsb-avatar" style={{ background: m.color }}>
+                      {(m.displayName || '?')[0].toUpperCase()}
+                    </span>
+                    <div className="ct-rsb-info">
+                      <span className="ct-rsb-name">{m.displayName.length > 14 ? m.displayName.slice(0,13)+'…' : m.displayName}</span>
+                      {m.isHost && <span className="ct-rsb-host">Host 👑</span>}
+                    </div>
+                    <span className="ct-rsb-online"/>
+                  </li>
+                ))}
+                {roomMembers.length === 0 && <li className="ct-rsb-empty">No one here yet</li>}
+              </ul>
+            </div>
+          )}
+        </aside>
+      )}
 
       {/* ──── CONNECT TYPE MODAL ──── */}
       {connModal && (
@@ -686,8 +836,12 @@ export default function ComponentTree({ canvasId }) {
             </div>
             <pre className="ct-export-code">{exportFiles[exportTab]?.code}</pre>
             <div className="ct-export-actions">
-              <button className="ct-copy-btn" onClick={() => navigator.clipboard.writeText(exportFiles[exportTab]?.code || '')}>
-                Copy File
+              <button
+                className={`ct-copy-btn ${fileCopied ? 'copied' : ''}`}
+                onClick={() => { navigator.clipboard.writeText(exportFiles[exportTab]?.code || ''); setFileCopied(true); setTimeout(() => setFileCopied(false), 1500); }}
+              >
+                {fileCopied ? <Check size={13}/> : <Copy size={13}/>}
+                {fileCopied ? 'Copied!' : 'Copy File'}
               </button>
               <button className="ct-download-btn" onClick={downloadAll}>
                 <Download size={13}/> Download All Files

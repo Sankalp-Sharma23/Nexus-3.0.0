@@ -1,0 +1,2411 @@
+{
+  "smoke_test": {
+    "userId": "smoke_test",
+    "target": {
+      "role": "Frontend Engineer",
+      "company": "Google",
+      "skills": "HTML,CSS,JS",
+      "hoursPerDay": 2,
+      "timeline": "6 months"
+    },
+    "generatedAt": "2026-03-03T09:56:21.682Z",
+    "skillGap": [
+      {
+        "skill": "React",
+        "currentLevel": 3,
+        "requiredLevel": 9
+      },
+      {
+        "skill": "TypeScript",
+        "currentLevel": 3,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "CSS / Tailwind",
+        "currentLevel": 7,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "Testing (Vitest)",
+        "currentLevel": 3,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "Accessibility",
+        "currentLevel": 2,
+        "requiredLevel": 6
+      },
+      {
+        "skill": "Performance",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "State Management",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "JavaScript",
+          "status": "locked"
+        },
+        {
+          "name": "TypeScript",
+          "status": "locked"
+        },
+        {
+          "name": "HTML/CSS",
+          "status": "mastered"
+        }
+      ],
+      "Frameworks": [
+        {
+          "name": "React",
+          "status": "locked"
+        },
+        {
+          "name": "Next.js",
+          "status": "locked"
+        },
+        {
+          "name": "Tailwind CSS",
+          "status": "locked"
+        }
+      ],
+      "Tools": [
+        {
+          "name": "Vite",
+          "status": "locked"
+        },
+        {
+          "name": "Vitest / Jest",
+          "status": "locked"
+        },
+        {
+          "name": "Git / GitHub",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "Accessibility (a11y)",
+          "status": "locked"
+        },
+        {
+          "name": "Core Web Vitals",
+          "status": "locked"
+        },
+        {
+          "name": "Design Systems",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 180,
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "TypeScript & Modern React",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "TypeScript",
+          "React"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete TypeScript Handbook exercises",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "TypeScript"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Migrate one project component to TS",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "TypeScript",
+              "React"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Build a reusable component library (3 components)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement custom hooks for data fetching (SWR)",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Testing & Accessibility",
+        "estimatedWeeks": 3,
+        "status": "locked",
+        "requiredSkills": [
+          "Testing",
+          "TypeScript"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Set up Vitest + React Testing Library",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Write tests for 5 components (80% coverage)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Fix 10 accessibility violations (Lighthouse audit)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Add skip-navigation and ARIA labels",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Performance & Next.js",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Next.js",
+          "Performance"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Score 90+ on Lighthouse for a real project",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Build a full-stack app with Next.js 14 (App Router)",
+            "timeEstimate": 20,
+            "isDone": false,
+            "skills": [
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Implement image optimization + lazy loading",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals",
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to Vercel with CI/CD",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Git / GitHub"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 0,
+    "lastActive": null,
+    "completedToday": [],
+    "nexusScore": 33,
+    "nexusBreakdown": {
+      "total": 33,
+      "skillCoverage": 33,
+      "executionProgress": 0,
+      "momentum": 0
+    },
+    "eta": {
+      "remainHours": 75,
+      "totalDays": 38,
+      "targetDate": "2026-04-10"
+    }
+  },
+  "1772476246709": {
+    "userId": "1772476246709",
+    "target": {
+      "role": "software engineer I",
+      "company": "Google",
+      "skills": "JavaScript, CSS",
+      "resumeText": "",
+      "githubData": {
+        "username": "Sankalp-Sharma23",
+        "publicRepos": 5,
+        "topLangs": [
+          "JavaScript",
+          "CSS"
+        ],
+        "repos": [
+          {
+            "name": "Nexus_2.0",
+            "description": "",
+            "stars": 0,
+            "language": "JavaScript",
+            "readmeExcerpt": null
+          },
+          {
+            "name": "Nexus",
+            "description": "An Integrated Career-Engineering Ecosystem for Modern Developers",
+            "stars": 0,
+            "language": "CSS",
+            "readmeExcerpt": "# React + Vite\n\nThis template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.\n\nCurrently, two official plugins are available:\n\n- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs) for Fast Refresh\n- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh\n\n## React Compiler\n\nThe React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, s"
+          },
+          {
+            "name": "TogetherAid",
+            "description": "",
+            "stars": 0,
+            "language": "",
+            "readmeExcerpt": null
+          },
+          {
+            "name": "fee",
+            "description": "",
+            "stars": 0,
+            "language": "",
+            "readmeExcerpt": null
+          },
+          {
+            "name": "Together-Aid",
+            "description": "",
+            "stars": 0,
+            "language": "",
+            "readmeExcerpt": null
+          }
+        ]
+      },
+      "hoursPerDay": 3,
+      "timeline": "6 months",
+      "lcStats": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      }
+    },
+    "generatedAt": "2026-03-03T14:10:23.214Z",
+    "jobSource": {
+      "matchType": "exact",
+      "title": "software engineer I at Google",
+      "company": "Google",
+      "url": null,
+      "snippet": "All Google SWE roles require algorithmic thinking at a high bar plus coding excellence.",
+      "requiredSkills": [
+        "Data Structures & Algorithms (LeetCode Hard)",
+        "System Design",
+        "Languages (Python/Java/Go/C++)",
+        "Testing",
+        "Git / Code Review"
+      ],
+      "niceToHave": [
+        "Open-source contributions",
+        "Tech writing"
+      ],
+      "source": "nexus-kb"
+    },
+    "skillsOverview": {
+      "youHave": [
+        {
+          "skill": "JavaScript",
+          "level": 7
+        },
+        {
+          "skill": "CSS",
+          "level": 7
+        }
+      ],
+      "theyWant": [
+        {
+          "skill": "Data Structures & Algorithms (LeetCode Hard)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "System Design",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Languages (Python/Java/Go/C++)",
+          "required": true,
+          "userHasIt": true
+        },
+        {
+          "skill": "Testing",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Git / Code Review",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Open-source contributions",
+          "required": false,
+          "userHasIt": false
+        },
+        {
+          "skill": "Tech writing",
+          "required": false,
+          "userHasIt": false
+        }
+      ]
+    },
+    "skillGap": [
+      {
+        "skill": "System Design",
+        "currentLevel": 1,
+        "requiredLevel": 9,
+        "fromJD": true
+      },
+      {
+        "skill": "Docker",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "PostgreSQL / SQL",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "Redis Caching",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "REST API Design",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "Kubernetes",
+        "currentLevel": 1,
+        "requiredLevel": 6
+      },
+      {
+        "skill": "Message Queues",
+        "currentLevel": 1,
+        "requiredLevel": 6
+      },
+      {
+        "skill": "Data Structures & Algorithms (LeetCode Hard)",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Languages (Python/Java/Go/C++)",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Testing",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "Node.js / JS",
+          "status": "locked"
+        },
+        {
+          "name": "Go",
+          "status": "locked"
+        },
+        {
+          "name": "Python",
+          "status": "locked"
+        }
+      ],
+      "Databases": [
+        {
+          "name": "PostgreSQL",
+          "status": "locked"
+        },
+        {
+          "name": "Redis",
+          "status": "locked"
+        },
+        {
+          "name": "MongoDB",
+          "status": "locked"
+        }
+      ],
+      "Infrastructure": [
+        {
+          "name": "Docker",
+          "status": "locked"
+        },
+        {
+          "name": "Kubernetes",
+          "status": "locked"
+        },
+        {
+          "name": "AWS / GCP",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "System Design",
+          "status": "locked"
+        },
+        {
+          "name": "REST / gRPC",
+          "status": "locked"
+        },
+        {
+          "name": "Message Queues",
+          "status": "locked"
+        },
+        {
+          "name": "Caching Patterns",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 220,
+    "lcStats": {
+      "easy": 0,
+      "medium": 0,
+      "hard": 0
+    },
+    "lcBenchmarks": {
+      "easy": 60,
+      "medium": 150,
+      "hard": 40,
+      "verdict": "needs_work",
+      "insight": "Google expects LeetCode Hard fluency — aim for 150+ Mediums and 40+ Hards."
+    },
+    "proofOfWork": [
+      {
+        "title": "Distributed Key-Value Store",
+        "why": "Google SWEs build infrastructure at scale — this demonstrates you understand consistency, replication, and CAP theorem",
+        "what": "Build a single-node KV store in Go/Python with a REST API, then add write-ahead logging and a basic leader election protocol",
+        "signals": [
+          "Systems thinking",
+          "Distributed systems fundamentals",
+          "Low-level data structures"
+        ],
+        "difficulty": "advanced",
+        "estimatedHours": 40
+      },
+      {
+        "title": "PageRank Visualizer",
+        "why": "Directly relevant to Google's core — shows you can implement graph algorithms on real data",
+        "what": "Crawl 500 pages starting from a seed URL, build a directed graph, run PageRank, visualize with D3.js",
+        "signals": [
+          "Graph algorithms",
+          "Web crawling",
+          "Data visualization"
+        ],
+        "difficulty": "intermediate",
+        "estimatedHours": 25
+      },
+      {
+        "title": "Search Autocomplete System",
+        "why": "Mirrors Google Search internals — Trie + prefix ranking signals strong core CS fundamentals",
+        "what": "Implement a Trie-based autocomplete engine with frequency-weighted ranking, serve via REST, and build a clean search UI",
+        "signals": [
+          "Data structures",
+          "Algorithm optimization",
+          "Full-stack execution"
+        ],
+        "difficulty": "intermediate",
+        "estimatedHours": 20
+      }
+    ],
+    "resumeProjects": [
+      {
+        "title": "Full-Stack SaaS Starter (Next.js + Prisma)",
+        "stack": [
+          "Next.js",
+          "TypeScript",
+          "Prisma",
+          "PostgreSQL",
+          "Stripe"
+        ],
+        "description": "A production-ready SaaS boilerplate with auth, billing, and multi-tenancy. Users can subscribe to plans, manage billing, and access role-based features.",
+        "highlights": [
+          "Built multi-tenant SaaS with Stripe subscription billing; supports 3 pricing tiers",
+          "Implemented JWT + session-based auth with OAuth (GitHub/Google) using NextAuth.js",
+          "Achieved 95 Lighthouse performance score with Next.js ISR and image optimisation"
+        ],
+        "whyItMatters": "Demonstrates full product ownership — architecture, auth, payments, and deployment",
+        "difficulty": "advanced",
+        "estimatedHours": 50
+      },
+      {
+        "title": "CLI Dev Tool (Node.js)",
+        "stack": [
+          "Node.js",
+          "TypeScript",
+          "Commander.js",
+          "npm"
+        ],
+        "description": "A publishable CLI tool that solves a real developer problem (e.g., scaffolding, bulk file ops, Git automation). Published to npm with full test coverage.",
+        "highlights": [
+          "Published npm package with 200+ weekly downloads — demonstrates real-world adoption",
+          "Built interactive prompts using Inquirer.js; supports 8 sub-commands with full --help docs",
+          "Achieved 96% test coverage with Jest; CI pipeline runs on Node 18/20/22"
+        ],
+        "whyItMatters": "A published npm tool signals strong engineering fundamentals and product thinking — rare for new grads",
+        "difficulty": "intermediate",
+        "estimatedHours": 20
+      }
+    ],
+    "careerRoadmap": {
+      "summary": "To land a software engineer I role at Google, you need to systematically close the skill gaps identified above while building proof-of-work that signals hiring-bar readiness. The path requires consistent daily work — expect 3–6 months depending on your current level. The most critical leverage point is building 1–2 strong projects and solving at least 80 medium LeetCode problems.",
+      "milestones": [
+        {
+          "label": "30 Days",
+          "goal": "Complete Phase 1 of the Execution Plan and solve 30 LeetCode Mediums",
+          "actions": [
+            "Solve 1 LeetCode problem daily (easy → medium)",
+            "Complete all Phase 1 tasks in your checklist",
+            "Pick one resume project and scaffold it"
+          ]
+        },
+        {
+          "label": "3 Months",
+          "goal": "Have 2 deployable projects on GitHub and reach 80 LeetCode Mediums",
+          "actions": [
+            "Ship your top-priority resume project with a README and live demo",
+            "Start Phase 2 of the execution plan",
+            "Do 2 mock interviews on Pramp or Interviewing.io",
+            "Apply to 5 companies to get interview reps"
+          ]
+        },
+        {
+          "label": "6 Months",
+          "goal": "Be fully interview-ready and have active applications at target companies",
+          "actions": [
+            "Complete execution plan (all phases)",
+            "Have 3 projects on GitHub with README + live demos",
+            "Solve 100+ mediums and 20+ hards on LeetCode",
+            "Apply to Google and 10 comparable companies"
+          ]
+        }
+      ],
+      "interviewStrategy": {
+        "overview": "Google's interview process is rigorous but follows a predictable structure. Prepare specifically for each round type — do not treat it as one monolithic \"coding test\".",
+        "rounds": [
+          "Recruiter screen (30 min): Background, motivation, compensation expectations. Know your resume cold.",
+          "Technical phone screen (45–60 min): 1–2 coding problems (medium difficulty). Focus on correctness first, then optimise.",
+          "Virtual onsite — Coding rounds (x2): Medium–hard LeetCode style. Think aloud, clarify before coding, test with examples.",
+          "Virtual onsite — System Design: Design a scalable system (e.g., URL shortener, news feed, rate limiter). Know CAP theorem, caching, load balancing.",
+          "Behavioural / Culture fit: STAR format stories. Prepare 5–7 situations covering leadership, conflict, failure, and impact."
+        ],
+        "tips": [
+          "Google values clarity of communication as much as correctness — talk through your thinking even when you're stuck",
+          "Always clarify constraints and edge cases before writing a single line of code — interviewers mark this positively",
+          "For system design, start with requirements, then capacity estimation, then high-level design — don't jump to databases first",
+          "Prepare questions to ask the interviewer — it signals genuine interest and product thinking"
+        ]
+      },
+      "doAndDont": {
+        "do": [
+          "Build and ship at least one end-to-end project that solves a real problem — not a tutorial clone",
+          "Practice explaining your code complexity (Big O) out loud, not just writing it",
+          "Research the team and product before each interview — mention specific features you find interesting",
+          "Apply to multiple companies simultaneously to create competing offers and reduce pressure"
+        ],
+        "dont": [
+          "Don't skip system design prep even for junior roles — it's increasingly tested earlier",
+          "Don't wait until you feel \"100% ready\" — apply when you hit 70% of the skill bar",
+          "Don't list skills on your resume you can't explain in depth under pressure",
+          "Don't ignore Google's engineering blog and tech talks — they reveal what the team values"
+        ]
+      }
+    },
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "Databases & Caching",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "PostgreSQL",
+          "Redis"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete PostgreSQL performance tuning tutorial",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "PostgreSQL"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Build a cache-aside pattern with Redis",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Redis"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Design a normalized schema for a social network",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "PostgreSQL"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement rate limiting with Redis sliding window",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Redis",
+              "REST / gRPC"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Docker & Microservices",
+        "estimatedWeeks": 3,
+        "status": "locked",
+        "requiredSkills": [
+          "Docker",
+          "System Design"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Containerize an existing Node.js API",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Docker"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Docker Compose: API + Postgres + Redis stack",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Docker"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Design a URL shortener (system design)",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "System Design"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Set up message queue (BullMQ) for async jobs",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Message Queues"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Kubernetes & Scale",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Kubernetes",
+          "AWS / GCP"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Deploy microservice to Kubernetes (local k3s)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Kubernetes"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Set up Horizontal Pod Autoscaler",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Kubernetes"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Design a distributed cache for 1M req/s",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "System Design",
+              "Caching Patterns"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to AWS ECS + RDS",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "AWS / GCP"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 0,
+    "lastActive": null,
+    "completedToday": [],
+    "progressHistory": [
+      {
+        "date": "2026-03-03T14:10:23.214Z",
+        "event": "plan_created",
+        "nexusScore": 0,
+        "tasksCompleted": 0,
+        "note": "Roadmap generated for software engineer I @ Google"
+      }
+    ],
+    "nexusScore": 0,
+    "nexusBreakdown": {
+      "total": 0,
+      "skillCoverage": 0,
+      "executionProgress": 0,
+      "momentum": 0
+    },
+    "eta": {
+      "remainHours": 57,
+      "totalDays": 19,
+      "targetDate": "2026-03-22"
+    },
+    "hireReadiness": {
+      "total": 8,
+      "label": "Building Foundation",
+      "skillScore": 8,
+      "taskScore": 0,
+      "dsaScore": 0
+    }
+  },
+  "smoke2": {
+    "userId": "smoke2",
+    "target": {
+      "role": "Frontend Engineer",
+      "company": "Google",
+      "skills": "React,JavaScript",
+      "hoursPerDay": 2,
+      "timeline": "6 months"
+    },
+    "generatedAt": "2026-03-03T10:13:00.986Z",
+    "jobSource": {
+      "matchType": "exact",
+      "title": "Frontend Engineer at Google",
+      "company": "Google",
+      "url": null,
+      "snippet": "Google expects mastery of web fundamentals, accessibility, and performance. Bar is L4–L5 SWE.",
+      "requiredSkills": [
+        "JavaScript",
+        "TypeScript",
+        "React or Angular or Vue",
+        "HTML/CSS",
+        "Accessibility (WCAG)",
+        "Performance (Core Web Vitals)",
+        "Testing (Jest/Karma)",
+        "Git"
+      ],
+      "niceToHave": [
+        "Lit/Web Components",
+        "Chrome DevTools profiling",
+        "i18n"
+      ],
+      "source": "nexus-kb"
+    },
+    "skillGap": [
+      {
+        "skill": "React",
+        "currentLevel": 6,
+        "requiredLevel": 9,
+        "fromJD": true
+      },
+      {
+        "skill": "TypeScript",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "CSS / Tailwind",
+        "currentLevel": 2,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Testing (Vitest)",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Accessibility",
+        "currentLevel": 2,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Performance",
+        "currentLevel": 2,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "State Management",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "JavaScript",
+        "currentLevel": 6,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "HTML/CSS",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Git",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "JavaScript",
+          "status": "mastered"
+        },
+        {
+          "name": "TypeScript",
+          "status": "locked"
+        },
+        {
+          "name": "HTML/CSS",
+          "status": "locked"
+        }
+      ],
+      "Frameworks": [
+        {
+          "name": "React",
+          "status": "mastered"
+        },
+        {
+          "name": "Next.js",
+          "status": "locked"
+        },
+        {
+          "name": "Tailwind CSS",
+          "status": "locked"
+        }
+      ],
+      "Tools": [
+        {
+          "name": "Vite",
+          "status": "locked"
+        },
+        {
+          "name": "Vitest / Jest",
+          "status": "locked"
+        },
+        {
+          "name": "Git / GitHub",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "Accessibility (a11y)",
+          "status": "locked"
+        },
+        {
+          "name": "Core Web Vitals",
+          "status": "locked"
+        },
+        {
+          "name": "Design Systems",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 180,
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "TypeScript & Modern React",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "TypeScript",
+          "React"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete TypeScript Handbook exercises",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "TypeScript"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Migrate one project component to TS",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "TypeScript",
+              "React"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Build a reusable component library (3 components)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement custom hooks for data fetching (SWR)",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Testing & Accessibility",
+        "estimatedWeeks": 3,
+        "status": "locked",
+        "requiredSkills": [
+          "Testing",
+          "TypeScript"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Set up Vitest + React Testing Library",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Write tests for 5 components (80% coverage)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Fix 10 accessibility violations (Lighthouse audit)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Add skip-navigation and ARIA labels",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Performance & Next.js",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Next.js",
+          "Performance"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Score 90+ on Lighthouse for a real project",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Build a full-stack app with Next.js 14 (App Router)",
+            "timeEstimate": 20,
+            "isDone": false,
+            "skills": [
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Implement image optimization + lazy loading",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals",
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to Vercel with CI/CD",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Git / GitHub"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 0,
+    "lastActive": null,
+    "completedToday": [],
+    "nexusScore": 67,
+    "nexusBreakdown": {
+      "total": 67,
+      "skillCoverage": 67,
+      "executionProgress": 0,
+      "momentum": 0
+    },
+    "eta": {
+      "remainHours": 75,
+      "totalDays": 38,
+      "targetDate": "2026-04-10"
+    }
+  },
+  "smoke3": {
+    "userId": "smoke3",
+    "target": {
+      "role": "Backend Engineer",
+      "company": "SomeStartupXYZ",
+      "skills": "Node.js",
+      "hoursPerDay": 3,
+      "timeline": "6 months"
+    },
+    "generatedAt": "2026-03-03T10:13:34.199Z",
+    "jobSource": {
+      "matchType": "bestPractice",
+      "title": "Backend Engineer",
+      "company": "SomeStartupXYZ",
+      "url": null,
+      "snippet": null,
+      "requiredSkills": [],
+      "source": "ai-inference"
+    },
+    "skillGap": [
+      {
+        "skill": "System Design",
+        "currentLevel": 1,
+        "requiredLevel": 9
+      },
+      {
+        "skill": "Docker",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "PostgreSQL / SQL",
+        "currentLevel": 3,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "Redis Caching",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "REST API Design",
+        "currentLevel": 3,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "Kubernetes",
+        "currentLevel": 3,
+        "requiredLevel": 6
+      },
+      {
+        "skill": "Message Queues",
+        "currentLevel": 2,
+        "requiredLevel": 6
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "Node.js / JS",
+          "status": "mastered"
+        },
+        {
+          "name": "Go",
+          "status": "locked"
+        },
+        {
+          "name": "Python",
+          "status": "locked"
+        }
+      ],
+      "Databases": [
+        {
+          "name": "PostgreSQL",
+          "status": "locked"
+        },
+        {
+          "name": "Redis",
+          "status": "locked"
+        },
+        {
+          "name": "MongoDB",
+          "status": "locked"
+        }
+      ],
+      "Infrastructure": [
+        {
+          "name": "Docker",
+          "status": "locked"
+        },
+        {
+          "name": "Kubernetes",
+          "status": "locked"
+        },
+        {
+          "name": "AWS / GCP",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "System Design",
+          "status": "locked"
+        },
+        {
+          "name": "REST / gRPC",
+          "status": "locked"
+        },
+        {
+          "name": "Message Queues",
+          "status": "locked"
+        },
+        {
+          "name": "Caching Patterns",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 220,
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "Databases & Caching",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "PostgreSQL",
+          "Redis"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete PostgreSQL performance tuning tutorial",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "PostgreSQL"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Build a cache-aside pattern with Redis",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Redis"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Design a normalized schema for a social network",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "PostgreSQL"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement rate limiting with Redis sliding window",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Redis",
+              "REST / gRPC"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Docker & Microservices",
+        "estimatedWeeks": 3,
+        "status": "locked",
+        "requiredSkills": [
+          "Docker",
+          "System Design"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Containerize an existing Node.js API",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Docker"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Docker Compose: API + Postgres + Redis stack",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Docker"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Design a URL shortener (system design)",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "System Design"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Set up message queue (BullMQ) for async jobs",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Message Queues"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Kubernetes & Scale",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Kubernetes",
+          "AWS / GCP"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Deploy microservice to Kubernetes (local k3s)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Kubernetes"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Set up Horizontal Pod Autoscaler",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Kubernetes"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Design a distributed cache for 1M req/s",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "System Design",
+              "Caching Patterns"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to AWS ECS + RDS",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "AWS / GCP"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 0,
+    "lastActive": null,
+    "completedToday": [],
+    "nexusScore": 31,
+    "nexusBreakdown": {
+      "total": 31,
+      "skillCoverage": 31,
+      "executionProgress": 0,
+      "momentum": 0
+    },
+    "eta": {
+      "remainHours": 57,
+      "totalDays": 19,
+      "targetDate": "2026-03-22"
+    }
+  },
+  "test1": {
+    "userId": "test1",
+    "target": {
+      "role": "Frontend",
+      "company": "Google",
+      "skills": "React",
+      "hoursPerDay": 2,
+      "timeline": "6 months"
+    },
+    "generatedAt": "2026-03-03T10:25:55.148Z",
+    "jobSource": {
+      "matchType": "exact",
+      "title": "Frontend at Google",
+      "company": "Google",
+      "url": null,
+      "snippet": "Google expects mastery of web fundamentals, accessibility, and performance. Bar is L4–L5 SWE.",
+      "requiredSkills": [
+        "JavaScript",
+        "TypeScript",
+        "React or Angular or Vue",
+        "HTML/CSS",
+        "Accessibility (WCAG)",
+        "Performance (Core Web Vitals)",
+        "Testing (Jest/Karma)",
+        "Git"
+      ],
+      "niceToHave": [
+        "Lit/Web Components",
+        "Chrome DevTools profiling",
+        "i18n"
+      ],
+      "source": "nexus-kb"
+    },
+    "skillsOverview": {
+      "youHave": [
+        {
+          "skill": "React",
+          "level": 7
+        }
+      ],
+      "theyWant": [
+        {
+          "skill": "JavaScript",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "TypeScript",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "React or Angular or Vue",
+          "required": true,
+          "userHasIt": true
+        },
+        {
+          "skill": "HTML/CSS",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Accessibility (WCAG)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Performance (Core Web Vitals)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Testing (Jest/Karma)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Git",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Lit/Web Components",
+          "required": false,
+          "userHasIt": false
+        },
+        {
+          "skill": "Chrome DevTools profiling",
+          "required": false,
+          "userHasIt": false
+        },
+        {
+          "skill": "i18n",
+          "required": false,
+          "userHasIt": false
+        }
+      ]
+    },
+    "skillGap": [
+      {
+        "skill": "React",
+        "currentLevel": 7,
+        "requiredLevel": 9,
+        "fromJD": true
+      },
+      {
+        "skill": "TypeScript",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "CSS / Tailwind",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Testing (Vitest)",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Accessibility",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Performance",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "State Management",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "JavaScript",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "HTML/CSS",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Git",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "JavaScript",
+          "status": "locked"
+        },
+        {
+          "name": "TypeScript",
+          "status": "locked"
+        },
+        {
+          "name": "HTML/CSS",
+          "status": "locked"
+        }
+      ],
+      "Frameworks": [
+        {
+          "name": "React",
+          "status": "mastered"
+        },
+        {
+          "name": "Next.js",
+          "status": "locked"
+        },
+        {
+          "name": "Tailwind CSS",
+          "status": "locked"
+        }
+      ],
+      "Tools": [
+        {
+          "name": "Vite",
+          "status": "locked"
+        },
+        {
+          "name": "Vitest / Jest",
+          "status": "locked"
+        },
+        {
+          "name": "Git / GitHub",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "Accessibility (a11y)",
+          "status": "locked"
+        },
+        {
+          "name": "Core Web Vitals",
+          "status": "locked"
+        },
+        {
+          "name": "Design Systems",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 180,
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "TypeScript & Modern React",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "TypeScript",
+          "React"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete TypeScript Handbook exercises",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "TypeScript"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Migrate one project component to TS",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "TypeScript",
+              "React"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Build a reusable component library (3 components)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement custom hooks for data fetching (SWR)",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Testing & Accessibility",
+        "estimatedWeeks": 3,
+        "status": "locked",
+        "requiredSkills": [
+          "Testing",
+          "TypeScript"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Set up Vitest + React Testing Library",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Write tests for 5 components (80% coverage)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Fix 10 accessibility violations (Lighthouse audit)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Add skip-navigation and ARIA labels",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Performance & Next.js",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Next.js",
+          "Performance"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Score 90+ on Lighthouse for a real project",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Build a full-stack app with Next.js 14 (App Router)",
+            "timeEstimate": 20,
+            "isDone": false,
+            "skills": [
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Implement image optimization + lazy loading",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals",
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to Vercel with CI/CD",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Git / GitHub"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 0,
+    "lastActive": null,
+    "completedToday": [],
+    "progressHistory": [
+      {
+        "date": "2026-03-03T10:25:55.148Z",
+        "event": "plan_created",
+        "nexusScore": 0,
+        "tasksCompleted": 0,
+        "note": "Roadmap generated for Frontend @ Google"
+      }
+    ],
+    "nexusScore": 33,
+    "nexusBreakdown": {
+      "total": 33,
+      "skillCoverage": 33,
+      "executionProgress": 0,
+      "momentum": 0
+    },
+    "eta": {
+      "remainHours": 75,
+      "totalDays": 38,
+      "targetDate": "2026-04-10"
+    }
+  },
+  "test3": {
+    "userId": "test3",
+    "target": {
+      "role": "Frontend",
+      "company": "Google",
+      "skills": "React",
+      "resumeText": "",
+      "githubData": null,
+      "hoursPerDay": 2,
+      "timeline": "6 months",
+      "lcStats": null
+    },
+    "generatedAt": "2026-03-03T13:00:11.288Z",
+    "jobSource": {
+      "matchType": "exact",
+      "title": "Frontend at Google",
+      "company": "Google",
+      "url": null,
+      "snippet": "Google expects mastery of web fundamentals, accessibility, and performance. Bar is L4–L5 SWE.",
+      "requiredSkills": [
+        "JavaScript",
+        "TypeScript",
+        "React or Angular or Vue",
+        "HTML/CSS",
+        "Accessibility (WCAG)",
+        "Performance (Core Web Vitals)",
+        "Testing (Jest/Karma)",
+        "Git"
+      ],
+      "niceToHave": [
+        "Lit/Web Components",
+        "Chrome DevTools profiling",
+        "i18n"
+      ],
+      "source": "nexus-kb"
+    },
+    "skillsOverview": {
+      "youHave": [
+        {
+          "skill": "React",
+          "level": 7
+        }
+      ],
+      "theyWant": [
+        {
+          "skill": "JavaScript",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "TypeScript",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "React or Angular or Vue",
+          "required": true,
+          "userHasIt": true
+        },
+        {
+          "skill": "HTML/CSS",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Accessibility (WCAG)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Performance (Core Web Vitals)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Testing (Jest/Karma)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Git",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Lit/Web Components",
+          "required": false,
+          "userHasIt": false
+        },
+        {
+          "skill": "Chrome DevTools profiling",
+          "required": false,
+          "userHasIt": false
+        },
+        {
+          "skill": "i18n",
+          "required": false,
+          "userHasIt": false
+        }
+      ]
+    },
+    "skillGap": [
+      {
+        "skill": "React",
+        "currentLevel": 6,
+        "requiredLevel": 9,
+        "fromJD": true
+      },
+      {
+        "skill": "TypeScript",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "CSS / Tailwind",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Testing (Vitest)",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Accessibility",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Performance",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "State Management",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "JavaScript",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "HTML/CSS",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Git",
+        "currentLevel": 1,
+        "requiredLevel": 8,
+        "fromJD": true
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "JavaScript",
+          "status": "locked"
+        },
+        {
+          "name": "TypeScript",
+          "status": "locked"
+        },
+        {
+          "name": "HTML/CSS",
+          "status": "locked"
+        }
+      ],
+      "Frameworks": [
+        {
+          "name": "React",
+          "status": "learning"
+        },
+        {
+          "name": "Next.js",
+          "status": "locked"
+        },
+        {
+          "name": "Tailwind CSS",
+          "status": "locked"
+        }
+      ],
+      "Tools": [
+        {
+          "name": "Vite",
+          "status": "locked"
+        },
+        {
+          "name": "Vitest / Jest",
+          "status": "locked"
+        },
+        {
+          "name": "Git / GitHub",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "Accessibility (a11y)",
+          "status": "locked"
+        },
+        {
+          "name": "Core Web Vitals",
+          "status": "locked"
+        },
+        {
+          "name": "Design Systems",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 180,
+    "lcStats": null,
+    "lcBenchmarks": {
+      "easy": 48,
+      "medium": 105,
+      "hard": 25,
+      "verdict": "needs_work",
+      "insight": "Frontend roles need lighter DSA coverage; focus on arrays, strings and trees."
+    },
+    "proofOfWork": [
+      {
+        "title": "Distributed Key-Value Store",
+        "why": "Google SWEs build infrastructure at scale — this demonstrates you understand consistency, replication, and CAP theorem",
+        "what": "Build a single-node KV store in Go/Python with a REST API, then add write-ahead logging and a basic leader election protocol",
+        "signals": [
+          "Systems thinking",
+          "Distributed systems fundamentals",
+          "Low-level data structures"
+        ],
+        "difficulty": "advanced",
+        "estimatedHours": 40
+      },
+      {
+        "title": "PageRank Visualizer",
+        "why": "Directly relevant to Google's core — shows you can implement graph algorithms on real data",
+        "what": "Crawl 500 pages starting from a seed URL, build a directed graph, run PageRank, visualize with D3.js",
+        "signals": [
+          "Graph algorithms",
+          "Web crawling",
+          "Data visualization"
+        ],
+        "difficulty": "intermediate",
+        "estimatedHours": 25
+      },
+      {
+        "title": "Search Autocomplete System",
+        "why": "Mirrors Google Search internals — Trie + prefix ranking signals strong core CS fundamentals",
+        "what": "Implement a Trie-based autocomplete engine with frequency-weighted ranking, serve via REST, and build a clean search UI",
+        "signals": [
+          "Data structures",
+          "Algorithm optimization",
+          "Full-stack execution"
+        ],
+        "difficulty": "intermediate",
+        "estimatedHours": 20
+      }
+    ],
+    "resumeProjects": [
+      {
+        "title": "Real-Time Dashboard (React + WebSockets)",
+        "stack": [
+          "React",
+          "Node.js",
+          "Socket.io",
+          "Chart.js"
+        ],
+        "description": "A live analytics dashboard that streams data via WebSockets and renders interactive charts. Supports multi-user sessions with per-user data isolation.",
+        "highlights": [
+          "Built a WebSocket data pipeline serving 500+ concurrent connections, reducing data latency by 60% vs polling",
+          "Implemented React context + reducer pattern for global state, cutting re-renders by 40%",
+          "Designed a responsive grid layout with CSS Grid that adapts across 5 breakpoints"
+        ],
+        "whyItMatters": "Demonstrates real-time frontend architecture — a common pattern in FAANG product dashboards",
+        "difficulty": "intermediate",
+        "estimatedHours": 25
+      },
+      {
+        "title": "Component Library with Storybook",
+        "stack": [
+          "React",
+          "TypeScript",
+          "Storybook",
+          "CSS-in-JS"
+        ],
+        "description": "A typed React component library with 20+ components, documented in Storybook with visual regression tests via Chromatic.",
+        "highlights": [
+          "Shipped 20+ reusable components used across 3 internal projects, reducing UI dev time by 35%",
+          "Authored TypeScript generics for form components, achieving 100% type safety",
+          "Set up automated visual regression testing via Chromatic on every PR"
+        ],
+        "whyItMatters": "Shows system-level UI thinking — exactly what senior FE engineers do at scale",
+        "difficulty": "intermediate",
+        "estimatedHours": 30
+      },
+      {
+        "title": "E-Commerce SPA with Cart & Checkout",
+        "stack": [
+          "React",
+          "Redux Toolkit",
+          "Node.js",
+          "Stripe API"
+        ],
+        "description": "A fully functional e-commerce SPA with product listings, cart management, and Stripe payment integration. Deployed on Vercel with SSR via Next.js.",
+        "highlights": [
+          "Integrated Stripe Checkout with webhook validation, processing test payments end-to-end",
+          "Optimised bundle size by 42% via code splitting and lazy loading",
+          "Deployed to Vercel with CI/CD; P99 Lighthouse score of 92"
+        ],
+        "whyItMatters": "Full product story with payments — proves you can ship complete features, not just components",
+        "difficulty": "intermediate",
+        "estimatedHours": 35
+      }
+    ],
+    "careerRoadmap": {
+      "summary": "To land a Frontend role at Google, you need to systematically close the skill gaps identified above while building proof-of-work that signals hiring-bar readiness. The path requires consistent daily work — expect 3–6 months depending on your current level. The most critical leverage point is building 1–2 strong projects and solving at least 80 medium LeetCode problems.",
+      "milestones": [
+        {
+          "label": "30 Days",
+          "goal": "Complete Phase 1 of the Execution Plan and solve 30 LeetCode Mediums",
+          "actions": [
+            "Solve 1 LeetCode problem daily (easy → medium)",
+            "Complete all Phase 1 tasks in your checklist",
+            "Pick one resume project and scaffold it"
+          ]
+        },
+        {
+          "label": "3 Months",
+          "goal": "Have 2 deployable projects on GitHub and reach 80 LeetCode Mediums",
+          "actions": [
+            "Ship your top-priority resume project with a README and live demo",
+            "Start Phase 2 of the execution plan",
+            "Do 2 mock interviews on Pramp or Interviewing.io",
+            "Apply to 5 companies to get interview reps"
+          ]
+        },
+        {
+          "label": "6 Months",
+          "goal": "Be fully interview-ready and have active applications at target companies",
+          "actions": [
+            "Complete execution plan (all phases)",
+            "Have 3 projects on GitHub with README + live demos",
+            "Solve 100+ mediums and 20+ hards on LeetCode",
+            "Apply to Google and 10 comparable companies"
+          ]
+        }
+      ],
+      "interviewStrategy": {
+        "overview": "Google's interview process is rigorous but follows a predictable structure. Prepare specifically for each round type — do not treat it as one monolithic \"coding test\".",
+        "rounds": [
+          "Recruiter screen (30 min): Background, motivation, compensation expectations. Know your resume cold.",
+          "Technical phone screen (45–60 min): 1–2 coding problems (medium difficulty). Focus on correctness first, then optimise.",
+          "Virtual onsite — Coding rounds (x2): Medium–hard LeetCode style. Think aloud, clarify before coding, test with examples.",
+          "Virtual onsite — System Design: Design a scalable system (e.g., URL shortener, news feed, rate limiter). Know CAP theorem, caching, load balancing.",
+          "Behavioural / Culture fit: STAR format stories. Prepare 5–7 situations covering leadership, conflict, failure, and impact."
+        ],
+        "tips": [
+          "Google values clarity of communication as much as correctness — talk through your thinking even when you're stuck",
+          "Always clarify constraints and edge cases before writing a single line of code — interviewers mark this positively",
+          "For system design, start with requirements, then capacity estimation, then high-level design — don't jump to databases first",
+          "Prepare questions to ask the interviewer — it signals genuine interest and product thinking"
+        ]
+      },
+      "doAndDont": {
+        "do": [
+          "Build and ship at least one end-to-end project that solves a real problem — not a tutorial clone",
+          "Practice explaining your code complexity (Big O) out loud, not just writing it",
+          "Research the team and product before each interview — mention specific features you find interesting",
+          "Apply to multiple companies simultaneously to create competing offers and reduce pressure"
+        ],
+        "dont": [
+          "Don't skip system design prep even for junior roles — it's increasingly tested earlier",
+          "Don't wait until you feel \"100% ready\" — apply when you hit 70% of the skill bar",
+          "Don't list skills on your resume you can't explain in depth under pressure",
+          "Don't ignore Google's engineering blog and tech talks — they reveal what the team values"
+        ]
+      }
+    },
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "TypeScript & Modern React",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "TypeScript",
+          "React"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete TypeScript Handbook exercises",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "TypeScript"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Migrate one project component to TS",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "TypeScript",
+              "React"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Build a reusable component library (3 components)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement custom hooks for data fetching (SWR)",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "React"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Testing & Accessibility",
+        "estimatedWeeks": 3,
+        "status": "locked",
+        "requiredSkills": [
+          "Testing",
+          "TypeScript"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Set up Vitest + React Testing Library",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Write tests for 5 components (80% coverage)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Vitest / Jest"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Fix 10 accessibility violations (Lighthouse audit)",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Add skip-navigation and ARIA labels",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Accessibility (a11y)"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Performance & Next.js",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Next.js",
+          "Performance"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Score 90+ on Lighthouse for a real project",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Build a full-stack app with Next.js 14 (App Router)",
+            "timeEstimate": 20,
+            "isDone": false,
+            "skills": [
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Implement image optimization + lazy loading",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Core Web Vitals",
+              "Next.js"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to Vercel with CI/CD",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "Git / GitHub"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 0,
+    "lastActive": null,
+    "completedToday": [],
+    "progressHistory": [
+      {
+        "date": "2026-03-03T13:00:11.289Z",
+        "event": "plan_created",
+        "nexusScore": 0,
+        "tasksCompleted": 0,
+        "note": "Roadmap generated for Frontend @ Google"
+      }
+    ],
+    "nexusScore": 0,
+    "nexusBreakdown": {
+      "total": 0,
+      "skillCoverage": 0,
+      "executionProgress": 0,
+      "momentum": 0
+    },
+    "eta": {
+      "remainHours": 75,
+      "totalDays": 38,
+      "targetDate": "2026-04-10"
+    },
+    "hireReadiness": {
+      "total": 15,
+      "label": "Building Foundation",
+      "skillScore": 5,
+      "taskScore": 0,
+      "dsaScore": 10
+    }
+  }
+}

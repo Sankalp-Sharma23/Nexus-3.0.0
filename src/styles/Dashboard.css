@@ -55,7 +55,7 @@
     "hero    hero    study   study"
     "hack    place   place   resume"
     "hack    dbboard comp    comp"
-    "intern  intern  tracker tracker";
+    "intern  intern  intern  intern";
   gap: 14px;
 }
 
@@ -70,11 +70,18 @@
   cursor: pointer;
   transition: border-color .22s, transform .22s, box-shadow .22s;
   opacity: 0; /* GSAP will animate in */
+  --gc: 139,92,246; /* default glow: purple */
+  box-shadow:
+    0 0 0 1px rgba(var(--gc), 0.12),
+    0 0 18px rgba(var(--gc), 0.07);
 }
 .bt:hover {
   border-color: rgba(255,255,255,0.16);
   transform: translateY(-3px);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  box-shadow:
+    0 0 0 1px rgba(var(--gc), 0.45),
+    0 0 24px rgba(var(--gc), 0.22),
+    0 16px 48px rgba(0,0,0,0.4);
 }
 
 /* ── grid area assignments ── */
@@ -126,6 +133,7 @@
    1. HERO TILE — image ◀ | text ▶
    ══════════════════════════ */
 .bt-hero {
+  --gc: 139,92,246;
   background: linear-gradient(145deg, rgba(139,92,246,0.10) 0%, rgba(15,15,22,1) 60%);
   border-color: rgba(139,92,246,0.2);
   display: flex;
@@ -321,13 +329,13 @@
 }
 
 /* ── Whiteboard accent ── */
-.bt-whiteboard { border-color: rgba(59,130,246,0.15); }
+.bt-whiteboard { --gc: 59,130,246; border-color: rgba(59,130,246,0.15); }
 .bt-whiteboard:hover { border-color: rgba(59,130,246,0.4); }
 
 /* ══════════════════════════
    3. STUDY TILE
    ══════════════════════════ */
-.bt-study { border-color: rgba(139,92,246,0.15); }
+.bt-study { --gc: 139,92,246; border-color: rgba(139,92,246,0.15); }
 .bt-study:hover { border-color: rgba(139,92,246,0.4); }
 
 .bt-study-row {
@@ -350,6 +358,7 @@
    5. HACKATHONS TILE
    ══════════════════════════ */
 .bt-hack {
+  --gc: 139,92,246;
   background: linear-gradient(170deg, rgba(139,92,246,0.08) 0%, rgba(13,13,18,1) 65%);
   border-color: rgba(139,92,246,0.15);
   display: flex;
@@ -400,6 +409,7 @@
    6. PLACEMENT TILE
    ══════════════════════════ */
 .bt-placement {
+  --gc: 16,185,129;
   background: linear-gradient(145deg, rgba(16,185,129,0.06) 0%, rgba(13,13,18,1) 65%);
   border-color: rgba(16,185,129,0.15);
 }
@@ -423,7 +433,7 @@
 /* ══════════════════════════
    7. RESUME TILE
    ══════════════════════════ */
-.bt-resume { border-color: rgba(245,158,11,0.15); }
+.bt-resume { --gc: 245,158,11; border-color: rgba(245,158,11,0.15); }
 .bt-resume:hover { border-color: rgba(245,158,11,0.4); }
 
 .bt-resume-pills { display:flex; flex-direction:column; gap:5px; margin-top:6px; }
@@ -439,13 +449,14 @@
 /* ══════════════════════════
    8. DATABASE TILE
    ══════════════════════════ */
-.bt-dbboard { border-color: rgba(6,182,212,0.15); }
+.bt-dbboard { --gc: 6,182,212; border-color: rgba(6,182,212,0.15); }
 .bt-dbboard:hover { border-color: rgba(6,182,212,0.4); }
 
 /* ══════════════════════════
    9. COMPONENT ARCHITECT TILE
    ══════════════════════════ */
 .bt-component {
+  --gc: 139,92,246;
   background: linear-gradient(145deg, rgba(139,92,246,0.06) 0%, rgba(13,13,18,1) 65%);
   border-color: rgba(139,92,246,0.15);
   display: flex;
@@ -486,7 +497,7 @@
 /* ══════════════════════════
    10. INTERNSHIPS TILE
    ══════════════════════════ */
-.bt-internships { border-color: rgba(16,185,129,0.12); }
+.bt-internships { --gc: 16,185,129; border-color: rgba(16,185,129,0.12); }
 .bt-internships:hover { border-color: rgba(16,185,129,0.35); }
 
 .bt-int-list { display:flex; flex-direction:column; gap:6px; }
@@ -510,7 +521,7 @@
 /* ══════════════════════════
    11. TRACKER TILE
    ══════════════════════════ */
-.bt-tracker { border-color: rgba(245,158,11,0.12); }
+.bt-tracker { --gc: 245,158,11; border-color: rgba(245,158,11,0.12); }
 .bt-tracker:hover { border-color: rgba(245,158,11,0.3); }
 
 .bt-tracker-cols { display:flex; gap:10px; height:100%; padding-top:4px; }
@@ -547,8 +558,7 @@
       "hack   place"
       "resume dbboard"
       "comp   comp"
-      "intern intern"
-      "tracker tracker";
+      "intern intern";
   }
 }
 
@@ -558,7 +568,219 @@
     grid-template-areas:
       "hero" "study" "hack"
       "place" "canvas" "resume"
-      "dbboard" "comp" "intern" "tracker";
+      "dbboard" "comp" "intern";
   }
   .bento-page { padding: 16px 14px 60px; }
 }
+
+/* ════════════════
+   AMBIENT ANIMATIONS
+   ════════════════ */
+
+/* stat numbers subtle glow pulse after count-up */
+@keyframes bt-stat-glow {
+  0%,100% { text-shadow: none; }
+  50%      { text-shadow: 0 0 14px rgba(139,92,246,0.6); }
+}
+.bt-hstat-n {
+  animation: bt-stat-glow 3.5s ease-in-out infinite 2s;
+}
+
+/* hackathon background icon slow drift */
+@keyframes bt-bg-drift {
+  0%,100% { transform: translateY(0)   rotate(-6deg); opacity:0.03; }
+  50%      { transform: translateY(-10px) rotate(-3deg); opacity:0.055; }
+}
+.bt-bg-icon {
+  animation: bt-bg-drift 6s ease-in-out infinite;
+}
+
+
+/* tracker card hover lift */
+.bt-tcard {
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+.bt-tcard:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* tool icon idle float (starts after GSAP entrance) */
+@keyframes bt-icon-float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+.bt-tool-icon {
+  animation: bt-icon-float 3.8s ease-in-out infinite 1.2s;
+}
+
+/* comp-tree node blink */
+@keyframes bt-node-blink {
+  0%,90%,100% { opacity:1; }
+  95%          { opacity:0.4; }
+}
+.bt-ct-root {
+  animation: bt-node-blink 4s ease-in-out infinite;
+}
+
+/* progress fill shimmer */
+@keyframes bt-fill-shimmer {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.35); }
+  100% { filter: brightness(1); }
+}
+.bt-pb-fill {
+  animation: bt-fill-shimmer 2.8s ease-in-out infinite 1.5s;
+}
+
+/* ── Hackathons: featured badge & empty state ── */
+.bt-featured-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: rgba(139,92,246,0.2);
+  color: #a78bfa;
+  border: 1px solid rgba(139,92,246,0.35);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+}
+
+.bt-hack-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px 8px;
+  color: rgba(255,255,255,0.35);
+  font-size: 12px;
+  gap: 8px;
+}
+.bt-hack-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.3);
+  color: #a78bfa;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background .18s;
+}
+.bt-hack-empty-btn:hover { background: rgba(139,92,246,0.28); }
+
+/* ── Study planner: overdue / due badges ── */
+.bt-task-overdue { color: rgba(255,255,255,0.85); }
+.bt-task-due-badge {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #ef4444;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.bt-task-date {
+  margin-left: auto;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+/* ── Placement tile: role badge ── */
+.bt-role-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  background: rgba(16,185,129,0.15);
+  border: 1px solid rgba(16,185,129,0.3);
+  color: #34d399;
+  border-radius: 4px;
+  padding: 1px 6px;
+  vertical-align: middle;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Jobs list ── */
+.bt-jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.bt-job-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: background .16s, border-color .16s;
+}
+.bt-job-row:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+}
+.bt-job-left { flex: 1; min-width: 0; }
+.bt-job-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.88);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bt-job-company {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 1px;
+}
+.bt-job-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.bt-job-type {
+  font-size: 9px;
+  font-weight: 600;
+  color: #a78bfa;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.bt-job-salary {
+  font-size: 9px;
+  color: #34d399;
+}
+.bt-job-empty {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* ── Internship rows: pointer cursor & click ── */
+.bt-int-row { cursor: pointer; }

@@ -308,6 +308,10 @@
   gap: 2rem;
 }
 
+.eh-card-wrapper {
+  position: relative;
+}
+
 @media (max-width: 800px) {
   .eh-cards-grid {
     grid-template-columns: 1fr;
@@ -334,6 +338,137 @@
 
 .eh-card:hover {
   border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Blur sibling card when one is hovered ── */
+.eh-cards-grid:has(.eh-card:hover) .eh-card:not(:hover) {
+  filter: blur(4px) brightness(0.7);
+  opacity: 0.6;
+  transition:
+    filter 0.45s ease,
+    opacity 0.45s ease,
+    transform 0.38s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.38s ease,
+    border-color 0.38s ease;
+}
+
+/* ── Polka dot balls ── */
+.eh-polka {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.34,1.3,0.64,1);
+}
+.eh-polka-1 {
+  width: 18px; height: 18px;
+  top: 10%; right: 14px;
+  background: #a78bfa;
+  box-shadow: 0 0 12px rgba(167,139,250,0.5);
+}
+.eh-polka-2 {
+  width: 14px; height: 14px;
+  bottom: 15%; left: 14px;
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56,189,248,0.5);
+}
+.eh-polka-3 {
+  width: 11px; height: 11px;
+  top: 50%; right: 6%;
+  background: #f472b6;
+  box-shadow: 0 0 10px rgba(244,114,182,0.5);
+}
+.eh-card:hover .eh-polka {
+  opacity: 1;
+  transform: scale(1);
+}
+.eh-card:hover .eh-polka-1 { transition-delay: 0.05s; }
+.eh-card:hover .eh-polka-2 { transition-delay: 0.15s; }
+.eh-card:hover .eh-polka-3 { transition-delay: 0.25s; }
+
+/* Hackathon card uses warmer ball colors */
+.eh-card-hack .eh-polka-1 {
+  background: #fbbf24;
+  box-shadow: 0 0 12px rgba(251,191,36,0.5);
+}
+.eh-card-hack .eh-polka-2 {
+  background: #f97316;
+  box-shadow: 0 0 10px rgba(249,115,22,0.5);
+}
+.eh-card-hack .eh-polka-3 {
+  background: #ec4899;
+  box-shadow: 0 0 10px rgba(236,72,153,0.5);
+}
+
+/* ── Challenge text on opposite side ── */
+
+/* Right challenge text (appears over internship card) */
+.eh-challenge-text-right {
+  position: absolute;
+  top: 50%;
+  right: 0%;
+  transform: translate(0%, -50%) scale(0.85);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  max-width: 480px;
+  padding: 0 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: right;
+  transition: opacity 0.45s ease 0.15s, transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.eh-challenge-text-right .eh-highlight-purple {
+  color: #a78bfa;
+  font-weight: 800;
+  position: relative;
+  display: inline-block;
+}
+
+/* Left challenge text (appears over hackathon card) */
+.eh-challenge-text-left {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translate(0%, -50%) scale(0.85);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  max-width: 480px;
+  padding: 0 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: left;
+  transition: opacity 0.45s ease 0.15s, transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.eh-challenge-text-left .eh-highlight-gold {
+  color: #fbbf24;
+  font-weight: 800;
+  position: relative;
+  display: inline-block;
+}
+
+/* Show challenge text on the BLURRED card */
+.eh-cards-grid:has(.eh-card-intern:hover) .eh-card-wrapper:has(.eh-card-hack) .eh-challenge-text-left {
+  opacity: 1;
+  transform: translate(0%, -50%) scale(1);
+}
+
+.eh-cards-grid:has(.eh-card-hack:hover) .eh-card-wrapper:has(.eh-card-intern) .eh-challenge-text-right {
+  opacity: 1;
+  transform: translate(0%, -50%) scale(1);
 }
 
 .eh-card-intern:hover {

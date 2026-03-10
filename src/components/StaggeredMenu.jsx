@@ -20,6 +20,9 @@ export const StaggeredMenu = ({
   activePath,
   onMenuOpen,
   onMenuClose,
+  leftSlot,
+  profileIcon,
+  onProfileClick,
 }) => {
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
@@ -357,8 +360,10 @@ export const StaggeredMenu = ({
 
         {/* Header bar */}
         <header className="staggered-menu-header" aria-label="Main navigation header">
-          {/* Left spacer — mirrors button width to keep NEXUS perfectly centered */}
-          <div className="sm-header-spacer" aria-hidden="true" />
+          {/* Left spacer / slot — mirrors button width to keep NEXUS perfectly centered */}
+          {leftSlot
+            ? <div className="sm-header-spacer sm-header-leftslot">{leftSlot}</div>
+            : <div className="sm-header-spacer" aria-hidden="true" />}
 
           {/* Centered logo / brand name */}
           <div className="sm-logo sm-logo--center" aria-label="Logo">
@@ -375,6 +380,18 @@ export const StaggeredMenu = ({
               />
             ) : null}
           </div>
+
+          {/* Right side profile area */}
+          {profileIcon && (
+            <button
+              className="sm-profile-btn"
+              onClick={onProfileClick}
+              aria-label="View profile"
+              type="button"
+            >
+              {profileIcon}
+            </button>
+          )}
 
           {/* Hamburger toggle */}
           <button
@@ -503,6 +520,11 @@ export const StaggeredMenu = ({
           flex-shrink: 0;
           pointer-events: none;
         }
+        .sm-scope .sm-header-leftslot {
+          pointer-events: auto;
+          display: flex;
+          align-items: center;
+        }
 
         /* ── Logo ────────────────────────────────────────────── */
         .sm-scope .sm-logo {
@@ -558,6 +580,39 @@ export const StaggeredMenu = ({
           outline: 2px solid #ffffffaa;
           outline-offset: 4px;
           border-radius: 4px;
+        }
+
+        /* ── Profile button ──────────────────────────────────── */
+        .sm-scope .sm-profile-btn {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent-color, #5227FF), var(--accent-color-light, #7c3aed));
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          z-index: 15;
+          padding: 0;
+          pointer-events: auto;
+        }
+        .sm-scope .sm-profile-btn:hover {
+          background: linear-gradient(135deg, var(--accent-color-light, #7c3aed), var(--accent-color, #5227FF));
+          box-shadow: 0 8px 24px rgba(82, 39, 255, 0.3);
+          transform: translateY(-2px);
+          border-color: rgba(255, 255, 255, 0.4);
+        }
+        .sm-scope .sm-profile-btn:focus-visible {
+          outline: 2px solid rgba(255, 255, 255, 0.5);
+          outline-offset: 2px;
+        }
+        .sm-scope .sm-profile-btn:active {
+          transform: translateY(0);
         }
         .sm-scope .sm-toggle-textWrap {
           position: relative;
@@ -803,6 +858,12 @@ export const StaggeredMenu = ({
           }
           .sm-scope .sm-panel-list {
             gap: 0.1rem;
+          }
+          .sm-scope .sm-profile-btn {
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 48px;
+            height: 48px;
           }
         }
       `}</style>

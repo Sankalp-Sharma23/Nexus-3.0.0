@@ -110,28 +110,28 @@ const Footer = () => {
             <div className="footer-section">
               <h4 className="footer-heading">
                 <Code size={16} />
-                Resources
+                Platform
               </h4>
               <ul className="footer-links">
-                <li><a href="/resume"><ArrowRight size={14} /> Resume Builder</a></li>
-                <li><a href="/agents"><ArrowRight size={14} /> Career Agents</a></li>
-                <li><a href="/community"><ArrowRight size={14} /> Community</a></li>
-                <li><a href="/docs"><ArrowRight size={14} /> Documentation</a></li>
-                <li><a href="/blog"><ArrowRight size={14} /> Blog</a></li>
+                <li><a href="/dashboard"><ArrowRight size={14} /> Dashboard</a></li>
+                <li><a href="/practice"><ArrowRight size={14} /> Practice Hub</a></li>
+                <li><a href="/study-planner"><ArrowRight size={14} /> Study Planner</a></li>
+                <li><a href="/whiteboard"><ArrowRight size={14} /> Whiteboard</a></li>
+                <li><a href="/aim"><ArrowRight size={14} /> Aim</a></li>
               </ul>
             </div>
 
             <div className="footer-section">
               <h4 className="footer-heading">
                 <Heart size={16} />
-                Company
+                Explore
               </h4>
               <ul className="footer-links">
-                <li><a href="/about"><ArrowRight size={14} /> About Us</a></li>
-                <li><a href="/careers"><ArrowRight size={14} /> Careers</a></li>
-                <li><a href="/contact"><ArrowRight size={14} /> Contact</a></li>
-                <li><a href="/partners"><ArrowRight size={14} /> Partners</a></li>
-                <li><a href="/press"><ArrowRight size={14} /> Press Kit</a></li>
+                <li><a href="/experience-hub"><ArrowRight size={14} /> Experience Hub</a></li>
+                <li><a href="/internships"><ArrowRight size={14} /> Internships</a></li>
+                <li><a href="/hackathons"><ArrowRight size={14} /> Hackathons</a></li>
+                <li><a href="/placement-portal"><ArrowRight size={14} /> Placement Portal</a></li>
+                <li><a href="/guidance"><ArrowRight size={14} /> Guidance</a></li>
               </ul>
             </div>
 
@@ -167,13 +167,13 @@ const Footer = () => {
             </p>
           </div>
           <div className="footer-legal">
-            <a href="/privacy">Privacy Policy</a>
+            <a href="#privacy">Privacy Policy</a>
             <span className="separator">•</span>
-            <a href="/terms">Terms of Service</a>
+            <a href="#terms">Terms of Service</a>
             <span className="separator">•</span>
-            <a href="/cookies">Cookie Policy</a>
+            <a href="#cookies">Cookie Policy</a>
             <span className="separator">•</span>
-            <a href="/security">Security</a>
+            <a href="#security">Security</a>
           </div>
         </div>
       </div>

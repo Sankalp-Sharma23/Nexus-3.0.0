@@ -191,6 +191,7 @@ const ExperiencePage = () => {
 
           {/* ── INTERNSHIPS ── */}
           <motion.div
+            className="eh-card-wrapper"
             initial={{ opacity: 0, y: 70 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
@@ -204,6 +205,9 @@ const ExperiencePage = () => {
               <div className="eh-card-shimmer" />
               <div className="eh-card-deco-quarter eh-deco-intern-quarter" />
               <div className="eh-card-deco-half eh-deco-intern-half" />
+              <span className="eh-polka eh-polka-1" />
+              <span className="eh-polka eh-polka-2" />
+              <span className="eh-polka eh-polka-3" />
 
               <div className="eh-card-top">
                 <div className="eh-card-icon-wrap eh-icon-intern">
@@ -247,10 +251,14 @@ const ExperiencePage = () => {
 
               <span className="eh-card-corner-tag eh-corner-intern">Career Launch</span>
             </TiltCard>
+            <div className="eh-challenge-text-right">
+           Are you bold enough to build under pressure? Join the next <span className="eh-highlight-purple">hackathon </span> , ship an incredible project, and claim your victory.
+            </div>
           </motion.div>
 
           {/* ── HACKATHONS ── */}
           <motion.div
+            className="eh-card-wrapper"
             initial={{ opacity: 0, y: 70 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
@@ -264,6 +272,9 @@ const ExperiencePage = () => {
               <div className="eh-card-shimmer" />
               <div className="eh-card-deco-quarter eh-deco-hack-quarter" />
               <div className="eh-card-deco-half eh-deco-hack-half" />
+              <span className="eh-polka eh-polka-1" />
+              <span className="eh-polka eh-polka-2" />
+              <span className="eh-polka eh-polka-3" />
 
               <div className="eh-card-top">
                 <div className="eh-card-icon-wrap eh-icon-hack">
@@ -307,6 +318,9 @@ const ExperiencePage = () => {
 
               <span className="eh-card-corner-tag eh-corner-hack">Build &amp; Win</span>
             </TiltCard>
+            <div className="eh-challenge-text-left">
+              Are you ready to turn your coding skills into a real career? Grab a top-tier<span className="eh-highlight-gold">internship</span> and let's get building.
+            </div>
           </motion.div>
         </div>
 

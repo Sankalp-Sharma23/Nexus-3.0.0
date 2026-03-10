@@ -1,23 +1,26 @@
-import { useState, useEffect, useCallback, useMemo, useRef, useTransition } from 'react';
+﻿import { useState, useEffect, useCallback, useMemo, useRef, useTransition, memo } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { useAuth } from '../contexts/AuthContext';
 import {
   CheckCircle2, Circle, ExternalLink, Search,
   Hash, ArrowLeftRight, GalleryHorizontal, Layers, ScanSearch,
   Link2, GitFork, Network, BarChart3, RotateCcw,
   Workflow, MapPin, Activity, Grid3x3, Zap, Sliders,
   Compass, Binary, Trophy, Target,
-  AlertCircle, X, Loader2, TrendingUp,
+  AlertCircle, X, Loader2, TrendingUp, Check,
   BookOpen, Database, MessageSquare, Table2,
-  Type, RefreshCcw, Server, SortAsc,
+  Type, RefreshCcw, Server, SortAsc, Play,
 } from 'lucide-react';
 import '../styles/PracticeHub.css';
 
 /* ─────────────── constants ─────────────── */
 const NEXUS_KEY = 'nexus_practice_username';
 const API       = '/api/practice';
+const LIMIT     = 50;   // problems per page
 
 const DIFFICULTY_COLORS = { Easy: 'easy', Medium: 'medium', Hard: 'hard' };
 
@@ -89,6 +92,16 @@ const CATEGORY_GROUPS = [
 
 // Flat set of all categories covered by a group (for the "Other" catch-all)
 const GROUPED_CATS = new Set(CATEGORY_GROUPS.flatMap(g => g.categories));
+
+/* ─────────────── useDebounce ─────────────── */
+function useDebounce(value, delay = 150) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
 
 /* ─────────────── helpers ─────────────── */
 function getOrCreateNexusId() {
@@ -199,7 +212,7 @@ function SyncToast({ msg, onDismiss }) {
 }
 
 /* ─────────────── ProblemRow ─────────────── */
-function ProblemRow({ problem, isSolved, onToggle, isNew }) {
+const ProblemRow = memo(function ProblemRow({ problem, isSolved, onToggle, isNew }) {
   const [toggling, setToggling] = useState(false);
 
   const handleToggle = async (e) => {
@@ -254,22 +267,43 @@ function ProblemRow({ problem, isSolved, onToggle, isNew }) {
       <span className={`ph-diff-chip diff-${DIFFICULTY_COLORS[problem.difficulty]}`}>
         {problem.difficulty}
       </span>
+      <a
+        className="ph-yt-btn"
+        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(problem.title + ' leetcode solution')}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={e => e.stopPropagation()}
+        title="Watch video solution"
+      >
+        <Play size={14} />
+      </a>
     </div>
   );
-}
+});
 
-/* ─────────────── ProblemList ─────────────── */
-function ProblemList({ problems, solvedSlugs, selectedCategory, onToggle, diffFilter, searchQ, newlySolved }) {
-  const filtered = useMemo(() => {
-    return problems.filter(p => {
-      const inCat    = !selectedCategory || p.category === selectedCategory;
-      const inDiff   = diffFilter === 'All' || p.difficulty === diffFilter;
-      const inSearch = !searchQ || p.title.toLowerCase().includes(searchQ.toLowerCase());
-      return inCat && inDiff && inSearch;
-    });
-  }, [problems, selectedCategory, diffFilter, searchQ]);
+/* ─────────────── ProblemList (virtualised + infinite scroll) ─────────────── */
+const ProblemList = memo(function ProblemList({ problems, solvedSlugs, onToggle, newlySolved, hasMore, isLoadingMore, onLoadMore }) {
+  const parentRef = useRef(null);
+  // +1 count for the loading sentinel shown when hasMore
+  const vCount = problems.length + (hasMore ? 1 : 0);
 
-  if (filtered.length === 0) {
+  const virtualizer = useVirtualizer({
+    count:            vCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize:     (i) => i === problems.length ? 56 : 48,
+    overscan:         8,
+  });
+
+  const items    = virtualizer.getVirtualItems();
+  const lastItem = items[items.length - 1];
+
+  // When the sentinel (or near-last item) enters viewport → load next page
+  useEffect(() => {
+    if (!lastItem || !hasMore || isLoadingMore) return;
+    if (lastItem.index >= problems.length - 1) onLoadMore();
+  }, [lastItem?.index, hasMore, isLoadingMore, problems.length, onLoadMore]);
+
+  if (!problems.length && !isLoadingMore) {
     return (
       <motion.div className="ph-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <BookOpen size={36} />
@@ -279,84 +313,76 @@ function ProblemList({ problems, solvedSlugs, selectedCategory, onToggle, diffFi
   }
 
   return (
-    <div className="ph-problem-list">
-      <AnimatePresence initial={false} mode="popLayout">
-        {filtered.map((p, i) => (
-          <motion.div
-            key={p.title_slug}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{
-              opacity: 1,
-              height: 48,
-              transition: {
-                height:  { duration: 0.18, ease: 'easeOut' },
-                opacity: { duration: 0.22, delay: Math.min(i * 0.018, 0.36) },
-              },
-            }}
-            exit={{ opacity: 0, height: 0, transition: { duration: 0.14 } }}
-            style={{ overflow: 'hidden' }}
-          >
-            <ProblemRow
-              problem={p}
-              isSolved={solvedSlugs.has(p.title_slug)}
-              onToggle={onToggle}
-              isNew={newlySolved?.has(p.title_slug)}
-            />
-          </motion.div>
-        ))}
-      </AnimatePresence>
+    <div ref={parentRef} className="ph-problem-list-scroller">
+      <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+        <div
+          style={{
+            position: 'absolute', top: 0, left: 0, width: '100%',
+            transform: `translateY(${items[0]?.start ?? 0}px)`,
+          }}
+        >
+          {items.map(vrow => {
+            if (vrow.index === problems.length) {
+              return (
+                <div key="sentinel" data-index={vrow.index} ref={virtualizer.measureElement} className="ph-load-more-row">
+                  <Loader2 size={18} className="spin" />
+                </div>
+              );
+            }
+            const p = problems[vrow.index];
+            return (
+              <div key={vrow.key} data-index={vrow.index} ref={virtualizer.measureElement}>
+                <ProblemRow
+                  problem={p}
+                  isSolved={solvedSlugs.has(p.title_slug)}
+                  onToggle={onToggle}
+                  isNew={newlySolved?.has(p.title_slug)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
-}
+});
 
-/* ─────────────── CategorySidebar ─────────────── */
-function CategorySidebar({ problems, solvedSlugs, selected, onSelect }) {
-  const categories = useMemo(() => {
-    const cats = {};
-    problems.forEach(p => {
-      if (!cats[p.category]) cats[p.category] = { total: 0, solved: 0 };
-      cats[p.category].total++;
-      if (solvedSlugs.has(p.title_slug)) cats[p.category].solved++;
-    });
-    return cats;
-  }, [problems, solvedSlugs]);
+/* ─────────────── CatButton (module-level to avoid remount) ─────────────── */
+const CatButton = memo(function CatButton({ cat, icon, name, solved, total, isAllBtn, selected, onSelect }) {
+  const isActive = isAllBtn ? !selected : selected === cat;
+  const isDone   = !isAllBtn && solved === total && total > 0;
+  return (
+    <button
+      className={`ph-cat-btn${isActive ? ' active' : ''}${isDone ? ' all-done' : ''}`}
+      onClick={() => onSelect(isAllBtn ? null : cat)}
+      style={{ position: 'relative' }}
+    >
+      {isActive && (
+        <motion.div
+          layoutId="sidebar-active-pill"
+          className="ph-cat-active-bg"
+          transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+        />
+      )}
+      <span className="ph-cat-icon">{icon}</span>
+      <span className="ph-cat-name">{name}</span>
+      <span className="ph-cat-prog">{solved} / {total}</span>
+      {isDone && (
+        <motion.span
+          className="ph-cat-done-badge"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+        >
+          <Check size={11} />
+        </motion.span>
+      )}
+    </button>
+  );
+});
 
-  const totalSolved   = solvedSlugs.size;
-  const totalProblems = problems.length;
-
-  const CatButton = ({ cat, icon, name, solved, total, isAllBtn }) => {
-    const isActive = isAllBtn ? !selected : selected === cat;
-    const isDone   = !isAllBtn && solved === total && total > 0;
-    return (
-      <button
-        className={`ph-cat-btn${isActive ? ' active' : ''}${isDone ? ' all-done' : ''}`}
-        onClick={() => onSelect(isAllBtn ? null : cat)}
-        style={{ position: 'relative' }}
-      >
-        {isActive && (
-          <motion.div
-            layoutId="sidebar-active-pill"
-            className="ph-cat-active-bg"
-            transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-          />
-        )}
-        <span className="ph-cat-icon">{icon}</span>
-        <span className="ph-cat-name">{name}</span>
-        <span className="ph-cat-prog">{solved} / {total}</span>
-        {isDone && (
-          <motion.span
-            className="ph-cat-done-badge"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-          >
-            <Check size={11} />
-          </motion.span>
-        )}
-      </button>
-    );
-  };
-
+/* u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500} CategorySidebar u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500} */
+function CategorySidebar({ catStats, catSolvedMap, totalProblems, totalSolved, selected, onSelect }) {
   return (
     <aside className="ph-sidebar">
       <div className="ph-sidebar-header">
@@ -365,45 +391,41 @@ function CategorySidebar({ problems, solvedSlugs, selected, onSelect }) {
       </div>
 
       <CatButton cat={null} icon={<BookOpen size={15} />} name="All Problems"
-        solved={totalSolved} total={totalProblems} isAllBtn />
+        solved={totalSolved} total={totalProblems} isAllBtn selected={selected} onSelect={onSelect} />
 
       {CATEGORY_GROUPS.map(({ label, categories: groupCats }) => {
-        const visibleCats = groupCats.filter(c => categories[c]);
+        const visibleCats = groupCats.filter(c => catStats[c]);
         if (visibleCats.length === 0) return null;
         return (
           <div key={label} className="ph-cat-group">
             <div className="ph-cat-group-label">{label}</div>
-            {visibleCats.map(cat => {
-              const { total, solved } = categories[cat];
-              return (
-                <CatButton
-                  key={cat} cat={cat}
-                  icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
-                  name={cat} solved={solved} total={total}
-                />
-              );
-            })}
+            {visibleCats.map(cat => (
+              <CatButton
+                key={cat} cat={cat}
+                icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
+                name={cat} solved={catSolvedMap[cat] ?? 0} total={catStats[cat]}
+                selected={selected} onSelect={onSelect}
+              />
+            ))}
           </div>
         );
       })}
 
-      {/* “Other” catch-all for any tags not covered by the groups above */}
+      {/* "Other" catch-all for any tags not covered by the groups above */}
       {(() => {
-        const otherCats = Object.keys(categories).filter(c => !GROUPED_CATS.has(c)).sort();
+        const otherCats = Object.keys(catStats).filter(c => !GROUPED_CATS.has(c)).sort();
         if (otherCats.length === 0) return null;
         return (
           <div className="ph-cat-group">
             <div className="ph-cat-group-label">Other</div>
-            {otherCats.map(cat => {
-              const { total, solved } = categories[cat];
-              return (
-                <CatButton
-                  key={cat} cat={cat}
-                  icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
-                  name={cat} solved={solved} total={total}
-                />
-              );
-            })}
+            {otherCats.map(cat => (
+              <CatButton
+                key={cat} cat={cat}
+                icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
+                name={cat} solved={catSolvedMap[cat] ?? 0} total={catStats[cat]}
+                selected={selected} onSelect={onSelect}
+              />
+            ))}
           </div>
         );
       })()}
@@ -413,18 +435,52 @@ function CategorySidebar({ problems, solvedSlugs, selected, onSelect }) {
 
 /* ─────────────── Main PracticeHub ─────────────── */
 export default function PracticeHub() {
-  const nexusUsername = useMemo(() => getOrCreateNexusId(), []);
+  const { user } = useAuth();
 
-  const [problems,      setProblems]      = useState([]);
-  const [solvedSlugs,   setSolvedSlugs]   = useState(new Set());
-  const [selectedCat,   setSelectedCat]   = useState(null);
-  const [diffFilter,    setDiffFilter]    = useState('All');
-  const [searchQ,       setSearchQ]       = useState('');
-  const [isLoading,     setIsLoading]     = useState(true);
-  const [toast,         setToast]         = useState(null);
-  const [newlySolved,   setNewlySolved]   = useState(new Set());
-  const prevCatSolvedRef  = useRef({});
-  const [isPending, startTransition]      = useTransition();
+  // Prefer the authenticated user's stable ID; fall back to the anonymous localStorage key.
+  // This means logged-in users keep progress across browsers/devices.
+  const nexusUsername = useMemo(() => {
+    if (user) return user._id || user.id || user.username || user.email || getOrCreateNexusId();
+    return getOrCreateNexusId();
+  }, [user]);
+
+  const [problems,       setProblems]       = useState([]);
+  const [probTotal,      setProbTotal]      = useState(0);   // total matching current filters
+  const [probHasMore,    setProbHasMore]    = useState(false);
+  const [isLoadingMore,  setIsLoadingMore]  = useState(false);
+  const [catStats,       setCatStats]       = useState({});  // { category: total }
+  const [diffStats,      setDiffStats]      = useState({});  // { Easy: N, Medium: N, Hard: N }
+  const [catSolvedMap,   setCatSolvedMap]   = useState({});  // { category: solved }
+  const [diffSolvedMap,  setDiffSolvedMap]  = useState({});  // { Easy: N, Medium: N, Hard: N }
+  const [solvedSlugs,    setSolvedSlugs]    = useState(new Set());
+  const [selectedCat,    setSelectedCat]    = useState(null);
+  const [diffFilter,     setDiffFilter]     = useState('All');
+  const [searchQ,        setSearchQ]        = useState('');
+  const [isLoading,      setIsLoading]      = useState(true);
+  const [toast,          setToast]          = useState(null);
+  const [newlySolved,    setNewlySolved]    = useState(new Set());
+  const prevCatSolvedRef   = useRef({});
+  const initialLoadDoneRef = useRef(false);
+  const currentPageRef     = useRef(1);          // stable page counter → no dep in handleLoadMore
+  const filtersRef         = useRef({ cat: null, diff: 'All', q: '' }); // mirror of filter state for stable callbacks
+  const [isPending, startTransition]        = useTransition();
+  const debouncedSearch = useDebounce(searchQ, 350);
+
+  // ── LeetCode sync state ─────────────────────────────────────────────── //
+  const LC_KEY       = `nexus_lc_username_${nexusUsername}`;
+  const LC_STATS_KEY = `nexus_lc_stats_${nexusUsername}`;
+  const [syncOpen,      setSyncOpen]      = useState(false);
+  const [syncTab,       setSyncTab]       = useState('quick'); // 'quick' | 'paste'
+  const [lcUsername,    setLcUsername]    = useState(() => localStorage.getItem(LC_KEY) || '');
+  const [pastedSlugs,   setPastedSlugs]   = useState('');
+  const [scriptCopied,  setScriptCopied]  = useState(false);
+  const [syncState,     setSyncState]     = useState('idle'); // idle | syncing | done | error
+  const [lastSyncInfo,  setLastSyncInfo]  = useState(null);  // { newCount, total }
+  const [lcAccountStats, setLcAccountStats] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(LC_STATS_KEY) || 'null'); } catch { return null; }
+  }); // { total, easy, medium, hard } straight from LeetCode
+  const lcInputRef    = useRef(null);
+  const pasteInputRef = useRef(null);
 
   // ── Initial load ────────────────────────────────────────────────────── //
   useEffect(() => {
@@ -437,14 +493,32 @@ export default function PracticeHub() {
           body: JSON.stringify({ nexusUsername }),
         });
 
-        const [probData, solvedData] = await Promise.all([
-          apiFetch('/lc-problems'),
+        const [catData, solvedData, probData] = await Promise.all([
+          apiFetch('/lc-categories'),
           apiFetch(`/solved/${encodeURIComponent(nexusUsername)}`),
+          apiFetch(`/lc-problems?page=1&limit=${LIMIT}`),
         ]);
 
         if (!mounted) return;
-        setProblems(probData.problems);
+        setCatStats(catData.categories.reduce((acc, { category, total }) => ({ ...acc, [category]: total }), {}));
+        setDiffStats(catData.byDifficulty ?? {});
+        setCatSolvedMap(solvedData.solvedByCategory  ?? {});
+        setDiffSolvedMap(solvedData.solvedByDifficulty ?? {});
         setSolvedSlugs(new Set(solvedData.solvedSlugs));
+        setProblems(probData.problems);
+        setProbTotal(probData.total);
+        setProbHasMore(probData.hasMore);
+        initialLoadDoneRef.current = true;
+
+        // If we already have a linked LC username, refresh account stats in the background
+        const lc = localStorage.getItem(LC_KEY);
+        if (lc && mounted) {
+          apiFetch(`/lc-account-stats/${encodeURIComponent(lc)}`).then(stats => {
+            if (!mounted) return;
+            setLcAccountStats(stats);
+            localStorage.setItem(LC_STATS_KEY, JSON.stringify(stats));
+          }).catch(() => {});
+        }
       } catch (err) {
         console.error('[PracticeHub] load error:', err);
       } finally {
@@ -454,30 +528,174 @@ export default function PracticeHub() {
     return () => { mounted = false; };
   }, [nexusUsername]); // eslint-disable-line
 
+  // ── Re-fetch on filter change ────────────────────────────────────────── //
+  useEffect(() => {
+    if (!initialLoadDoneRef.current) return;
+    // Keep the ref in sync so handleLoadMore always reads current filters
+    filtersRef.current = { cat: selectedCat, diff: diffFilter, q: debouncedSearch };
+    currentPageRef.current = 1;
+    let mounted = true;
+    setIsLoadingMore(true);
+    (async () => {
+      try {
+        const params = new URLSearchParams({ page: 1, limit: LIMIT });
+        if (selectedCat) params.set('category', selectedCat);
+        if (diffFilter && diffFilter !== 'All') params.set('difficulty', diffFilter);
+        if (debouncedSearch) params.set('q', debouncedSearch);
+        const data = await apiFetch(`/lc-problems?${params}`);
+        if (!mounted) return;
+        setProblems(data.problems);
+        setProbTotal(data.total);
+        setProbHasMore(data.hasMore);
+      } catch (err) {
+        console.error('[PracticeHub] filter load error:', err);
+      } finally {
+        if (mounted) setIsLoadingMore(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [selectedCat, diffFilter, debouncedSearch]); // eslint-disable-line
+
+  // ── Load more (infinite scroll) ──────────────────────────────────────── //
+  // Uses refs for filters/page so the function reference never changes → ProblemList stays memoized
+  const handleLoadMore = useCallback(() => {
+    if (!probHasMore || isLoadingMore) return;
+    const nextPage = currentPageRef.current + 1;
+    const { cat, diff, q } = filtersRef.current;
+    setIsLoadingMore(true);
+    (async () => {
+      try {
+        const params = new URLSearchParams({ page: nextPage, limit: LIMIT });
+        if (cat) params.set('category', cat);
+        if (diff && diff !== 'All') params.set('difficulty', diff);
+        if (q) params.set('q', q);
+        const data = await apiFetch(`/lc-problems?${params}`);
+        setProblems(prev => [...prev, ...data.problems]);
+        setProbHasMore(data.hasMore);
+        currentPageRef.current = nextPage;
+      } catch (err) {
+        console.error('[PracticeHub] loadMore error:', err);
+      } finally {
+        setIsLoadingMore(false);
+      }
+    })();
+  }, [probHasMore, isLoadingMore]); // ← stable: no problems.length/filter deps
+
   // ── Manual toggle ────────────────────────────────────────────────────── //
   const handleToggle = useCallback(async (slug, solved) => {
+    // Optimistic update: instant UI response, no waiting for network
+    setSolvedSlugs(prev => {
+      const next = new Set(prev);
+      if (solved) next.add(slug); else next.delete(slug);
+      return next;
+    });
     try {
       const data = await apiFetch('/mark', {
         method: 'POST',
         body: JSON.stringify({ nexusUsername, slug, solved }),
       });
+      // Reconcile with server truth
       setSolvedSlugs(new Set(data.solvedSlugs));
+      setCatSolvedMap(data.solvedByCategory   ?? {});
+      setDiffSolvedMap(data.solvedByDifficulty ?? {});
     } catch {
+      // Revert optimistic update
+      setSolvedSlugs(prev => {
+        const next = new Set(prev);
+        if (solved) next.delete(slug); else next.add(slug);
+        return next;
+      });
       setToast({ type: 'error', text: 'Could not update problem status.' });
     }
   }, [nexusUsername]);
 
+  // ── LeetCode sync ─────────────────────────────────────────────────── //
+  const handleSync = useCallback(async () => {
+    const lc = lcUsername.trim();
+    if (!lc) { lcInputRef.current?.focus(); return; }
+    localStorage.setItem(LC_KEY, lc);
+    setSyncState('syncing');
+    try {
+      const data = await apiFetch('/sync', {
+        method: 'POST',
+        body: JSON.stringify({ nexusUsername, leetcodeUsername: lc }),
+      });
+
+      // Re-fetch the authoritative solved list from the server after sync,
+      // so the UI always reflects exactly what is in the DB regardless of
+      // what the sync response itself returned.
+      const freshSolved = await apiFetch(`/solved/${encodeURIComponent(nexusUsername)}`);
+      const freshSet = new Set(freshSolved.solvedSlugs);
+      setSolvedSlugs(freshSet);
+      setCatSolvedMap(freshSolved.solvedByCategory  ?? {});
+      setDiffSolvedMap(freshSolved.solvedByDifficulty ?? {});
+
+      const totalInNexus = freshSet.size;
+      setLastSyncInfo({ newCount: data.newThisSync, total: totalInNexus });
+
+      if (data.lcAccountStats) {
+        setLcAccountStats(data.lcAccountStats);
+        localStorage.setItem(LC_STATS_KEY, JSON.stringify(data.lcAccountStats));
+      }
+      setSyncState('done');
+      setSyncOpen(false);
+      const lc_total = data.lcAccountStats?.total;
+      setToast({
+        type: 'success',
+        text: lc_total
+          ? `LeetCode account: ${lc_total} solved · ${totalInNexus} tracked in Nexus`
+          : data.newThisSync > 0
+            ? `Imported ${data.newThisSync} new problems! (${totalInNexus} total tracked in Nexus)`
+            : `Already up to date — ${totalInNexus} problems tracked.`,
+      });
+      setTimeout(() => setSyncState('idle'), 3000);
+    } catch {
+      setSyncState('error');
+      setToast({ type: 'error', text: 'Sync failed. Check your LeetCode username and try again.' });
+      setTimeout(() => setSyncState('idle'), 3000);
+    }
+  }, [lcUsername, nexusUsername, LC_KEY, LC_STATS_KEY]);
+
+  // ── Paste import (from browser console script) ─────────────────────── //
+  const CONSOLE_SCRIPT = `(async()=>{try{const r=await fetch('/api/problems/all/',{headers:{'x-requested-with':'XMLHttpRequest'}});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();const s=d.stat_status_pairs.filter(p=>p.status==='ac').map(p=>p.stat.question__title_slug);const j=JSON.stringify(s);try{await navigator.clipboard.writeText(j);console.log(s.length+' solved slugs copied to clipboard!');}catch(e){console.log('COPY EVERYTHING BETWEEN THE STARS');console.log('***'+j+'***');};}catch(e){console.error('Error:',e.message);}})();`;
+
+  const handlePasteSync = useCallback(async () => {
+    const raw = pastedSlugs.trim();
+    if (!raw) { pasteInputRef.current?.focus(); return; }
+    let slugs;
+    try { slugs = JSON.parse(raw); } catch { setToast({ type: 'error', text: 'Invalid format — paste the JSON array from the console script.' }); return; }
+    if (!Array.isArray(slugs) || slugs.length === 0) { setToast({ type: 'error', text: 'No slugs found in pasted data.' }); return; }
+    setSyncState('syncing');
+    try {
+      await apiFetch('/paste-sync', {
+        method: 'POST',
+        body: JSON.stringify({ nexusUsername, slugs }),
+      });
+      const freshSolved = await apiFetch(`/solved/${encodeURIComponent(nexusUsername)}`);
+      const freshSet = new Set(freshSolved.solvedSlugs);
+      setSolvedSlugs(freshSet);
+      setCatSolvedMap(freshSolved.solvedByCategory  ?? {});
+      setDiffSolvedMap(freshSolved.solvedByDifficulty ?? {});
+      const totalInNexus = freshSet.size;
+      setLastSyncInfo({ newCount: slugs.length, total: totalInNexus });
+      setSyncState('done');
+      setSyncOpen(false);
+      setPastedSlugs('');
+      setToast({ type: 'success', text: `Imported ${slugs.length} problems! ${totalInNexus} total tracked in Nexus.` });
+      setTimeout(() => setSyncState('idle'), 3000);
+    } catch (err) {
+      setSyncState('error');
+      setToast({ type: 'error', text: err.message || 'Paste import failed.' });
+      setTimeout(() => setSyncState('idle'), 3000);
+    }
+  }, [pastedSlugs, nexusUsername]);
+
   // ── Confetti on category completion ────────────────────────────────── //
   useEffect(() => {
-    if (problems.length === 0) return;
-    const catMap = {};
-    problems.forEach(p => {
-      if (!catMap[p.category]) catMap[p.category] = { solved: 0, total: 0 };
-      catMap[p.category].total++;
-      if (solvedSlugs.has(p.title_slug)) catMap[p.category].solved++;
-    });
-    Object.entries(catMap).forEach(([cat, { solved, total }]) => {
-      const prev = prevCatSolvedRef.current[cat] ?? 0;
+    if (!Object.keys(catStats).length) return;
+    Object.entries(catStats).forEach(([cat, total]) => {
+      const solved = catSolvedMap[cat] ?? 0;
+      const prev   = prevCatSolvedRef.current[cat] ?? 0;
       if (solved === total && total > 0 && prev < total) {
         confetti({
           particleCount: 90,
@@ -490,31 +708,21 @@ export default function PracticeHub() {
         });
       }
     });
-    prevCatSolvedRef.current = Object.fromEntries(
-      Object.entries(catMap).map(([k, v]) => [k, v.solved])
-    );
-  }, [solvedSlugs, problems]);
+    prevCatSolvedRef.current = { ...catSolvedMap };
+  }, [catSolvedMap, catStats]);
 
   // ── Derived stats ────────────────────────────────────────────────────── //
-  const totalProblems = problems.length || 0;
-  const totalSolved   = solvedSlugs.size;
-  const progressPct   = Math.round((totalSolved / totalProblems) * 100);
-  const easySolved    = useMemo(() => problems.filter(p => p.difficulty === 'Easy'   && solvedSlugs.has(p.title_slug)).length, [problems, solvedSlugs]);
-  const mediumSolved  = useMemo(() => problems.filter(p => p.difficulty === 'Medium' && solvedSlugs.has(p.title_slug)).length, [problems, solvedSlugs]);
-  const hardSolved    = useMemo(() => problems.filter(p => p.difficulty === 'Hard'   && solvedSlugs.has(p.title_slug)).length, [problems, solvedSlugs]);
-  const easyTotal     = useMemo(() => problems.filter(p => p.difficulty === 'Easy').length,   [problems]);
-  const mediumTotal   = useMemo(() => problems.filter(p => p.difficulty === 'Medium').length, [problems]);
-  const hardTotal     = useMemo(() => problems.filter(p => p.difficulty === 'Hard').length,   [problems]);
-
-  const catFilteredCount = useMemo(() => {
-    if (!selectedCat) return problems.length;
-    return problems.filter(p => p.category === selectedCat).length;
-  }, [problems, selectedCat]);
-
-  const catSolvedCount = useMemo(() => {
-    if (!selectedCat) return totalSolved;
-    return problems.filter(p => p.category === selectedCat && solvedSlugs.has(p.title_slug)).length;
-  }, [problems, selectedCat, solvedSlugs, totalSolved]);
+  const totalProblems  = probTotal || 0;
+  const totalSolved    = solvedSlugs.size;
+  const progressPct    = totalProblems > 0 ? Math.round((totalSolved / totalProblems) * 100) : 0;
+  const easySolved     = diffSolvedMap.Easy   ?? 0;
+  const mediumSolved   = diffSolvedMap.Medium ?? 0;
+  const hardSolved     = diffSolvedMap.Hard   ?? 0;
+  const easyTotal      = diffStats.Easy   ?? 0;
+  const mediumTotal    = diffStats.Medium ?? 0;
+  const hardTotal      = diffStats.Hard   ?? 0;
+  const catFilteredCount = selectedCat ? (catStats[selectedCat] ?? 0) : totalProblems;
+  const catSolvedCount   = selectedCat ? (catSolvedMap[selectedCat] ?? 0) : totalSolved;
 
   // ── Render ───────────────────────────────────────────────────────────── //
   if (isLoading) return (
@@ -586,6 +794,12 @@ export default function PracticeHub() {
 
             {/* global progress card */}
             <SpotlightCard className="ph-progress-card">
+              <div className="ph-progress-user">
+                <span className="ph-progress-user-label">Tracking progress for</span>
+                <span className="ph-progress-user-id">
+                  {user?.name || user?.username || user?.email?.split('@')[0] || 'Guest'}
+                </span>
+              </div>
               <div className="ph-global-count">
                 <span className="ph-count-big"><NumberTicker value={totalSolved} /></span>
                 <span className="ph-count-sep">/</span>
@@ -620,6 +834,120 @@ export default function PracticeHub() {
                 </div>
               </div>
 
+              {/* LeetCode account stats — shown when synced */}
+              {lcAccountStats && lcUsername && (
+                <div className="ph-lc-account-stats">
+                  <span className="ph-lc-account-label">LeetCode account</span>
+                  <div className="ph-lc-account-nums">
+                    <span className="ph-lc-total">{lcAccountStats.total}</span>
+                    <span className="ph-lc-sep">·</span>
+                    <span className="ph-lc-easy diff-easy-text">{lcAccountStats.easy}E</span>
+                    <span className="ph-lc-sep">·</span>
+                    <span className="ph-lc-medium diff-medium-text">{lcAccountStats.medium}M</span>
+                    <span className="ph-lc-sep">·</span>
+                    <span className="ph-lc-hard diff-hard-text">{lcAccountStats.hard}H</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ── LeetCode sync ── */}
+              <div className="ph-sync-area">
+                {!syncOpen ? (
+                  <button
+                    className={`ph-sync-btn${!lcUsername ? ' needs-lc' : ''}`}
+                    onClick={() => { setSyncOpen(true); setSyncTab('quick'); setTimeout(() => lcInputRef.current?.focus(), 60); }}
+                  >
+                    {syncState === 'syncing' ? (
+                      <Loader2 size={15} className="spin" />
+                    ) : syncState === 'done' ? (
+                      <CheckCircle2 size={15} />
+                    ) : (
+                      <RefreshCcw size={15} />
+                    )}
+                    {lcUsername ? 'Sync from LeetCode' : 'Import LeetCode Progress'}
+                  </button>
+                ) : (
+                  <div className="ph-sync-form">
+                    {/* Tabs */}
+                    <div className="ph-sync-tabs">
+                      <button
+                        className={`ph-sync-tab${syncTab === 'quick' ? ' active' : ''}`}
+                        onClick={() => { setSyncTab('quick'); setTimeout(() => lcInputRef.current?.focus(), 60); }}
+                      >Quick Sync</button>
+                      <button
+                        className={`ph-sync-tab${syncTab === 'paste' ? ' active' : ''}`}
+                        onClick={() => { setSyncTab('paste'); }}
+                      >Full Import ✦</button>
+                    </div>
+
+                    {syncTab === 'quick' ? (
+                      <>
+                        <div className="ph-sync-form-label"><RefreshCcw size={12} /> LeetCode username</div>
+                        <div className="ph-sync-input-row">
+                          <input
+                            ref={lcInputRef}
+                            className="ph-sync-input"
+                            placeholder="e.g. lee215"
+                            value={lcUsername}
+                            onChange={e => setLcUsername(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleSync()}
+                            disabled={syncState === 'syncing'}
+                            spellCheck={false}
+                            autoCapitalize="none"
+                          />
+                          <button className="ph-sync-go-btn" onClick={handleSync} disabled={!lcUsername.trim() || syncState === 'syncing'}>
+                            {syncState === 'syncing' ? <Loader2 size={14} className="spin" /> : <RefreshCcw size={14} />}
+                          </button>
+                        </div>
+                        <p className="ph-sync-hint">Imports your ~20 most recent solved problems. No login needed.</p>
+                      </>
+                    ) : (
+                      <>
+                        {/* Step 1: copy the script */}
+                        <div className="ph-sync-form-label">Step 1 — Run this in your browser console on leetcode.com</div>
+                        <div className="ph-script-box">
+                          <code className="ph-script-code">{CONSOLE_SCRIPT}</code>
+                          <button
+                            className={`ph-script-copy${scriptCopied ? ' copied' : ''}`}
+                            onClick={() => {
+                              navigator.clipboard.writeText(CONSOLE_SCRIPT);
+                              setScriptCopied(true);
+                              setTimeout(() => setScriptCopied(false), 2000);
+                            }}
+                          >{scriptCopied ? '✓ Copied' : 'Copy'}</button>
+                        </div>
+                        <p className="ph-sync-hint">Go to <strong>leetcode.com</strong> → press <code>F12</code> → <strong>Console</strong> tab → paste &amp; press Enter. It will copy a JSON array to your clipboard.</p>
+
+                        {/* Step 2: paste result */}
+                        <div className="ph-sync-form-label" style={{marginTop:'0.35rem'}}>Step 2 — Paste the result here</div>
+                        <div className="ph-sync-input-row">
+                          <textarea
+                            ref={pasteInputRef}
+                            className="ph-sync-input ph-sync-textarea"
+                            placeholder='["two-sum","add-two-numbers",...]'
+                            value={pastedSlugs}
+                            onChange={e => setPastedSlugs(e.target.value)}
+                            disabled={syncState === 'syncing'}
+                            spellCheck={false}
+                            rows={2}
+                          />
+                          <button className="ph-sync-go-btn" style={{alignSelf:'flex-end'}} onClick={handlePasteSync} disabled={!pastedSlugs.trim() || syncState === 'syncing'}>
+                            {syncState === 'syncing' ? <Loader2 size={14} className="spin" /> : <RefreshCcw size={14} />}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                    <button className="ph-sync-cancel" onClick={() => { setSyncOpen(false); setPastedSlugs(''); }}>
+                      Cancel
+                    </button>
+                  </div>
+                )}
+                {lastSyncInfo && !syncOpen && (
+                  <p className="ph-last-synced">
+                    Last sync: {lastSyncInfo.total} tracked in Nexus
+                  </p>
+                )}
+              </div>
 
             </SpotlightCard>
           </div>
@@ -630,8 +958,10 @@ export default function PracticeHub() {
 
           {/* Sidebar */}
           <CategorySidebar
-            problems={problems}
-            solvedSlugs={solvedSlugs}
+            catStats={catStats}
+            catSolvedMap={catSolvedMap}
+            totalProblems={totalProblems}
+            totalSolved={totalSolved}
             selected={selectedCat}
             onSelect={cat => startTransition(() => setSelectedCat(cat))}
           />
@@ -696,11 +1026,11 @@ export default function PracticeHub() {
             <ProblemList
               problems={problems}
               solvedSlugs={solvedSlugs}
-              selectedCategory={selectedCat}
-              diffFilter={diffFilter}
-              searchQ={searchQ}
               onToggle={handleToggle}
               newlySolved={newlySolved}
+              hasMore={probHasMore}
+              isLoadingMore={isLoadingMore}
+              onLoadMore={handleLoadMore}
             />
           </div>
         </div>

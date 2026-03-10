@@ -1,17 +1,18 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+﻿import { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   Zap, Trophy, Users, Calendar, MapPin, Clock,
-  Rocket, Star, X, ArrowRight, ExternalLink, Code, Target, ArrowLeft
+  Rocket, Star, X, ArrowRight, ExternalLink, Code, Target, ArrowLeft, Search,
+  Heart, Share2, Copy, CalendarPlus, MessageCircle, Shield, Check, ChevronDown
 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import '../styles/Hackathons.css';
 
-/* ─────────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    MAGNETIC CURSOR HOOK
-   ───────────────────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function useMagnetic(strength = 0.4) {
   const ref = useRef(null);
   const onMove = useCallback((e) => {
@@ -26,11 +27,6 @@ function useMagnetic(strength = 0.4) {
   }, []);
   return { ref, onMove, onLeave };
 }
-
-/* ─────────────────────────────────────────────────────────────
-   NEURAL GRID  — Three.js wireframe terrain with
-   scroll parallax + card-hover pedestal pulse
-   ───────────────────────────────────────────────────────────── */
 const NeuralGrid = ({ hoveredCardRect }) => {
   const canvasRef  = useRef(null);
   const hoveredRef = useRef(null);
@@ -90,16 +86,12 @@ const NeuralGrid = ({ hoveredCardRect }) => {
         t += 0.007;
         const sy = scrollRef.current;
 
-        /* ── Parallax fly-over: camera advances along Z as user scrolls.
-              Near grid lines (large Z in clip space) shift faster than
-              distant ones — naturally 0.4x vs 0.1x through perspective. */
         camera.position.set(0, Math.max(60, 160 - sy * 0.04), 500 - sy * 0.18);
         camera.lookAt(0, -sy * 0.02, -200 - sy * 0.1);
         camera.updateMatrixWorld();
         camPos.copy(camera.position);
 
-        /* ── Project hovered card centre onto the Y=0 grid plane */
-        let pedestalX = null, pedestalZ = null;
+       let pedestalX = null, pedestalZ = null;
         const rect = hoveredRef.current;
         if (rect) {
           const cx =  (rect.left + rect.width  * 0.5) / W * 2 - 1;
@@ -115,12 +107,11 @@ const NeuralGrid = ({ hoveredCardRect }) => {
           }
         }
 
-        /* ── Vertex displacement */
+        /* â”€â”€ Vertex displacement */
         for (let i = 0; i < count; i++) {
           const x = baseX[i], z = baseZ[i];
 
-          // rolling terrain — two frequency layers
-          let y  = Math.sin(x * 0.006 + t)           * Math.cos(z * 0.005 + t * 0.8) * 28;
+            let y  = Math.sin(x * 0.006 + t)           * Math.cos(z * 0.005 + t * 0.8) * 28;
               y += Math.sin(x * 0.012 + t * 1.5)     * 13;
               y += Math.cos(z * 0.009 + t * 0.6)     * 16;
               y += Math.sin((x + z) * 0.007 + t * 0.4) * 9;
@@ -165,9 +156,9 @@ const NeuralGrid = ({ hoveredCardRect }) => {
   return <canvas ref={canvasRef} className="hack-neural-grid" />;
 };
 
-/* ─────────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    3-D TILT CARD
-   ───────────────────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const TiltCard = ({ children, className, onClick, layoutId, style, onCardHover, onCardLeave }) => {
   const ref = useRef(null);
   const onMove = (e) => {
@@ -196,9 +187,9 @@ const TiltCard = ({ children, className, onClick, layoutId, style, onCardHover, 
   );
 };
 
-/* ─────────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    NEON CTA BUTTON
-   ───────────────────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const NeonButton = ({ children, className, onClick }) => {
   const mag = useMagnetic(0.38);
   return (
@@ -209,11 +200,127 @@ const NeonButton = ({ children, className, onClick }) => {
   );
 };
 
-/* ─────────────────────────────────────────────────────────────
+/* ───────────────────────────────────────────────────────────
+   COUNTDOWN TIMER (Feature 2)
+   ─────────────────────────────────────────────────────────── */
+const CountdownTimer = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
+  useEffect(() => {
+    if (!targetDate) return;
+    const calc = () => {
+      const ms = new Date(targetDate).getTime() - Date.now();
+      if (ms <= 0) return { d: 0, h: 0, m: 0, s: 0 };
+      return {
+        d: Math.floor(ms / 86400000),
+        h: Math.floor((ms % 86400000) / 3600000),
+        m: Math.floor((ms % 3600000) / 60000),
+        s: Math.floor((ms % 60000) / 1000),
+      };
+    };
+    setTimeLeft(calc());
+    const id = setInterval(() => setTimeLeft(calc()), 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+  if (!targetDate) return null;
+  const { d, h, m, s } = timeLeft;
+  if (d > 7) return null;
+  return (
+    <div className="hack-countdown">
+      <Clock size={11} />
+      <span className="hack-cd-block">{String(d).padStart(2, '0')}<small>d</small></span>
+      <span className="hack-cd-sep">:</span>
+      <span className="hack-cd-block">{String(h).padStart(2, '0')}<small>h</small></span>
+      <span className="hack-cd-sep">:</span>
+      <span className="hack-cd-block">{String(m).padStart(2, '0')}<small>m</small></span>
+      <span className="hack-cd-sep">:</span>
+      <span className="hack-cd-block">{String(s).padStart(2, '0')}<small>s</small></span>
+    </div>
+  );
+};
+
+/* ───────────────────────────────────────────────────────────
+   DIFFICULTY BADGE (Feature 8)
+   ─────────────────────────────────────────────────────────── */
+const DIFFICULTY_CONFIG = {
+  beginner:     { label: 'Beginner',     color: '#22c55e', icon: Shield },
+  intermediate: { label: 'Intermediate', color: '#f59e0b', icon: Shield },
+  advanced:     { label: 'Advanced',     color: '#ef4444', icon: Shield },
+  'all levels': { label: 'All Levels',   color: '#8b5cf6', icon: Star },
+};
+const DifficultyBadge = ({ difficulty }) => {
+  const key = (difficulty || 'all levels').toLowerCase();
+  const cfg = DIFFICULTY_CONFIG[key] || DIFFICULTY_CONFIG['all levels'];
+  const Icon = cfg.icon;
+  return (
+    <span className="hack-difficulty-badge" style={{ '--diff-color': cfg.color }}>
+      <Icon size={11} /> {cfg.label}
+    </span>
+  );
+};
+
+/* ───────────────────────────────────────────────────────────
+   HELPER: Calendar Export (Feature 5)
+   ─────────────────────────────────────────────────────────── */
+function generateICS(hack) {
+  const fmt = (d) => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const start = hack.startDate ? fmt(hack.startDate) : '';
+  const end = hack.endDate ? fmt(hack.endDate) : start;
+  if (!start) return;
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Nexus//Hackathons//EN',
+    'BEGIN:VEVENT',
+    `DTSTART:${start}`, `DTEND:${end}`,
+    `SUMMARY:${hack.name}`,
+    `DESCRIPTION:${hack.name} by ${hack.organizer}. Prize: ${hack.prize || 'TBA'}. URL: ${hack.url}`,
+    `LOCATION:${hack.location}`,
+    `URL:${hack.url}`,
+    'END:VEVENT', 'END:VCALENDAR',
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${hack.name.replace(/[^a-zA-Z0-9]/g, '_')}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ───────────────────────────────────────────────────────────
+   HELPER: Share (Feature 6)
+   ─────────────────────────────────────────────────────────── */
+function shareHack(hack, platform) {
+  const text = `Check out "${hack.name}" hackathon! Prize: ${hack.prize || 'TBA'}`;
+  const url = hack.url && hack.url !== '#' ? hack.url : window.location.href;
+  if (platform === 'copy') {
+    navigator.clipboard?.writeText(`${text}\n${url}`);
+    return true;
+  }
+  if (platform === 'twitter') {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+  }
+  if (platform === 'linkedin') {
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+  }
+  return false;
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    EXPAND DETAIL OVERLAY
-   ───────────────────────────────────────────────────────────── */
-const DetailOverlay = ({ hack, onClose }) => {
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const DetailOverlay = ({ hack, onClose, isSaved, onToggleSave }) => {
+  const [copied, setCopied] = useState(false);
+  const [lookingForTeam, setLookingForTeam] = useState(false);
   if (!hack) return null;
+
+  const handleCopy = () => {
+    if (shareHack(hack, 'copy')) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <AnimatePresence>
       <motion.div className="hack-overlay-backdrop"
@@ -254,7 +361,7 @@ const DetailOverlay = ({ hack, onClose }) => {
                 { icon: Users,    label: 'Participants',  val: hack.participants  },
                 { icon: Trophy,   label: 'Prize Pool',   val: hack.prize         },
                 { icon: Target,   label: 'Difficulty',   val: hack.difficulty    },
-                { icon: Clock,    label: 'Starts In',    val: hack.isLive ? 'Live now!' : `${hack.daysUntil} days` },
+                { icon: Clock,    label: 'Starts In',    val: hack.isLive ? 'Live now!' : (hack.daysUntil + ' days') },
               ].map(({ icon: Icon, label, val }) => (
                 <div key={label} className="hack-detail-item">
                   <span className="hack-detail-icon"><Icon size={15} /></span>
@@ -270,7 +377,7 @@ const DetailOverlay = ({ hack, onClose }) => {
               <h4>Tracks &amp; Tags</h4>
               <div className="hack-pill-row">
                 {hack.tags.map(t => <span key={t} className="hack-glass-pill">{t}</span>)}
-                <span className="hack-diff-pill">{hack.difficulty}</span>
+                <DifficultyBadge difficulty={hack.difficulty} />
               </div>
             </div>
 
@@ -283,7 +390,49 @@ const DetailOverlay = ({ hack, onClose }) => {
               </p>
             </div>
 
-            <NeonButton className="hack-register-neon">
+            {/* ── Feature 7: Team Finder ── */}
+            <div className="hack-overlay-section hack-team-finder">
+              <h4>Team Finder</h4>
+              <div className="hack-team-row">
+                <button
+                  className={`hack-team-toggle ${lookingForTeam ? 'active' : ''}`}
+                  onClick={() => setLookingForTeam(v => !v)}
+                >
+                  <MessageCircle size={14} />
+                  {lookingForTeam ? 'Looking for Team!' : 'Looking for a Team?'}
+                </button>
+                {lookingForTeam && (
+                  <motion.p className="hack-team-hint"
+                    initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                  >
+                    Share this hackathon with friends or find teammates on Discord communities!
+                  </motion.p>
+                )}
+              </div>
+            </div>
+
+            {/* ── Action buttons row: Save + Calendar + Share ── */}
+            <div className="hack-overlay-actions">
+              <button className={`hack-action-btn hack-save-btn ${isSaved ? 'saved' : ''}`} onClick={onToggleSave}>
+                <Heart size={16} fill={isSaved ? 'currentColor' : 'none'} /> {isSaved ? 'Saved' : 'Save'}
+              </button>
+              {hack.startDate && (
+                <button className="hack-action-btn" onClick={() => generateICS(hack)}>
+                  <CalendarPlus size={16} /> Add to Calendar
+                </button>
+              )}
+              <button className="hack-action-btn" onClick={handleCopy}>
+                {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> Copy Link</>}
+              </button>
+              <button className="hack-action-btn" onClick={() => shareHack(hack, 'twitter')}>
+                <Share2 size={16} /> Twitter
+              </button>
+              <button className="hack-action-btn" onClick={() => shareHack(hack, 'linkedin')}>
+                <Share2 size={16} /> LinkedIn
+              </button>
+            </div>
+
+            <NeonButton className="hack-register-neon" onClick={() => hack.url && hack.url !== '#' && window.open(hack.url, '_blank')}>
               {hack.isLive ? 'Join Now' : 'Register'} <ExternalLink size={15} />
             </NeonButton>
           </motion.div>
@@ -292,61 +441,157 @@ const DetailOverlay = ({ hack, onClose }) => {
     </AnimatePresence>
   );
 };
+const CATEGORY_COLOR = { ai:'#10a37f', web3:'#9945ff', hardware:'#4ECDC4', climate:'#22c55e', data:'#3B82F6', general:'#f59e0b' };
+const CATEGORY_EMOJI = { ai:'psychology', web3:'currency_bitcoin', hardware:'memory', climate:'eco', data:'analytics', general:'code' };
 
-/* ─────────────────────────────────────────────────────────────
+function fmtDateRange(s, e) {
+  if (!s) return 'TBA';
+  const o = { month:'short', day:'numeric' };
+  const start = new Date(s).toLocaleDateString('en-US', o);
+  if (!e) return start;
+  const end = new Date(e).toLocaleDateString('en-US', { ...o, year:'numeric' });
+  return `${start} “ ${end}`;
+}
+function daysFromNow(d) {
+  if (!d) return null;
+  const ms = new Date(d).getTime() - Date.now();
+  return ms < 0 ? 0 : Math.ceil(ms / 86_400_000);
+}
+function normalizeApiHack(h, idx) {
+  const cat = h.category || 'general';
+  return {
+    id:           h.uid || h._id || `api-${idx}`,
+    name:         h.title       || 'Untitled',
+    organizer:    h.organizer   || 'Unknown',
+    emoji:        CATEGORY_EMOJI[cat] || 'code',
+    date:         fmtDateRange(h.startDate, h.endDate),
+    location:     h.location    || 'Online',
+    participants: h.participants || null,
+    prize:        h.prize        || null,
+    difficulty:   h.difficulty   || 'All Levels',
+    tags:         h.tags         || [],
+    isLive:       h.status === 'live',
+    daysUntil:    daysFromNow(h.startDate),
+    color:        CATEGORY_COLOR[cat] || '#f59e0b',
+    featured:     !!h.featured,
+    category:     cat,
+    url:          h.url || '#',
+    description:  h.description || '',
+    startDate:    h.startDate || null,
+    endDate:      h.endDate || null,
+    prizeRaw:     h.prizeRaw || 0,
+  };
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    MAIN PAGE
-   ───────────────────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const Hackathons = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const deepLinkDone = useRef(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [activeHack, setActiveHack]             = useState(null);
   const [hoveredCardRect, setHoveredCardRect]   = useState(null);
+  const [apiHacks,  setApiHacks]                = useState([]);
+  const [loading,   setLoading]                 = useState(true);
+  const [liveCount, setLiveCount]               = useState(3);
+  const [totalPrize, setTotalPrize]             = useState('$1.5M+');
+  const [locationSearch, setLocationSearch]     = useState('');
+
+  /* Feature 1: Bookmark / Save */
+  const [savedHacks, setSavedHacks] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('nexus_saved_hacks') || '[]'); }
+    catch { return []; }
+  });
+  const toggleSave = useCallback((hackId) => {
+    setSavedHacks(prev => {
+      const next = prev.includes(hackId) ? prev.filter(id => id !== hackId) : [...prev, hackId];
+      localStorage.setItem('nexus_saved_hacks', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+  const [showSaved, setShowSaved] = useState(false);
+
+  /* Feature 4: Sort */
+  const [sortBy, setSortBy] = useState('default');
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const sortRef = useRef(null);
+  useEffect(() => {
+    const handler = (e) => { if (sortRef.current && !sortRef.current.contains(e.target)) setShowSortMenu(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const { scrollY } = useScroll();
   const heroY  = useTransform(scrollY, [0, 500], [0, 130]);
   const heroOp = useTransform(scrollY, [0, 350], [1, 0]);
 
-  const hackathons = [
-    /* ── LIVE NOW ───────────────────────────────────────────── */
-    { id:  1, name: 'ETHGlobal Waterloo',           organizer: 'ETHGlobal',              emoji: 'bolt',                   date: 'Feb 27 – Mar 1, 2026',  location: 'Waterloo, Canada',  participants: '2,000+',   prize: '$100,000',  difficulty: 'Advanced',     tags: ['Blockchain', 'DeFi', 'Smart Contracts'],          isLive: true,  daysUntil: 0,  color: '#f59e0b', featured: true,  category: 'web3'     },
-    { id:  2, name: 'Solana Grizzlython',           organizer: 'Solana Foundation',      emoji: 'currency_bitcoin',       date: 'Feb 25 – Mar 4, 2026',  location: 'Online',            participants: '8,500+',   prize: '$400,000',  difficulty: 'Advanced',     tags: ['Web3', 'DeFi', 'NFT', 'dApps'],                  isLive: true,  daysUntil: 0,  color: '#9945ff', featured: true,  category: 'web3'     },
-    { id:  3, name: 'OpenAI Assistants Hackathon',  organizer: 'OpenAI',                 emoji: 'psychology',             date: 'Feb 26 – Mar 2, 2026',  location: 'Online',            participants: '12,000+',  prize: '$150,000',  difficulty: 'Intermediate', tags: ['GPT-4', 'Agents', 'Plugins', 'AI'],               isLive: true,  daysUntil: 0,  color: '#10a37f', featured: true,  category: 'ai'       },
+  /* Fetch live data from backend */
+  useEffect(() => {
+    fetch('/api/hackathons?limit=500')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        const normalized = (data.hackathons || []).map(normalizeApiHack);
+        setApiHacks(normalized);
+        if (normalized.length) {
+          setLiveCount(normalized.filter(h => h.isLive).length);
+          const raw = (data.hackathons || []).reduce((a, h) => a + (h.prizeRaw || 0), 0);
+          if (raw > 0) setTotalPrize(
+            raw >= 1_000_000 ? `$${(raw / 1_000_000).toFixed(1)}M+` : `$${Math.round(raw / 1000)}k+`
+          );
+        }
+        setLoading(false);
+      })
+      .catch(() => { setLoading(false); });
+  }, []);
 
-    /* ── UPCOMING — FEATURED ────────────────────────────────── */
-    { id:  4, name: 'MLH Global Hack Week',         organizer: 'Major League Hacking',   emoji: 'public',                 date: 'Mar 2-8, 2026',         location: 'Online',            participants: '18,000+',  prize: '$50,000',   difficulty: 'All Levels',   tags: ['AI/ML', 'Web3', 'Open Source'],                   isLive: false, daysUntil: 3,  color: '#a78bfa', featured: true,  category: 'ai'       },
-    { id:  5, name: 'HackMIT 2026',                 organizer: 'MIT',                    emoji: 'school',                 date: 'Mar 5-7, 2026',         location: 'Cambridge, MA',     participants: '1,500+',   prize: '$25,000',   difficulty: 'Intermediate', tags: ['Hardware', 'IoT', 'Robotics'],                    isLive: false, daysUntil: 6,  color: '#4ECDC4', featured: true,  category: 'hardware' },
-    { id:  6, name: 'Google DevFest Hackathon',     organizer: 'Google',                 emoji: 'local_fire_department',  date: 'Mar 12-14, 2026',       location: 'Online',            participants: '10,000+',  prize: '$75,000',   difficulty: 'Intermediate', tags: ['Cloud', 'Mobile', 'AI'],                          isLive: false, daysUntil: 13, color: '#fbbc04', featured: true,  category: 'ai'       },
-    { id:  7, name: 'Hack the North 2026',          organizer: 'University of Waterloo', emoji: 'north_star',             date: 'Mar 20-22, 2026',       location: 'Waterloo, Canada',  participants: '3,000+',   prize: '$40,000',   difficulty: 'All Levels',   tags: ['ML', 'Health Tech', 'Fintech'],                   isLive: false, daysUntil: 21, color: '#f43f5e', featured: true,  category: 'ai'       },
-    { id:  8, name: 'Chainlink Hackathon Spring',   organizer: 'Chainlink Labs',          emoji: 'link',                   date: 'Mar 25 – Apr 8, 2026',  location: 'Online',            participants: '5,000+',   prize: '$300,000',  difficulty: 'Advanced',     tags: ['Oracles', 'DeFi', 'Cross-chain', 'Automation'],  isLive: false, daysUntil: 26, color: '#375bd2', featured: true,  category: 'web3'     },
-    { id:  9, name: 'NASA Space Apps Challenge',    organizer: 'NASA',                   emoji: 'rocket_launch',          date: 'Apr 2-4, 2026',         location: 'Global',            participants: '25,000+',  prize: '$60,000',   difficulty: 'All Levels',   tags: ['Space Tech', 'Data Science', 'Innovation'],       isLive: false, daysUntil: 34, color: '#3B82F6', featured: true,  category: 'data'     },
+  /* Deep-link: open a specific hack card when navigated from Dashboard */
+  useEffect(() => {
+    if (!location.state?.openId || !apiHacks.length || deepLinkDone.current) return;
+    const target = apiHacks.find(h => String(h._id || h.id) === String(location.state.openId));
+    if (target) { setActiveHack(target); deepLinkDone.current = true; }
+  }, [apiHacks, location.state]);
 
-    /* ── UPCOMING — REST ────────────────────────────────────── */
-    { id: 10, name: 'TreeHacks',                    organizer: 'Stanford University',    emoji: 'park',                   date: 'Mar 7-9, 2026',         location: 'Stanford, CA',      participants: '1,200+',   prize: '$30,000',   difficulty: 'All Levels',   tags: ['Climate Tech', 'Sustainability', 'Impact'],       isLive: false, daysUntil: 8,  color: '#10B981', featured: false, category: 'climate'  },
-    { id: 11, name: 'Climate Hack 2026',            organizer: 'Climate Draft',          emoji: 'eco',                    date: 'Mar 14-16, 2026',       location: 'Online',            participants: '4,200+',   prize: '$35,000',   difficulty: 'All Levels',   tags: ['GreenTech', 'Carbon', 'Clean Energy'],            isLive: false, daysUntil: 15, color: '#22c55e', featured: false, category: 'climate'  },
-    { id: 12, name: 'HackSC XI',                    organizer: 'USC',                    emoji: 'sunny',                  date: 'Mar 14-16, 2026',       location: 'Los Angeles, CA',   participants: '800+',     prize: '$20,000',   difficulty: 'Beginner',     tags: ['Social Good', 'EdTech', 'Health'],                isLive: false, daysUntil: 15, color: '#fb923c', featured: false, category: 'data'     },
-    { id: 13, name: 'PennApps XXV',                 organizer: 'UPenn',                  emoji: 'lightbulb',              date: 'Mar 21-23, 2026',       location: 'Philadelphia, PA',  participants: '1,800+',   prize: '$45,000',   difficulty: 'Intermediate', tags: ['Fintech', 'AI', 'Open Innovation'],               isLive: false, daysUntil: 22, color: '#e879f9', featured: false, category: 'ai'       },
-    { id: 14, name: 'Reality Hack 2026',            organizer: 'MIT Media Lab',          emoji: 'view_in_ar',             date: 'Mar 28-30, 2026',       location: 'Cambridge, MA',     participants: '600+',     prize: '$50,000',   difficulty: 'Intermediate', tags: ['AR/VR', 'XR', 'Spatial Computing'],               isLive: false, daysUntil: 29, color: '#c026d3', featured: false, category: 'hardware' },
-    { id: 15, name: 'Junction 2026',                organizer: 'Junction',               emoji: 'hub',                    date: 'Apr 4-6, 2026',         location: 'Helsinki, Finland', participants: '1,500+',   prize: '$55,000',   difficulty: 'All Levels',   tags: ['Deep Tech', 'Mobility', 'AI'],                    isLive: false, daysUntil: 36, color: '#06b6d4', featured: false, category: 'hardware' },
-    { id: 16, name: 'CalHacks 11.0',               organizer: 'UC Berkeley',            emoji: 'calculate',              date: 'Apr 11-13, 2026',       location: 'Berkeley, CA',      participants: '2,500+',   prize: '$30,000',   difficulty: 'All Levels',   tags: ['AI', 'Developer Tools', 'Open Innovation'],      isLive: false, daysUntil: 43, color: '#fbbf24', featured: false, category: 'ai'       },
-    { id: 17, name: 'BioHack UCLA',                 organizer: 'UCLA',                   emoji: 'biotech',                date: 'Apr 18-20, 2026',       location: 'Los Angeles, CA',   participants: '700+',     prize: '$15,000',   difficulty: 'Intermediate', tags: ['Biotech', 'Health Tech', 'Data Science'],         isLive: false, daysUntil: 50, color: '#34d399', featured: false, category: 'data'     },
-    { id: 18, name: 'HackDavis 2026',               organizer: 'UC Davis',               emoji: 'agriculture',            date: 'Apr 25-27, 2026',       location: 'Davis, CA',         participants: '1,000+',   prize: '$12,000',   difficulty: 'Beginner',     tags: ['Social Good', 'AgTech', 'Sustainability'],        isLive: false, daysUntil: 57, color: '#84cc16', featured: false, category: 'climate'  },
-  ];
+  /* Real API data only */
+  const hackathons = apiHacks;
 
   const categories = ['all', 'ai', 'web3', 'hardware', 'climate', 'data'];
 
-  const filtered = hackathons.filter(h =>
-    selectedCategory === 'all' || h.category === selectedCategory
-  );
+  const filtered = hackathons.filter(h => {
+    if (showSaved && !savedHacks.includes(h.id)) return false;
+    if (selectedCategory !== 'all' && h.category !== selectedCategory) return false;
+    if (locationSearch.trim()) {
+      const ll = locationSearch.toLowerCase().trim();
+      if (!(h.location || '').toLowerCase().includes(ll)) return false;
+    }
+    return true;
+  });
 
-  const featured = filtered.filter(h => h.featured);
-  const rest     = filtered.filter(h => !h.featured);
+  /* Feature 4: Sort */
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'prize')        return (b.prizeRaw || 0) - (a.prizeRaw || 0);
+    if (sortBy === 'deadline')     return (a.daysUntil ?? 999) - (b.daysUntil ?? 999);
+    if (sortBy === 'participants') {
+      const pa = parseInt(String(a.participants).replace(/\D/g, '')) || 0;
+      const pb = parseInt(String(b.participants).replace(/\D/g, '')) || 0;
+      return pb - pa;
+    }
+    if (sortBy === 'newest') return new Date(b.startDate || 0) - new Date(a.startDate || 0);
+    return 0;
+  });
+
+  /* Feature 3: Happening Now */
+  const liveHacks = sorted.filter(h => h.isLive);
+  const featured  = sorted.filter(h => h.featured && !h.isLive);
+  const rest      = sorted.filter(h => !h.featured && !h.isLive);
 
   return (
     <div className="hack-page">
       <Navbar />
       <NeuralGrid hoveredCardRect={hoveredCardRect} />
 
-      {/* ── Back to Experience Hub ── */}
+      {/* â”€â”€ Back to Experience Hub â”€â”€ */}
       <motion.button
         className="exp-back-btn"
         onClick={() => navigate('/experience-hub')}
@@ -366,7 +611,7 @@ const Hackathons = () => {
         <div className="hack-blob hack-blob-3" />
       </div>
 
-      {/* ── HERO ─────────────────────────────────────────────── */}
+      {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="hack-hero">
         <motion.div className="hack-hero-content" style={{ y: heroY, opacity: heroOp }}>
           <motion.div className="hack-hero-badge"
@@ -388,7 +633,7 @@ const Hackathons = () => {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.16 }}
           >
-            The world's hottest hackathons — curated, live, and ready for you.<br />
+            The world's hottest hackathons ” curated, live, and ready for you.<br />
             Ship bold ideas. Earn real prizes.
           </motion.p>
 
@@ -398,19 +643,19 @@ const Hackathons = () => {
             transition={{ delay: 0.22 }}
           >
             <span className="hack-live-indicator">
-              <span className="hack-live-dot" /><Zap size={14} /> 3 Live Right Now
+              <span className="hack-live-dot" /><Zap size={14} /> {liveCount} Live Right Now
             </span>
             <span className="hack-prize-total">
-              <Trophy size={14} /> $1.5M+ Prize Pool
+              <Trophy size={14} /> {totalPrize} Prize Pool
             </span>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ── CARDS BODY ───────────────────────────────────────── */}
+      {/* â”€â”€ CARDS BODY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="hack-cards-body">
 
-        {/* Filter pills */}
+        {/* Filter pills + location search */}
         <div className="hack-filter-wrapper">
           <motion.div className="hack-filter-row"
             initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
@@ -418,17 +663,155 @@ const Hackathons = () => {
           >
             {categories.map(c => (
               <button key={c}
-                className={`hack-filter-pill ${selectedCategory === c ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(c)}
+                className={`hack-filter-pill ${selectedCategory === c && !showSaved ? 'active' : ''}`}
+                onClick={() => { setSelectedCategory(c); setShowSaved(false); }}
               >
                 {c.charAt(0).toUpperCase() + c.slice(1)}
               </button>
             ))}
+            <button
+              className={`hack-filter-pill hack-saved-pill ${showSaved ? 'active' : ''}`}
+              onClick={() => setShowSaved(v => !v)}
+            >
+              <Heart size={12} fill={showSaved ? 'currentColor' : 'none'} /> Saved ({savedHacks.length})
+            </button>
           </motion.div>
+
+          <motion.div className="hack-location-bar"
+            initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.08 }}
+          >
+            <MapPin size={15} className="hack-location-icon" />
+            <input
+              type="text"
+              className="hack-location-input"
+              placeholder="Filter by location… e.g. India, Online, New York"
+              value={locationSearch}
+              onChange={e => setLocationSearch(e.target.value)}
+            />
+            {locationSearch && (
+              <button className="hack-location-clear" onClick={() => setLocationSearch('')}>
+                <X size={14} />
+              </button>
+            )}
+          </motion.div>
+
+          {/* Feature 4: Sort dropdown */}
+          <div className="hack-sort-wrapper" ref={sortRef}>
+            <button className="hack-sort-trigger" onClick={() => setShowSortMenu(v => !v)}>
+              <ChevronDown size={14} className={showSortMenu ? 'hack-sort-chevron-open' : ''} />
+              Sort: {sortBy === 'default' ? 'Relevance' : sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
+            </button>
+            {showSortMenu && (
+              <motion.div className="hack-sort-menu"
+                initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {[
+                  { key: 'default',      label: 'Relevance' },
+                  { key: 'prize',        label: 'Prize (highest)' },
+                  { key: 'deadline',     label: 'Deadline (soonest)' },
+                  { key: 'participants', label: 'Participants (most)' },
+                  { key: 'newest',       label: 'Newest First' },
+                ].map(opt => (
+                  <button key={opt.key}
+                    className={`hack-sort-opt ${sortBy === opt.key ? 'active' : ''}`}
+                    onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
+                  >
+                    {sortBy === opt.key && <Check size={13} />} {opt.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </div>
         </div>
 
-        {/* ── FEATURED BENTO ─────────────────────────────────── */}
-        {featured.length > 0 && (
+        {/* â”€â”€ FEATURED BENTO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── Feature 3: HAPPENING NOW live section ── */}
+        {!loading && liveHacks.length > 0 && (
+          <section className="hack-section hack-live-section">
+            <motion.div className="hack-section-header"
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ duration: 0.55 }}
+            >
+              <span className="hack-live-pulse-icon"><Zap size={16} /></span>
+              <h2>Happening Now</h2>
+              <span className="hack-live-count-badge">{liveHacks.length} Live</span>
+            </motion.div>
+            <div className="hack-live-grid">
+              {liveHacks.map(hack => (
+                <TiltCard
+                  key={hack.id}
+                  layoutId={`hack-${hack.id}`}
+                  className="hack-card hack-card-live"
+                  style={{ '--accent': '#ef4444' }}
+                  onClick={() => setActiveHack(hack)}
+                  onCardHover={setHoveredCardRect}
+                  onCardLeave={() => setHoveredCardRect(null)}
+                >
+                  <div className="hack-card-border-anim" />
+                  <div className="hack-card-top">
+                    <div className="hack-emoji-wrap">
+                      <span className="material-symbols-rounded">{hack.emoji}</span>
+                    </div>
+                    <div className="hack-card-meta">
+                      <span className="hack-card-name">{hack.name}</span>
+                      <span className="hack-card-org">{hack.organizer}</span>
+                    </div>
+                    <span className="hack-live-chip"><span className="hack-live-dot" />LIVE</span>
+                    <button className={`hack-bookmark ${savedHacks.includes(hack.id) ? 'saved' : ''}`}
+                      onClick={e => { e.stopPropagation(); toggleSave(hack.id); }}>
+                      <Heart size={15} fill={savedHacks.includes(hack.id) ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
+                  {hack.prize && (
+                    <div className="hack-card-prize"><Trophy size={16} /><span>{hack.prize}</span></div>
+                  )}
+                  <div className="hack-card-stats">
+                    <span className="hack-stat"><MapPin size={13} />{hack.location}</span>
+                    <span className="hack-stat"><Users size={13} />{hack.participants}</span>
+                  </div>
+                  <div className="hack-pill-row">
+                    {hack.tags.map(t => <span key={t} className="hack-glass-pill">{t}</span>)}
+                    <DifficultyBadge difficulty={hack.difficulty} />
+                  </div>
+                  <NeonButton className="hack-reg-btn hack-reg-live">
+                    Join Now <ArrowRight size={15} />
+                  </NeonButton>
+                </TiltCard>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Loading skeletons */}
+        {loading && (
+          <div className="hack-loading-state">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="hack-skeleton-card" />
+            ))}
+          </div>
+        )}
+
+        {/* No data from server */}
+        {!loading && hackathons.length === 0 && (
+          <div className="hack-empty-state">
+            <Zap size={40} className="hack-empty-icon" />
+            <h3>No hackathons found</h3>
+            <p>The server couldn&apos;t load hackathon data. Make sure the backend is running.</p>
+          </div>
+        )}
+
+        {/* No filter matches */}
+        {!loading && filtered.length === 0 && hackathons.length > 0 && (
+          <div className="hack-empty-state">
+            <Search size={40} className="hack-empty-icon" />
+            <h3>No matches</h3>
+            <p>Try adjusting your category or location filter.</p>
+          </div>
+        )}
+
+        {!loading && featured.length > 0 && (
           <section className="hack-section">
           <motion.div className="hack-section-header"
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -463,17 +846,29 @@ const Hackathons = () => {
                     ? <span className="hack-live-chip"><span className="hack-live-dot" />LIVE</span>
                     : <span className="hack-days-chip"><Clock size={11} />{hack.daysUntil}d</span>
                   }
+                  <button className={`hack-bookmark ${savedHacks.includes(hack.id) ? 'saved' : ''}`}
+                    onClick={e => { e.stopPropagation(); toggleSave(hack.id); }}>
+                    <Heart size={15} fill={savedHacks.includes(hack.id) ? 'currentColor' : 'none'} />
+                  </button>
                 </div>
 
-                <div className="hack-card-prize">
-                  <Trophy size={16} />
-                  <span>{hack.prize}</span>
-                </div>
+                {hack.prize && (
+                  <div className="hack-card-prize">
+                    <Trophy size={16} />
+                    <span>{hack.prize}</span>
+                  </div>
+                )}
 
                 <div className="hack-card-stats">
                   <span className="hack-stat"><MapPin size={13} />{hack.location}</span>
                   <span className="hack-stat"><Users size={13} />{hack.participants}</span>
                   <span className="hack-stat"><Calendar size={13} />{hack.date}</span>
+                </div>
+
+                {/* Feature 2+8: Countdown + Difficulty Badge */}
+                <div className="hack-card-badges-row">
+                  <DifficultyBadge difficulty={hack.difficulty} />
+                  {!hack.isLive && <CountdownTimer targetDate={hack.startDate} />}
                 </div>
 
                 <div className="hack-pill-row">
@@ -489,8 +884,8 @@ const Hackathons = () => {
           </section>
         )}
 
-        {/* ── REST GRID ──────────────────────────────────────── */}
-        {rest.length > 0 && (
+        {/* â”€â”€ REST GRID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {!loading && rest.length > 0 && (
           <section className="hack-section">
           <motion.div className="hack-section-header"
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -522,16 +917,28 @@ const Hackathons = () => {
                     <span className="hack-card-org">{hack.organizer}</span>
                   </div>
                   <span className="hack-days-chip"><Clock size={11} />{hack.daysUntil}d</span>
+                  <button className={`hack-bookmark ${savedHacks.includes(hack.id) ? 'saved' : ''}`}
+                    onClick={e => { e.stopPropagation(); toggleSave(hack.id); }}>
+                    <Heart size={15} fill={savedHacks.includes(hack.id) ? 'currentColor' : 'none'} />
+                  </button>
                 </div>
 
-                <div className="hack-card-prize">
-                  <Trophy size={14} />
-                  <span>{hack.prize}</span>
-                </div>
+                {hack.prize && (
+                  <div className="hack-card-prize">
+                    <Trophy size={14} />
+                    <span>{hack.prize}</span>
+                  </div>
+                )}
 
                 <div className="hack-card-stats">
                   <span className="hack-stat"><MapPin size={13} />{hack.location}</span>
                   <span className="hack-stat"><Users size={13} />{hack.participants}</span>
+                </div>
+
+                {/* Feature 2+8: Countdown + Difficulty Badge */}
+                <div className="hack-card-badges-row">
+                  <DifficultyBadge difficulty={hack.difficulty} />
+                  <CountdownTimer targetDate={hack.startDate} />
                 </div>
 
                 <div className="hack-pill-row">
@@ -551,10 +958,15 @@ const Hackathons = () => {
 
       <Footer />
 
-      {/* ── DETAIL OVERLAY ──────────────────────────────────── */}
+      {/* â”€â”€ DETAIL OVERLAY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <AnimatePresence>
         {activeHack && (
-          <DetailOverlay hack={activeHack} onClose={() => setActiveHack(null)} />
+          <DetailOverlay
+            hack={activeHack}
+            onClose={() => setActiveHack(null)}
+            isSaved={activeHack ? savedHacks.includes(activeHack.id) : false}
+            onToggleSave={() => activeHack && toggleSave(activeHack.id)}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import TargetCursor from './TargetCursor';
@@ -7,8 +8,10 @@ import PortalTransition from './PortalTransition';
 import { Code, Target, Zap, Users, Briefcase, BookOpen, Calendar, Pencil, Folder, FileText, Bot, TrendingUp, Award, CheckCircle, ArrowRight, Sparkles, Rocket, Shield, Globe, LayoutDashboard, Plus, Map, Compass, Activity } from 'lucide-react';
 import '../styles/Home.css';
 
+
 const Home = ({ theme, toggleTheme }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const observerRef = useRef(null);
   const portalRef   = useRef(null);
 
@@ -97,13 +100,6 @@ const Home = ({ theme, toggleTheme }) => {
       description: "Share work, earn karma, build portfolio",
       shortDesc: "Connect with peers",
       color: "#06B6D4"
-    },
-    {
-      icon: <TrendingUp size={28} />,
-      title: "Experience Radar",
-      description: "Track and showcase your professional growth journey",
-      shortDesc: "Monitor career progress",
-      color: "#F43F5E"
     }
   ];
 
@@ -166,13 +162,27 @@ const Home = ({ theme, toggleTheme }) => {
             <strong> Learn → Architect → Build → Optimize → Land</strong>
           </p>
           <div className="banner-cta-group">
-            <button className="cta-critical" onClick={() => navigate('/login')}>
-              <span>Start Your Journey</span>
-              <ArrowRight size={20} />
-            </button>
-            <button className="cta-secondary" onClick={() => navigate('/dashboard')}>
-              <span>Explore Dashboard</span>
-            </button>
+            {isAuthenticated ? (
+              <>
+                <button className="cta-critical" onClick={() => navigate('/dashboard')}>
+                  <span>Go to Dashboard</span>
+                  <ArrowRight size={20} />
+                </button>
+                <button className="cta-secondary" onClick={() => navigate('/practice')}>
+                  <span>Practice Now</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="cta-critical" onClick={() => navigate('/login')}>
+                  <span>Start Your Journey</span>
+                  <ArrowRight size={20} />
+                </button>
+                <button className="cta-secondary" onClick={() => navigate('/signup')}>
+                  <span>Create Account</span>
+                </button>
+              </>
+            )}
           
           </div>
           {/* Stats removed as requested */}
@@ -409,7 +419,7 @@ const Home = ({ theme, toggleTheme }) => {
           </div>
 
           {/* 5 · Experience Hub – wide (2×1), row 2 left */}
-          <div className="bento-card bento-experience" onClick={(e) => handleBentoClick(e, '/experience-radar')}>
+          <div className="bento-card bento-experience" onClick={(e) => handleBentoClick(e, '/experience-hub')}>
             <div className="bento-accent-circle bento-accent-right" />
             <div className="bento-card-icon"><Activity size={26} /></div>
             <h3 className="bento-card-title">Experience Hub</h3>
@@ -432,10 +442,10 @@ const Home = ({ theme, toggleTheme }) => {
           </div>
 
           {/* 8 · Guidance – wide bottom-left (3×1) */}
-          <div className="bento-card bento-guidance" onClick={(e) => handleBentoClick(e, '/project-workspace')}>
+          <div className="bento-card bento-guidance" onClick={(e) => handleBentoClick(e, '/guidance')}>
             <div className="bento-card-icon"><Compass size={26} /></div>
             <h3 className="bento-card-title">Guidance</h3>
-            <p className="bento-card-desc">Role-specific roadmaps, curated resources &amp; step-by-step paths to get you from where you are to where you want to be.</p>
+            <p className="bento-card-desc">Role-specific roadmaps &amp; curated resources to land your target role.</p>
             <div className="bento-card-tag">Your Roadmap</div>
           </div>
 
@@ -444,7 +454,7 @@ const Home = ({ theme, toggleTheme }) => {
             <div className="bento-accent-circle" />
             <div className="bento-card-icon"><Map size={26} /></div>
             <h3 className="bento-card-title">Aim</h3>
-            <p className="bento-card-desc">Set your north star. Define your dream company, role, and timeline — then let Nexus align everything around it.</p>
+            <p className="bento-card-desc">Set your target company, role &amp; timeline. Nexus aligns everything around it.</p>
             <div className="bento-card-tag">North Star</div>
           </div>
 
@@ -481,14 +491,29 @@ const Home = ({ theme, toggleTheme }) => {
 
           {/* CTAs */}
           <div className="cta-actions">
-            <button className="cta-btn-primary" onClick={() => navigate('/login')}>
-              <span>Start for Free</span>
-              <Rocket size={18} />
-            </button>
-            <button className="cta-btn-secondary" onClick={() => navigate('/dashboard')}>
-              <span>Live Demo</span>
-              <ArrowRight size={18} />
-            </button>
+            {isAuthenticated ? (
+              <>
+                <button className="cta-btn-primary" onClick={() => navigate('/dashboard')}>
+                  <span>Go to Dashboard</span>
+                  <Rocket size={18} />
+                </button>
+                <button className="cta-btn-secondary" onClick={() => navigate('/aim')}>
+                  <span>Set Your Aim</span>
+                  <ArrowRight size={18} />
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="cta-btn-primary" onClick={() => navigate('/signup')}>
+                  <span>Start for Free</span>
+                  <Rocket size={18} />
+                </button>
+                <button className="cta-btn-secondary" onClick={() => navigate('/login')}>
+                  <span>Sign In</span>
+                  <ArrowRight size={18} />
+                </button>
+              </>
+            )}
           </div>
 
           {/* stats strip */}
