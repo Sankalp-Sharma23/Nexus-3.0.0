@@ -1,13 +1,13 @@
-[dotenv@17.3.1] injecting env (4) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.3.1] injecting env (4) from .env -- tip:   specify custom .env file path with { path: '/custom/path/.env' }
 [whiteboard] Loaded 10 persisted room(s) from disk.
-[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.3.1] injecting env (0) from .env -- tip:   load multiple .env files with { path: ['.env.local', '.env'] }
 
-  ✓  Nexus server running → http://localhost:3001
+     Nexus server running → http://localhost:3001
      /api/practice     – Practice Hub endpoints
      /api/jobs         – Placement Portal job listings
      /api/hackathons   – Hackathons listings
      /api/internships  – Internships listings
      ws://localhost:3001/  – Whiteboard real-time socket
 
-[db] MongoDB connected ✓
-[db] LcProblem collection has 3859 problems ✓
+[db] MongoDB connected 
+[db] LcProblem collection has 3859 problems 

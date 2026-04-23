@@ -1,5 +1,5 @@
 // Import React utilities for lazy loading components and suspense
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 // Import routing components for defining app routes
 import { Routes, Route, Navigate } from 'react-router-dom';
 // Import ScrollToTop component to scroll to top on route changes
@@ -42,6 +42,19 @@ function PageLoader() {
 
 /* Main App component: Sets up routing, error handling, and app-level context providers */
 function App() {
+  useEffect(() => {
+    fetch('/api/health')
+      .then(res => res.json())
+      .then(data => {
+        if (data.source === 'JSON') {
+          console.warn('%c⚠️ USING LOCAL JSON FALLBACK DATA', 'color: orange; font-weight: bold; font-size: 14px;');
+        } else if (data.source === 'MongoDB') {
+          console.log('%c☁️ Using Cloud MongoDB Data', 'color: #34a853; font-weight: bold;');
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     // ErrorBoundary: Catches any React errors in child components
     <ErrorBoundary>

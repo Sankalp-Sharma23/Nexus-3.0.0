@@ -3,7 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // Import routing provider for client-side navigation
 import { BrowserRouter } from 'react-router-dom'
-// Import authentication context for managing user auth state
+  // Import authentication context for managing user auth state
 import { AuthProvider } from './contexts/AuthContext'
 // Import toast notification provider for displaying messages
 import { ToastProvider } from './components/Toast'

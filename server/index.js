@@ -13,6 +13,7 @@ const http     = require('http');
 const express  = require('express');
 const cors     = require('cors');
 const path     = require('path');
+const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 const { registerWhiteboardSocket } = require('./socket/WhiteboardSocket');
 const { registerStudySocket }     = require('./socket/StudySocket');
@@ -53,7 +54,10 @@ app.use('/api/study',       studyRouter);
 app.use('/api/dashboard',   dashboardRouter);
 
 // Health check
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
+app.get('/api/health', (_req, res) => {
+  const isMongo = mongoose.connection.readyState === 1;
+  res.json({ status: 'ok', time: new Date().toISOString(), source: isMongo ? 'MongoDB' : 'JSON' });
+});
 
 // ── 404 for unknown API routes ──────────────────────────────────────────── //
 app.use('/api/*', (_req, res) => res.status(404).json({ error: 'API endpoint not found' }));
