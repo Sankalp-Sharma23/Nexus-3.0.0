@@ -53,6 +53,12 @@
       "nexus_username": "1773151160348",
       "leetcode_username": null,
       "last_synced_at": null
+    },
+    {
+      "id": 8,
+      "nexus_username": "69ce4e0b76654229d7da3cbc",
+      "leetcode_username": null,
+      "last_synced_at": null
     }
   ],
   "user_solved_problems": [
@@ -417,5 +423,5 @@
       "solved_at": "2026-03-05T13:58:28.853Z"
     }
   ],
-  "_nextUserId": 8
+  "_nextUserId": 9
 }

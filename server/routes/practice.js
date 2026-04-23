@@ -124,16 +124,28 @@ router.get('/lc-problems', async (req, res) => {
   const category   = req.query.category   || '';
   const difficulty = req.query.difficulty || '';
   const q          = (req.query.q || '').trim();
+  const company    = req.query.company    || '';
 
-  const result = await db.getLcProblems({ page, limit, category, difficulty, q });
-  return res.json({ ...result, source: 'db' });
+  try {
+    const result = await db.getLcProblems({ page, limit, category, difficulty, q, company });
+    return res.json({ ...result, source: 'db' });
+  } catch (err) {
+    console.error('[practice] lc-problems error:', err.message);
+    return res.status(500).json({ error: 'Failed to load problems. Please try again.' });
+  }
 });
 
 // ── GET /api/practice/lc-categories  (lightweight stats for sidebar) ─────── //
 
-router.get('/lc-categories', async (_req, res) => {
-  const data = await db.getLcCategories();
-  res.json(data);
+router.get('/lc-categories', async (req, res) => {
+  const company = req.query.company || '';
+  try {
+    const result = await db.getLcCategories(company);
+    return res.json({ ...result, source: 'db' });
+  } catch (err) {
+    console.error('[practice] lc-categories error:', err.message);
+    return res.status(500).json({ error: 'Failed to load categories.' });
+  }
 });
 
 // ── POST /api/practice/problems/refresh  (manual re-seed from LeetCode) ───── //
@@ -155,8 +167,13 @@ router.post('/user', async (req, res) => {
   const { nexusUsername, leetcodeUsername = null } = req.body;
   if (!nexusUsername) return res.status(400).json({ error: 'nexusUsername required' });
 
-  const user = await db.upsertUser(nexusUsername, leetcodeUsername);
-  res.json({ user });
+  try {
+    const user = await db.upsertUser(nexusUsername, leetcodeUsername);
+    res.json({ user });
+  } catch (err) {
+    console.error('[practice] user upsert error:', err.message);
+    res.status(500).json({ error: 'Failed to register user.' });
+  }
 });
 
 // ── GET /api/practice/solved/:nexusUsername ─────────────────────────── //
@@ -193,15 +210,19 @@ router.post('/mark', async (req, res) => {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug))
     return res.status(400).json({ error: 'Invalid problem slug format' });
 
-  await db.upsertUser(nexusUsername);
-  if (solved) {
-    await db.insertSolved(nexusUsername, slug);
-  } else {
-    await db.deleteSolved(nexusUsername, slug);
+  try {
+    await db.upsertUser(nexusUsername);
+    if (solved) {
+      await db.insertSolved(nexusUsername, slug);
+    } else {
+      await db.deleteSolved(nexusUsername, slug);
+    }
+    const { slugs, byCategory, byDifficulty } = await db.getSolvedWithMeta(nexusUsername);
+    res.json({ solvedSlugs: slugs, solvedByCategory: byCategory, solvedByDifficulty: byDifficulty });
+  } catch (err) {
+    console.error('[practice] mark error:', err.message);
+    res.status(500).json({ error: 'Failed to update problem status.' });
   }
-
-  const { slugs, byCategory, byDifficulty } = await db.getSolvedWithMeta(nexusUsername);
-  res.json({ solvedSlugs: slugs, solvedByCategory: byCategory, solvedByDifficulty: byDifficulty });
 });
 
 // ── POST /api/practice/full-sync ─────────────────────────────────────────── //

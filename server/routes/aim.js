@@ -430,9 +430,14 @@ async function callGemini(prompt) {
     const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     // Strip markdown fences if present
     const json = raw.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
-    return JSON.parse(json);
+    try {
+      return JSON.parse(json);
+    } catch (parseErr) {
+      console.error('[aim] Gemini JSON parse failed. Raw output snippet:\n', raw.slice(0, 500));
+      return null;
+    }
   } catch (e) {
-    console.error('[aim] Gemini error:', e.message);
+    console.error('[aim] Gemini network/API error:', e.message);
     return null;
   }
 }

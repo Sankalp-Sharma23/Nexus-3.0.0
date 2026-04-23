@@ -249,6 +249,7 @@ const Home = ({ theme, toggleTheme }) => {
         <div className="problems-grid">
           {problems.map((problem, index) => (
             <div key={index} className="problem-card scroll-animate anim-from-right" style={{ transitionDelay: `${index * 0.12}s` }}>
+              <div className="problem-bottom-circle" />
               <div className="problem-icon">{problem.icon}</div>
               <h3 className="problem-title">{problem.title}</h3>
               <p className="problem-description">{problem.description}</p>

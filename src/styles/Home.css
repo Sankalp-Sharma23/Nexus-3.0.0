@@ -746,6 +746,27 @@
   opacity: 0.15;
 }
 
+/* New: bottom half-circle that disappears on hover */
+.problem-bottom-circle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  width: 180px;
+  height: 90px;
+  border-radius: 90px 90px 0 0;
+  background: var(--brand-primary);
+  opacity: 0.15;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.problem-card:hover .problem-bottom-circle {
+  transform: translateX(-50%) translateY(100%);
+  opacity: 0;
+}
+
 .problem-card::before {
   content: '';
   position: absolute;
@@ -1896,6 +1917,174 @@
 }
 .bento-aim {
   background: linear-gradient(145deg, var(--bg-card), rgba(99,102,241,0.06));
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HOVER HALF-CIRCLE REVEAL
+   Each card gets a colour-coded semi-circle that slides in from
+   its designated edge on hover.
+
+   • Bottom-center : Dashboard, Whiteboard, AIM, Experience, Guidance
+   • Right-center  : Practice Hub, Placement Portal
+   • Left-center   : Study Planner, Resume
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── shared base ── */
+.bento-card::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity   0.45s ease;
+  opacity: 0;
+}
+
+/* ─── BOTTOM-CENTER group ─── */
+/* Dashboard – violet */
+.bento-dashboard::after {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  width: 200px;
+  height: 100px;
+  border-radius: 100px 100px 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.55) 0%, rgba(124,58,237,0.1) 70%, transparent 100%);
+  filter: blur(6px);
+}
+.bento-dashboard:hover::after {
+  transform: translate(-50%, 35%);
+  opacity: 1;
+}
+
+/* Whiteboard – green */
+.bento-whiteboard::after {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  width: 160px;
+  height: 80px;
+  border-radius: 80px 80px 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(16,185,129,0.55) 0%, rgba(16,185,129,0.1) 70%, transparent 100%);
+  filter: blur(5px);
+}
+.bento-whiteboard:hover::after {
+  transform: translate(-50%, 35%);
+  opacity: 1;
+}
+
+/* AIM – indigo-purple */
+.bento-aim::after {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  width: 200px;
+  height: 100px;
+  border-radius: 100px 100px 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(99,102,241,0.55) 0%, rgba(168,85,247,0.15) 70%, transparent 100%);
+  filter: blur(6px);
+}
+.bento-aim:hover::after {
+  transform: translate(-50%, 35%);
+  opacity: 1;
+}
+
+/* Experience Hub – blue */
+.bento-experience::after {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  width: 200px;
+  height: 100px;
+  border-radius: 100px 100px 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.55) 0%, rgba(59,130,246,0.1) 70%, transparent 100%);
+  filter: blur(6px);
+}
+.bento-experience:hover::after {
+  transform: translate(-50%, 35%);
+  opacity: 1;
+}
+
+/* Guidance – orange */
+.bento-guidance::after {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  width: 220px;
+  height: 110px;
+  border-radius: 110px 110px 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(249,115,22,0.5) 0%, rgba(249,115,22,0.1) 70%, transparent 100%);
+  filter: blur(6px);
+}
+.bento-guidance:hover::after {
+  transform: translate(-50%, 35%);
+  opacity: 1;
+}
+
+/* ─── RIGHT-CENTER group ─── */
+/* Practice Hub – pink */
+.bento-practice::after {
+  right: 0;
+  top: 50%;
+  transform: translate(100%, -50%);
+  width: 80px;
+  height: 160px;
+  border-radius: 80px 0 0 80px;
+  background: radial-gradient(ellipse at 100% 50%, rgba(236,72,153,0.6) 0%, rgba(236,72,153,0.1) 70%, transparent 100%);
+  filter: blur(5px);
+}
+.bento-practice:hover::after {
+  transform: translate(35%, -50%);
+  opacity: 1;
+}
+
+/* Placement Portal – cyan */
+.bento-placement::after {
+  right: 0;
+  top: 50%;
+  transform: translate(100%, -50%);
+  width: 80px;
+  height: 160px;
+  border-radius: 80px 0 0 80px;
+  background: radial-gradient(ellipse at 100% 50%, rgba(6,182,212,0.6) 0%, rgba(6,182,212,0.1) 70%, transparent 100%);
+  filter: blur(5px);
+}
+.bento-placement:hover::after {
+  transform: translate(35%, -50%);
+  opacity: 1;
+}
+
+/* ─── LEFT-CENTER group ─── */
+/* Study Planner – amber */
+.bento-study::after {
+  left: 0;
+  top: 50%;
+  transform: translate(-100%, -50%);
+  width: 80px;
+  height: 160px;
+  border-radius: 0 80px 80px 0;
+  background: radial-gradient(ellipse at 0% 50%, rgba(245,158,11,0.6) 0%, rgba(245,158,11,0.1) 70%, transparent 100%);
+  filter: blur(5px);
+}
+.bento-study:hover::after {
+  transform: translate(-35%, -50%);
+  opacity: 1;
+}
+
+/* Resume – violet-soft */
+.bento-resume::after {
+  left: 0;
+  top: 50%;
+  transform: translate(-100%, -50%);
+  width: 80px;
+  height: 160px;
+  border-radius: 0 80px 80px 0;
+  background: radial-gradient(ellipse at 0% 50%, rgba(139,92,246,0.6) 0%, rgba(139,92,246,0.1) 70%, transparent 100%);
+  filter: blur(5px);
+}
+.bento-resume:hover::after {
+  transform: translate(-35%, -50%);
+  opacity: 1;
 }
 
 /* ---- per-card typography scaling ---- */

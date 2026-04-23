@@ -460,6 +460,78 @@
   display: inline-block;
 }
 
+/* Animated background blob circles behind the left challenge text */
+.eh-hover-circ {
+  position: absolute;
+  filter: blur(40px);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.1s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.eh-circ-1 {
+  width: 198px;
+  height: 198px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.65); /* Purple */
+  top: -40px;
+  left: -20px;
+  transform: translate(-30px, -30px) scale(0.5);
+}
+
+.eh-circ-2 {
+  width: 132px;
+  height: 264px; /* Different shape - oval/pill */
+  border-radius: 100px;
+  background: rgba(56, 189, 248, 0.55); /* Blue */
+  bottom: -60px;
+  right: 20px;
+  transform: translate(30px, 30px) scale(0.5) rotate(15deg);
+}
+
+.eh-cards-grid:has(.eh-card-intern:hover) .eh-circ-1 {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+.eh-cards-grid:has(.eh-card-intern:hover) .eh-circ-2 {
+  opacity: 1;
+  transform: translate(0, 0) scale(1) rotate(15deg);
+  transition-delay: 0.12s;
+}
+
+.eh-circ-3 {
+  width: 60px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.65); /* Amber/Orange */
+  top: -40px;
+  right: -20px;
+  transform: translate(30px, -30px) scale(0.5);
+}
+
+.eh-circ-4 {
+  width: 123px;
+  height: 246px; /* Oval/pill */
+  border-radius: 100px;
+  background: rgba(236, 72, 153, 0.55); /* Pink */
+  bottom: -60px;
+  left: 20px;
+  transform: translate(-30px, 30px) scale(0.5) rotate(-15deg);
+}
+
+.eh-cards-grid:has(.eh-card-hack:hover) .eh-circ-3 {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+.eh-cards-grid:has(.eh-card-hack:hover) .eh-circ-4 {
+  opacity: 1;
+  transform: translate(0, 0) scale(1) rotate(-15deg);
+  transition-delay: 0.12s;
+}
+
 /* Show challenge text on the BLURRED card */
 .eh-cards-grid:has(.eh-card-intern:hover) .eh-card-wrapper:has(.eh-card-hack) .eh-challenge-text-left {
   opacity: 1;

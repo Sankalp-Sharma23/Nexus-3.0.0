@@ -1,10 +1,17 @@
-﻿import { useState, useEffect, useCallback, useMemo, useRef, useTransition, memo } from 'react';
+// Import React hooks for state, effects, and performance optimization
+import { useState, useEffect, useCallback, useMemo, useRef, useTransition, memo } from 'react';
+// Virtual scrolling for efficient rendering of large problem lists
 import { useVirtualizer } from '@tanstack/react-virtual';
+// Animation library for smooth transitions
 import { motion, AnimatePresence } from 'framer-motion';
+// Confetti animation for celebratory moments (like solving problems)
 import confetti from 'canvas-confetti';
+// Navigation and footer components
 import Navbar from './Navbar';
 import Footer from './Footer';
+// Authentication context hook for accessing user info
 import { useAuth } from '../contexts/AuthContext';
+// Import icons from lucide-react for UI elements
 import {
   CheckCircle2, Circle, ExternalLink, Search,
   Hash, ArrowLeftRight, GalleryHorizontal, Layers, ScanSearch,
@@ -14,16 +21,23 @@ import {
   AlertCircle, X, Loader2, TrendingUp, Check,
   BookOpen, Database, MessageSquare, Table2,
   Type, RefreshCcw, Server, SortAsc, Play,
+  ChevronDown, Building2,
 } from 'lucide-react';
+// Component styles
 import '../styles/PracticeHub.css';
 
 /* ─────────────── constants ─────────────── */
+// LocalStorage key for storing user's practice username
 const NEXUS_KEY = 'nexus_practice_username';
+// API base path for practice hub endpoints
 const API       = '/api/practice';
-const LIMIT     = 50;   // problems per page
+// Number of problems to fetch per page (optimized for performance)
+const LIMIT     = 20;
 
+// Map difficulty levels to CSS class names
 const DIFFICULTY_COLORS = { Easy: 'easy', Medium: 'medium', Hard: 'hard' };
 
+// Icon mapping for problem categories for visual identification
 const CATEGORY_ICONS = {
   // Data Structures
   'Array':                      <Hash size={15} />,
@@ -82,7 +96,7 @@ const CATEGORY_ICONS = {
   'Shell':                      <Server size={15} />,
 };
 
-/* Category groups — based on LeetCode's actual topic tags */
+/* Logical grouping of categories for better organization in filters */
 const CATEGORY_GROUPS = [
   { label: 'Data Structures', categories: ['Array', 'String', 'Hash Table', 'Linked List', 'Stack', 'Queue', 'Monotonic Stack', 'Monotonic Queue', 'Tree', 'Binary Tree', 'Binary Search Tree', 'Graph', 'Trie', 'Heap (Priority Queue)', 'Matrix', 'Ordered Set', 'Segment Tree', 'Binary Indexed Tree', 'Union Find'] },
   { label: 'Algorithms',      categories: ['Dynamic Programming', 'Greedy', 'Two Pointers', 'Binary Search', 'Sliding Window', 'Backtracking', 'Depth-First Search', 'Breadth-First Search', 'Divide and Conquer', 'Recursion', 'Memoization', 'Sorting', 'Topological Sort', 'Shortest Path'] },
@@ -90,10 +104,19 @@ const CATEGORY_GROUPS = [
   { label: 'Topics',          categories: ['Design', 'Database', 'Simulation', 'String Matching', 'Prefix Sum', 'Counting', 'Enumeration', 'Data Stream', 'Interactive', 'Game Theory', 'Concurrency', 'Shell'] },
 ];
 
-// Flat set of all categories covered by a group (for the "Other" catch-all)
+// Set of all categories grouped above (used to identify uncategorized/other problems)
 const GROUPED_CATS = new Set(CATEGORY_GROUPS.flatMap(g => g.categories));
 
+/* ─── Company filter constants ─── */
+// List of major tech companies that hire based on problem tags
+const COMPANY_LIST = [
+  { key: 'Meta',   label: 'Meta',   color: '#608dff' },
+  { key: 'Amazon', label: 'Amazon', color: '#ff9900' },
+  { key: 'Google', label: 'Google', color: '#34a853' },
+];
+
 /* ─────────────── useDebounce ─────────────── */
+// Custom hook to debounce values (delays updates to reduce API calls)
 function useDebounce(value, delay = 150) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -104,6 +127,7 @@ function useDebounce(value, delay = 150) {
 }
 
 /* ─────────────── helpers ─────────────── */
+// Generate or retrieve user's unique practice ID from localStorage
 function getOrCreateNexusId() {
   let id = localStorage.getItem(NEXUS_KEY);
   if (!id) {
@@ -113,6 +137,7 @@ function getOrCreateNexusId() {
   return id;
 }
 
+// Fetch helper for API calls with error handling
 async function apiFetch(path, opts = {}) {
   const res = await fetch(API + path, {
     headers: { 'Content-Type': 'application/json' },
@@ -123,6 +148,7 @@ async function apiFetch(path, opts = {}) {
 }
 
 /* ─────────────── NumberTicker ─────────────── */
+// Animated number component that smoothly transitions from one value to another
 function NumberTicker({ value, duration = 1100 }) {
   const [display, setDisplay] = useState(0);
   const frameRef = useRef(null);
@@ -133,9 +159,11 @@ function NumberTicker({ value, duration = 1100 }) {
     const to   = value ?? 0;
     if (from === to) return;
     let startTime = null;
+    // Use requestAnimationFrame for smooth animation
     const tick = (now) => {
       if (!startTime) startTime = now;
       const t = Math.min((now - startTime) / duration, 1);
+      // Apply easing function for smooth acceleration
       const eased = 1 - Math.pow(1 - t, 4);
       setDisplay(Math.round(from + (to - from) * eased));
       if (t < 1) frameRef.current = requestAnimationFrame(tick);
@@ -149,8 +177,10 @@ function NumberTicker({ value, duration = 1100 }) {
 }
 
 /* ─────────────── SpotlightCard ─────────────── */
+// Card component with spotlight effect following mouse movement
 function SpotlightCard({ children, className = '' }) {
   const ref = useRef(null);
+  // Update CSS variables for spotlight position on mouse move
   const handleMouseMove = useCallback((e) => {
     const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
@@ -165,6 +195,7 @@ function SpotlightCard({ children, className = '' }) {
 }
 
 /* ─────────────── DifficultyDot ─────────────── */
+// Visual indicator showing problem difficulty (Easy/Medium/Hard)
 function DifficultyDot({ d }) {
   return <span className={`ph-diff-dot diff-${DIFFICULTY_COLORS[d]}`} title={d} />;
 }
@@ -240,6 +271,8 @@ const ProblemRow = memo(function ProblemRow({ problem, isSolved, onToggle, isNew
     setToggling(false);
   };
 
+  const companies = problem.companies ?? [];
+
   return (
     <div className={`ph-problem-row${isSolved ? ' solved' : ''}${isNew ? ' new-solve' : ''}`}>
       <button
@@ -254,16 +287,30 @@ const ProblemRow = memo(function ProblemRow({ problem, isSolved, onToggle, isNew
       </button>
       <span className="ph-row-num">{problem.id}</span>
       <DifficultyDot d={problem.difficulty} />
-      <a
-        className="ph-row-title"
-        href={problem.leetcode_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={e => e.stopPropagation()}
-      >
-        <span className="ph-row-title-text">{problem.title}</span>
-        <ExternalLink size={12} className="ph-row-ext" />
-      </a>
+      <div className="ph-row-title-cell">
+        <a
+          className="ph-row-title"
+          href={problem.leetcode_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+        >
+          <span className="ph-row-title-text">{problem.title}</span>
+          <ExternalLink size={12} className="ph-row-ext" />
+        </a>
+        {companies.length > 0 && (
+          <span className="ph-company-tags">
+            {companies.map(c => {
+              const info = COMPANY_LIST.find(cl => cl.key === c);
+              return (
+                <span key={c} className={`ph-company-tag ph-company-${c.toLowerCase()}`}>
+                  {info?.label ?? c}
+                </span>
+              );
+            })}
+          </span>
+        )}
+      </div>
       <span className={`ph-diff-chip diff-${DIFFICULTY_COLORS[problem.difficulty]}`}>
         {problem.difficulty}
       </span>
@@ -348,8 +395,8 @@ const ProblemList = memo(function ProblemList({ problems, solvedSlugs, onToggle,
 });
 
 /* ─────────────── CatButton (module-level to avoid remount) ─────────────── */
-const CatButton = memo(function CatButton({ cat, icon, name, solved, total, isAllBtn, selected, onSelect }) {
-  const isActive = isAllBtn ? !selected : selected === cat;
+const CatButton = memo(function CatButton({ cat, icon, name, solved, total, isAllBtn, selectedCat, companyFilter, onSelect }) {
+  const isActive = isAllBtn ? (!selectedCat && !companyFilter) : (selectedCat === cat);
   const isDone   = !isAllBtn && solved === total && total > 0;
   return (
     <button
@@ -359,7 +406,7 @@ const CatButton = memo(function CatButton({ cat, icon, name, solved, total, isAl
     >
       {isActive && (
         <motion.div
-          layoutId="sidebar-active-pill"
+          layoutId="cat-active-pill"
           className="ph-cat-active-bg"
           transition={{ type: 'spring', stiffness: 420, damping: 36 }}
         />
@@ -381,8 +428,18 @@ const CatButton = memo(function CatButton({ cat, icon, name, solved, total, isAl
   );
 });
 
-/* u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500} CategorySidebar u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500}u{2500} */
-function CategorySidebar({ catStats, catSolvedMap, totalProblems, totalSolved, selected, onSelect }) {
+/* ─────────────── CategorySidebar ─────────────── */
+const CategorySidebar = memo(function CategorySidebar({ catStats, catSolvedMap, totalProblems, totalSolved, selected, onSelect, companyFilter, onCompanySelect }) {
+  const [collapsed, setCollapsed] = useState(new Set(['Algorithms', 'Math & Logic', 'Topics', 'Other']));
+
+  const toggleGroup = useCallback((label) => {
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label); else next.add(label);
+      return next;
+    });
+  }, []);
+
   return (
     <aside className="ph-sidebar">
       <div className="ph-sidebar-header">
@@ -391,22 +448,71 @@ function CategorySidebar({ catStats, catSolvedMap, totalProblems, totalSolved, s
       </div>
 
       <CatButton cat={null} icon={<BookOpen size={15} />} name="All Problems"
-        solved={totalSolved} total={totalProblems} isAllBtn selected={selected} onSelect={onSelect} />
+        solved={totalSolved} total={3432} isAllBtn selectedCat={selected} companyFilter={companyFilter} 
+        onSelect={() => { onSelect(null); onCompanySelect(null); }} />
 
+      {/* ── Company filter section ── */}
+      <div className="ph-cat-group">
+        <button
+          className="ph-cat-group-toggle"
+          onClick={() => toggleGroup('Companies')}
+        >
+          <Building2 size={12} />
+          <span>Companies</span>
+          <ChevronDown size={14} className={`ph-chevron${collapsed.has('Companies') ? '' : ' open'}`} />
+        </button>
+        {!collapsed.has('Companies') && (
+          <div className="ph-cat-group-body">
+            {COMPANY_LIST.map(({ key, label, color }) => (
+              <button
+                key={key}
+                className={`ph-cat-btn${companyFilter === key ? ' active' : ''}`}
+                onClick={() => onCompanySelect(companyFilter === key ? null : key)}
+                style={{ position: 'relative' }}
+              >
+                {companyFilter === key && (
+                  <motion.div
+                    layoutId="company-active-pill"
+                    className="ph-cat-active-bg"
+                    transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                  />
+                )}
+                <span className="ph-cat-icon" style={{ color }}>
+                  <Building2 size={15} />
+                </span>
+                <span className="ph-cat-name">{label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Category groups (collapsible) ── */}
       {CATEGORY_GROUPS.map(({ label, categories: groupCats }) => {
         const visibleCats = groupCats.filter(c => catStats[c]);
         if (visibleCats.length === 0) return null;
+        const isCollapsed = collapsed.has(label);
         return (
           <div key={label} className="ph-cat-group">
-            <div className="ph-cat-group-label">{label}</div>
-            {visibleCats.map(cat => (
-              <CatButton
-                key={cat} cat={cat}
-                icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
-                name={cat} solved={catSolvedMap[cat] ?? 0} total={catStats[cat]}
-                selected={selected} onSelect={onSelect}
-              />
-            ))}
+            <button
+              className="ph-cat-group-toggle"
+              onClick={() => toggleGroup(label)}
+            >
+              <span>{label}</span>
+              <ChevronDown size={14} className={`ph-chevron${isCollapsed ? '' : ' open'}`} />
+            </button>
+            {!isCollapsed && (
+              <div className="ph-cat-group-body">
+                {visibleCats.map(cat => (
+                  <CatButton
+                    key={cat} cat={cat}
+                    icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
+                    name={cat} solved={catSolvedMap[cat] ?? 0} total={catStats[cat]}
+                    selectedCat={selected} onSelect={onSelect}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
@@ -415,23 +521,34 @@ function CategorySidebar({ catStats, catSolvedMap, totalProblems, totalSolved, s
       {(() => {
         const otherCats = Object.keys(catStats).filter(c => !GROUPED_CATS.has(c)).sort();
         if (otherCats.length === 0) return null;
+        const isCollapsed = collapsed.has('Other');
         return (
           <div className="ph-cat-group">
-            <div className="ph-cat-group-label">Other</div>
-            {otherCats.map(cat => (
-              <CatButton
-                key={cat} cat={cat}
-                icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
-                name={cat} solved={catSolvedMap[cat] ?? 0} total={catStats[cat]}
-                selected={selected} onSelect={onSelect}
-              />
-            ))}
+            <button
+              className="ph-cat-group-toggle"
+              onClick={() => toggleGroup('Other')}
+            >
+              <span>Other</span>
+              <ChevronDown size={14} className={`ph-chevron${isCollapsed ? '' : ' open'}`} />
+            </button>
+            {!isCollapsed && (
+              <div className="ph-cat-group-body">
+                {otherCats.map(cat => (
+                  <CatButton
+                    key={cat} cat={cat}
+                    icon={CATEGORY_ICONS[cat] ?? <BookOpen size={15} />}
+                    name={cat} solved={catSolvedMap[cat] ?? 0} total={catStats[cat]}
+                    selectedCat={selected} onSelect={onSelect}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         );
       })()}
     </aside>
   );
-}
+});
 
 /* ─────────────── Main PracticeHub ─────────────── */
 export default function PracticeHub() {
@@ -456,15 +573,20 @@ export default function PracticeHub() {
   const [selectedCat,    setSelectedCat]    = useState(null);
   const [diffFilter,     setDiffFilter]     = useState('All');
   const [searchQ,        setSearchQ]        = useState('');
+  const [companyFilter,  setCompanyFilter]  = useState(null);
   const [isLoading,      setIsLoading]      = useState(true);
   const [toast,          setToast]          = useState(null);
   const [newlySolved,    setNewlySolved]    = useState(new Set());
   const prevCatSolvedRef   = useRef({});
   const initialLoadDoneRef = useRef(false);
   const currentPageRef     = useRef(1);          // stable page counter → no dep in handleLoadMore
-  const filtersRef         = useRef({ cat: null, diff: 'All', q: '' }); // mirror of filter state for stable callbacks
+  const filtersRef         = useRef({ cat: null, diff: 'All', q: '', company: null }); // mirror of filter state for stable callbacks
   const [isPending, startTransition]        = useTransition();
-  const debouncedSearch = useDebounce(searchQ, 350);
+  const debouncedSearch  = useDebounce(searchQ, 350);
+  // Ref mirrors of hasMore/isLoadingMore — keep handleLoadMore dep array empty
+  // so ProblemList memo is never busted by filter/page state changes.
+  const probHasMoreRef   = useRef(false);
+  const isLoadingMoreRef = useRef(false);
 
   // ── LeetCode sync state ─────────────────────────────────────────────── //
   const LC_KEY       = `nexus_lc_username_${nexusUsername}`;
@@ -481,6 +603,10 @@ export default function PracticeHub() {
   }); // { total, easy, medium, hard } straight from LeetCode
   const lcInputRef    = useRef(null);
   const pasteInputRef = useRef(null);
+
+  // Keep refs in sync with state so handleLoadMore always reads current values
+  useEffect(() => { probHasMoreRef.current   = probHasMore;   }, [probHasMore]);
+  useEffect(() => { isLoadingMoreRef.current = isLoadingMore; }, [isLoadingMore]);
 
   // ── Initial load ────────────────────────────────────────────────────── //
   useEffect(() => {
@@ -528,11 +654,33 @@ export default function PracticeHub() {
     return () => { mounted = false; };
   }, [nexusUsername]); // eslint-disable-line
 
+  // ── Re-fetch category stats when company changes ────────────────────── //
+  useEffect(() => {
+    if (!initialLoadDoneRef.current) return;
+    let mounted = true;
+    (async () => {
+      try {
+        const url = companyFilter ? `/lc-categories?company=${encodeURIComponent(companyFilter)}` : '/lc-categories';
+        const catData = await apiFetch(url);
+        if (!mounted) return;
+        const newCatStats = catData.categories.reduce((acc, { category, total }) => ({ ...acc, [category]: total }), {});
+        setCatStats(newCatStats);
+        setDiffStats(catData.byDifficulty ?? {});
+        
+        // Auto-deselect category if it has no problems for this company
+        setSelectedCat(current => (current && !newCatStats[current]) ? null : current);
+      } catch (err) {
+        console.error('[PracticeHub] cat fetch error:', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [companyFilter]);
+
   // ── Re-fetch on filter change ────────────────────────────────────────── //
   useEffect(() => {
     if (!initialLoadDoneRef.current) return;
     // Keep the ref in sync so handleLoadMore always reads current filters
-    filtersRef.current = { cat: selectedCat, diff: diffFilter, q: debouncedSearch };
+    filtersRef.current = { cat: selectedCat, diff: diffFilter, q: debouncedSearch, company: companyFilter };
     currentPageRef.current = 1;
     let mounted = true;
     setIsLoadingMore(true);
@@ -542,6 +690,7 @@ export default function PracticeHub() {
         if (selectedCat) params.set('category', selectedCat);
         if (diffFilter && diffFilter !== 'All') params.set('difficulty', diffFilter);
         if (debouncedSearch) params.set('q', debouncedSearch);
+        if (companyFilter) params.set('company', companyFilter);
         const data = await apiFetch(`/lc-problems?${params}`);
         if (!mounted) return;
         setProblems(data.problems);
@@ -554,14 +703,14 @@ export default function PracticeHub() {
       }
     })();
     return () => { mounted = false; };
-  }, [selectedCat, diffFilter, debouncedSearch]); // eslint-disable-line
+  }, [selectedCat, diffFilter, debouncedSearch, companyFilter]); // eslint-disable-line
 
   // ── Load more (infinite scroll) ──────────────────────────────────────── //
-  // Uses refs for filters/page so the function reference never changes → ProblemList stays memoized
+  // All deps read from refs → dep array is [] → ProblemList memo is never busted
   const handleLoadMore = useCallback(() => {
-    if (!probHasMore || isLoadingMore) return;
+    if (!probHasMoreRef.current || isLoadingMoreRef.current) return;
     const nextPage = currentPageRef.current + 1;
-    const { cat, diff, q } = filtersRef.current;
+    const { cat, diff, q, company } = filtersRef.current;
     setIsLoadingMore(true);
     (async () => {
       try {
@@ -569,6 +718,7 @@ export default function PracticeHub() {
         if (cat) params.set('category', cat);
         if (diff && diff !== 'All') params.set('difficulty', diff);
         if (q) params.set('q', q);
+        if (company) params.set('company', company);
         const data = await apiFetch(`/lc-problems?${params}`);
         setProblems(prev => [...prev, ...data.problems]);
         setProbHasMore(data.hasMore);
@@ -579,7 +729,7 @@ export default function PracticeHub() {
         setIsLoadingMore(false);
       }
     })();
-  }, [probHasMore, isLoadingMore]); // ← stable: no problems.length/filter deps
+  }, []); // ← truly stable: all live deps read from refs above
 
   // ── Manual toggle ────────────────────────────────────────────────────── //
   const handleToggle = useCallback(async (slug, solved) => {
@@ -964,6 +1114,8 @@ export default function PracticeHub() {
             totalSolved={totalSolved}
             selected={selectedCat}
             onSelect={cat => startTransition(() => setSelectedCat(cat))}
+            companyFilter={companyFilter}
+            onCompanySelect={c => startTransition(() => setCompanyFilter(c))}
           />
 
           {/* Problem list pane */}

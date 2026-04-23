@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    PRACTICE HUB  –  Premium Stylesheet
    Glassmorphism · Mesh gradient · Noise · Framer Motion CSS hooks
 ═══════════════════════════════════════════════════════════════ */
@@ -829,6 +829,44 @@
   padding: 0.3rem 0.5rem 0.2rem;
 }
 
+/* ── Collapsible group toggle ── */
+.ph-cat-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  background: none;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, #6b7280);
+  transition: color 0.15s, background 0.15s;
+}
+.ph-cat-group-toggle:hover {
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.03);
+}
+.ph-chevron {
+  margin-left: auto;
+  transition: transform 0.25s ease;
+  transform: rotate(-90deg);
+}
+.ph-chevron.open {
+  transform: rotate(0deg);
+}
+.ph-cat-group-body {
+  animation: ph-group-slide 0.2s ease-out;
+}
+@keyframes ph-group-slide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Category button ── */
 .ph-cat-btn {
   position: relative;
@@ -1025,6 +1063,46 @@
 }
 .ph-problem-row:hover { background: rgba(255,255,255,0.03); }
 .ph-problem-row:last-child { border-bottom: none; }
+
+/* ── Title cell (wraps link + company tags) ── */
+.ph-row-title-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Company tag badges ── */
+.ph-company-tags {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.ph-company-tag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.ph-company-meta {
+  background: rgba(96,141,255,0.12);
+  border: 1px solid rgba(96,141,255,0.25);
+  color: #608dff;
+}
+.ph-company-amazon {
+  background: rgba(255,153,0,0.12);
+  border: 1px solid rgba(255,153,0,0.25);
+  color: #ff9900;
+}
+.ph-company-google {
+  background: rgba(52,168,83,0.12);
+  border: 1px solid rgba(52,168,83,0.25);
+  color: #34a853;
+}
 
 .ph-solve-btn {
   background: none; border: none; cursor: pointer;

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import boyImg  from '../assets/image/boy.jpg';
 import girlImg from '../assets/image/girl.png';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +48,8 @@ const JOBS_FB = [
 
 /* ── Progress Ring ── */
 function Ring({ done, total, color='#8b5cf6', size=72 }) {
-  const rad = (size-10)/2, circ = 2*Math.PI*rad, dash=(done/total)*circ;
+  const rad  = (size-10)/2, circ = 2*Math.PI*rad;
+  const dash = total > 0 ? (done / total) * circ : 0; // guard against ÷0 NaN
   return (
     <svg width={size} height={size}>
       <circle cx={size/2} cy={size/2} r={rad} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5"/>
@@ -86,7 +87,7 @@ export default function Dashboard({ children }) {
   const [theme] = useState('dark');
   const { user } = useAuth();
   const navigate = useNavigate();
-  const gridRef = useRef(null);
+  const gridRef       = useRef(null);
 
   const userId = user?._id || user?.id || user?.username
                  || localStorage.getItem('nexus_guest_id') || 'guest';
@@ -371,7 +372,7 @@ export default function Dashboard({ children }) {
             </div>
 
             {/* 7. RESUME BUILDER — col 4, row 3 */}
-            <div className="bt bt-resume" onClick={()=>navigate('/experience-hub')}>
+            <div className="bt bt-resume" onClick={()=>navigate('/resume-builder')}>
               <div className="bt-eyebrow"><FileText size={12}/>Resume Builder</div>
               <div className="bt-tool-icon bt-tool-amber"><FileText size={28}/></div>
               <div className="bt-tool-name">Resume</div>

@@ -54,16 +54,24 @@ const ExperiencePage = () => {
   const heroY  = useTransform(scrollY, [0, 600], [0, 160]);
   const heroOp = useTransform(scrollY, [0, 380], [1, 0]);
 
-  /* Mouse-driven orb parallax */
+  /* Mouse-driven orb parallax — rAF-gated so at most 1 style write per frame */
   useEffect(() => {
+    let rafId = null;
     const onMove = (e) => {
       if (!orbRef.current) return;
-      const x = (e.clientX / window.innerWidth  - 0.5) * 50;
-      const y = (e.clientY / window.innerHeight - 0.5) * 50;
-      orbRef.current.style.transform = `translate(${x}px, ${y}px)`;
+      if (rafId) return;                 // already have a frame queued, skip
+      rafId = requestAnimationFrame(() => {
+        const x = (e.clientX / window.innerWidth  - 0.5) * 50;
+        const y = (e.clientY / window.innerHeight - 0.5) * 50;
+        if (orbRef.current) orbRef.current.style.transform = `translate(${x}px, ${y}px)`;
+        rafId = null;
+      });
     };
     window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const internshipFeatures = [
@@ -252,7 +260,11 @@ const ExperiencePage = () => {
               <span className="eh-card-corner-tag eh-corner-intern">Career Launch</span>
             </TiltCard>
             <div className="eh-challenge-text-right">
-           Are you bold enough to build under pressure? Join the next <span className="eh-highlight-purple">hackathon </span> , ship an incredible project, and claim your victory.
+              <div className="eh-hover-circ eh-circ-3" />
+              <div className="eh-hover-circ eh-circ-4" />
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                Are you bold enough to build under pressure? Join the next <span className="eh-highlight-purple">hackathon</span>, ship an incredible project, and claim your victory.
+              </div>
             </div>
           </motion.div>
 
@@ -319,7 +331,11 @@ const ExperiencePage = () => {
               <span className="eh-card-corner-tag eh-corner-hack">Build &amp; Win</span>
             </TiltCard>
             <div className="eh-challenge-text-left">
-              Are you ready to turn your coding skills into a real career? Grab a top-tier<span className="eh-highlight-gold">internship</span> and let's get building.
+              <div className="eh-hover-circ eh-circ-1" />
+              <div className="eh-hover-circ eh-circ-2" />
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                Are you ready to turn your coding skills into a real career? Grab a top-tier <span className="eh-highlight-gold">internship</span> and let's get building.
+              </div>
             </div>
           </motion.div>
         </div>

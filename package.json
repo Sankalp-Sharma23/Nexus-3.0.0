@@ -48,5 +48,17 @@
 		"postcss": "^8.5.6",
 		"tailwindcss": "^4.1.18",
 		"vite": "^7.3.1"
-	}
+	},
+	"main": "eslint.config.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Sankalp-Sharma23/Nexus-final.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Sankalp-Sharma23/Nexus-final/issues"
+	},
+	"homepage": "https://github.com/Sankalp-Sharma23/Nexus-final#readme",
+	"description": ""
 }

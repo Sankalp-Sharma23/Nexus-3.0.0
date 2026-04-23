@@ -1386,16 +1386,31 @@ const InputPhase = function InputPhase({ onSubmit }) {
   return (
     <div className="inp-phase">
       <div className="inp-container">
-        <div className="inp-eyebrow"><Zap size={11} /> AI-Powered Career Engine</div>
-        <h1 className="inp-title">
-          Know exactly what it takes<br />to land your dream role.
-        </h1>
-        <p className="inp-sub">
-          Enter your target role and current skills. The AI generates a precise skill gap analysis,
-          a phased execution plan, and a live Nexus Score that rises as you complete tasks.
-        </p>
+        <div className="inp-text-section">
+          <div className="inp-eyebrow"><Zap size={11} /> AI-Powered Career Engine</div>
+          <h1 className="inp-title">
+            Know exactly what it takes<br />to land your dream role.
+          </h1>
+          <p className="inp-sub">
+            Enter your target role and current skills. The AI generates a precise skill gap analysis,
+            a phased execution plan, and a live Nexus Score that rises as you complete tasks.
+          </p>
 
-        <form className="inp-card" onSubmit={handleSubmit}>
+          <div className="scroll-indicator">
+            <div className="scroll-mouse">
+              <div className="scroll-wheel"></div>
+            </div>
+            <div className="scroll-text">Scroll to continue</div>
+            <div className="scroll-arrow">
+              <svg width="12" height="20" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 2V18M6 18L1 13M6 18L11 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="inp-form-section">
+          <form className="inp-card" onSubmit={handleSubmit}>
           <div className="inp-row2">
             <div className="inp-field">
               <label className="inp-label">
@@ -1508,11 +1523,12 @@ const InputPhase = function InputPhase({ onSubmit }) {
             <ChevronRight size={14} />
           </button>
         </form>
-
-        <div className="inp-trust">
-          <span className="inp-trust-dot" />
-          <span>Analysis is instant &middot; All data stays on your device</span>
         </div>
+      </div>
+
+      <div className="inp-trust">
+        <span className="inp-trust-dot" />
+        <span>Analysis is instant &middot; All data stays on your device</span>
       </div>
     </div>
   );
