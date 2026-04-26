@@ -1119,88 +1119,93 @@ function buildPlan(userId, target, aiData, jobSource) {
    POST /api/aim/generate
    ──────────────────────────────────────────────────────────── */
 router.post('/generate', async (req, res) => {
-  const { userId, role, company, skills, hoursPerDay, timeline, lcStats, resumeText, githubData } = req.body;
-  if (!role) return res.status(400).json({ error: 'role is required' });
-
-  // Normalise lcStats
-  const normLcStats = lcStats && typeof lcStats === 'object' && !isNaN(lcStats.easy)
-    ? { easy: Number(lcStats.easy) || 0, medium: Number(lcStats.medium) || 0, hard: Number(lcStats.hard) || 0 }
-    : null;
-
-  // Merge typed skills + github top languages into one effective skills string
-  const ghLangs    = (githubData && Array.isArray(githubData.topLangs)) ? githubData.topLangs : [];
-  const userSkills = (skills || '').split(/,\s*/).map(s => s.trim()).filter(Boolean);
-  const effectiveSkills = [...new Set([...userSkills, ...ghLangs])].join(', ');
-
-  const target = {
-    role,
-    company:      company || '',
-    skills:       effectiveSkills,
-    resumeText:   (resumeText || '').slice(0, 2500),   // up to 2500 chars to AI
-    githubData:   githubData || null,
-    hoursPerDay:  hoursPerDay || 2,
-    timeline:     timeline || '6 months',
-    lcStats:      normLcStats,
-  };
-
-  console.log(`[aim] Generating plan: ${role} @ ${company || 'any'} | skills="${effectiveSkills.slice(0,80)}" | resume=${target.resumeText.length}chars | github=${githubData ? '@' + githubData.username : 'none'} | lcStats=${JSON.stringify(normLcStats)}`);
-
-  // ── Step 1: find matching job listing ─────────────────────
-  let jobSource = null;
   try {
-    jobSource = await findJobListing(role, company);
-    console.log(`[aim] Job search result: matchType=${jobSource.matchType} source=${jobSource.source} company=${jobSource.company}`);
-  } catch (e) {
-    console.error('[aim] Job search error:', e.message);
-    jobSource = { matchType: 'bestPractice', title: role, company: company || '', url: null, snippet: null, requiredSkills: [], source: 'ai-inference' };
-  }
+    const { userId, role, company, skills, hoursPerDay, timeline, lcStats, resumeText, githubData } = req.body;
+    if (!role) return res.status(400).json({ error: 'role is required' });
 
-  // ── Step 2: AI skill gap + execution plan ─────────────────
-  let aiData = null;
-  if (process.env.GEMINI_API_KEY) {
-    aiData = await callGemini(buildPrompt(target, jobSource));
-  }
-  if (!aiData) {
-    console.log('[aim] Using rich mock fallback');
-    aiData = richMock(target);
-    // If KB match, overlay required skills into skillGap requiredLevels
-    if (jobSource.requiredSkills && jobSource.requiredSkills.length) {
-      const jdSet = new Set(jobSource.requiredSkills.map(s => s.toLowerCase()));
-      aiData.skillGap = aiData.skillGap.map(g => {
-        const matched = [...jdSet].find(s => s.includes(g.skill.toLowerCase().split(' ')[0]) || g.skill.toLowerCase().includes(s.split(' ')[0]));
-        return matched ? { ...g, requiredLevel: Math.max(g.requiredLevel, 8), fromJD: true } : g;
-      });
-      // Add JD skills not in mock gap
-      jobSource.requiredSkills.forEach(skill => {
-        const alreadyIn = aiData.skillGap.some(g => g.skill.toLowerCase().includes(skill.toLowerCase().split('/')[0].split(' ')[0]));
-        if (!alreadyIn && aiData.skillGap.length < 10) {
-          const effSet = new Set(effectiveSkills.split(/,\s*/).map(s => s.trim().toLowerCase()));
-          const hasIt = [...effSet].some(u => u.includes(skill.toLowerCase().split(' ')[0]) || skill.toLowerCase().split(' ')[0].includes(u));
-          aiData.skillGap.push({ skill, currentLevel: hasIt ? 6 : 1, requiredLevel: 8, fromJD: true });
-        }
-      });
+    // Normalise lcStats
+    const normLcStats = lcStats && typeof lcStats === 'object' && !isNaN(lcStats.easy)
+      ? { easy: Number(lcStats.easy) || 0, medium: Number(lcStats.medium) || 0, hard: Number(lcStats.hard) || 0 }
+      : null;
+
+    // Merge typed skills + github top languages into one effective skills string
+    const ghLangs    = (githubData && Array.isArray(githubData.topLangs)) ? githubData.topLangs : [];
+    const userSkills = (skills || '').split(/,\s*/).map(s => s.trim()).filter(Boolean);
+    const effectiveSkills = [...new Set([...userSkills, ...ghLangs])].join(', ');
+
+    const target = {
+      role,
+      company:      company || '',
+      skills:       effectiveSkills,
+      resumeText:   (resumeText || '').slice(0, 2500),   // up to 2500 chars to AI
+      githubData:   githubData || null,
+      hoursPerDay:  hoursPerDay || 2,
+      timeline:     timeline || '6 months',
+      lcStats:      normLcStats,
+    };
+
+    console.log(`[aim] Generating plan: ${role} @ ${company || 'any'} | skills="${effectiveSkills.slice(0,80)}" | resume=${target.resumeText.length}chars | github=${githubData ? '@' + githubData.username : 'none'} | lcStats=${JSON.stringify(normLcStats)}`);
+
+    // ── Step 1: find matching job listing ─────────────────────
+    let jobSource = null;
+    try {
+      jobSource = await findJobListing(role, company);
+      console.log(`[aim] Job search result: matchType=${jobSource.matchType} source=${jobSource.source} company=${jobSource.company}`);
+    } catch (e) {
+      console.error('[aim] Job search error:', e.message);
+      jobSource = { matchType: 'bestPractice', title: role, company: company || '', url: null, snippet: null, requiredSkills: [], source: 'ai-inference' };
     }
-  }
 
-  const plan = buildPlan(userId || 'anon', target, aiData, jobSource);
-
-  try {
-    if (useMongo()) {
-      await AimPlan.findOneAndUpdate(
-        { userId: plan.userId },
-        { $set: { plan, updatedAt: new Date() } },
-        { upsert: true, returnDocument: 'after' }
-      );
-    } else {
-      const fileDb = readDB();
-      fileDb[plan.userId] = plan;
-      writeDB(fileDb);
+    // ── Step 2: AI skill gap + execution plan ─────────────────
+    let aiData = null;
+    if (process.env.GEMINI_API_KEY) {
+      aiData = await callGemini(buildPrompt(target, jobSource));
     }
-  } catch (e) {
-    console.error('[aim] save error:', e.message);
-  }
+    if (!aiData) {
+      console.log('[aim] Using rich mock fallback');
+      aiData = richMock(target);
+      // If KB match, overlay required skills into skillGap requiredLevels
+      if (jobSource.requiredSkills && jobSource.requiredSkills.length) {
+        const jdSet = new Set(jobSource.requiredSkills.map(s => s.toLowerCase()));
+        aiData.skillGap = aiData.skillGap.map(g => {
+          const matched = [...jdSet].find(s => s.includes(g.skill.toLowerCase().split(' ')[0]) || g.skill.toLowerCase().includes(s.split(' ')[0]));
+          return matched ? { ...g, requiredLevel: Math.max(g.requiredLevel, 8), fromJD: true } : g;
+        });
+        // Add JD skills not in mock gap
+        jobSource.requiredSkills.forEach(skill => {
+          const alreadyIn = aiData.skillGap.some(g => g.skill.toLowerCase().includes(skill.toLowerCase().split('/')[0].split(' ')[0]));
+          if (!alreadyIn && aiData.skillGap.length < 10) {
+            const effSet = new Set(effectiveSkills.split(/,\s*/).map(s => s.trim().toLowerCase()));
+            const hasIt = [...effSet].some(u => u.includes(skill.toLowerCase().split(' ')[0]) || skill.toLowerCase().split(' ')[0].includes(u));
+            aiData.skillGap.push({ skill, currentLevel: hasIt ? 6 : 1, requiredLevel: 8, fromJD: true });
+          }
+        });
+      }
+    }
 
-  res.json({ ok: true, plan });
+    const plan = buildPlan(userId || 'anon', target, aiData, jobSource);
+
+    try {
+      if (useMongo()) {
+        await AimPlan.findOneAndUpdate(
+          { userId: plan.userId },
+          { $set: { plan, updatedAt: new Date() } },
+          { upsert: true, returnDocument: 'after' }
+        );
+      } else {
+        const fileDb = readDB();
+        fileDb[plan.userId] = plan;
+        writeDB(fileDb);
+      }
+    } catch (e) {
+      console.error('[aim] save error:', e.message);
+    }
+
+    res.json({ ok: true, plan });
+  } catch (err) {
+    console.error('[aim] /generate unhandled error:', err.message || err);
+    res.status(500).json({ error: 'Generation failed: ' + (err.message || 'unknown error') });
+  }
 });
 
 /* ────────────────────────────────────────────────────────────

@@ -2407,5 +2407,596 @@
       "taskScore": 0,
       "dsaScore": 10
     }
+  },
+  "69e62262b5914ef3b6f3aadb": {
+    "userId": "69e62262b5914ef3b6f3aadb",
+    "target": {
+      "role": "Software developer",
+      "company": "Google",
+      "skills": "",
+      "resumeText": "",
+      "githubData": null,
+      "hoursPerDay": 2,
+      "timeline": "6 months",
+      "lcStats": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      }
+    },
+    "generatedAt": "2026-04-26T14:24:19.112Z",
+    "jobSource": {
+      "matchType": "exact",
+      "title": "Software developer at Google",
+      "company": "Google",
+      "url": null,
+      "snippet": "All Google SWE roles require algorithmic thinking at a high bar plus coding excellence.",
+      "requiredSkills": [
+        "Data Structures & Algorithms (LeetCode Hard)",
+        "System Design",
+        "Languages (Python/Java/Go/C++)",
+        "Testing",
+        "Git / Code Review"
+      ],
+      "niceToHave": [
+        "Open-source contributions",
+        "Tech writing"
+      ],
+      "source": "nexus-kb"
+    },
+    "skillsOverview": {
+      "youHave": [],
+      "theyWant": [
+        {
+          "skill": "Data Structures & Algorithms (LeetCode Hard)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "System Design",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Languages (Python/Java/Go/C++)",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Testing",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Git / Code Review",
+          "required": true,
+          "userHasIt": false
+        },
+        {
+          "skill": "Open-source contributions",
+          "required": false,
+          "userHasIt": false
+        },
+        {
+          "skill": "Tech writing",
+          "required": false,
+          "userHasIt": false
+        }
+      ]
+    },
+    "skillGap": [
+      {
+        "skill": "System Design",
+        "currentLevel": 1,
+        "requiredLevel": 9,
+        "fromJD": true
+      },
+      {
+        "skill": "Docker",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "PostgreSQL / SQL",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "Redis Caching",
+        "currentLevel": 1,
+        "requiredLevel": 7
+      },
+      {
+        "skill": "REST API Design",
+        "currentLevel": 1,
+        "requiredLevel": 8
+      },
+      {
+        "skill": "Kubernetes",
+        "currentLevel": 1,
+        "requiredLevel": 6
+      },
+      {
+        "skill": "Message Queues",
+        "currentLevel": 1,
+        "requiredLevel": 6
+      },
+      {
+        "skill": "Data Structures & Algorithms (LeetCode Hard)",
+        "currentLevel": 6,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Languages (Python/Java/Go/C++)",
+        "currentLevel": 6,
+        "requiredLevel": 8,
+        "fromJD": true
+      },
+      {
+        "skill": "Testing",
+        "currentLevel": 6,
+        "requiredLevel": 8,
+        "fromJD": true
+      }
+    ],
+    "skillMatrix": {
+      "Languages": [
+        {
+          "name": "Node.js / JS",
+          "status": "locked"
+        },
+        {
+          "name": "Go",
+          "status": "locked"
+        },
+        {
+          "name": "Python",
+          "status": "locked"
+        }
+      ],
+      "Databases": [
+        {
+          "name": "PostgreSQL",
+          "status": "mastered"
+        },
+        {
+          "name": "Redis",
+          "status": "mastered"
+        },
+        {
+          "name": "MongoDB",
+          "status": "locked"
+        }
+      ],
+      "Infrastructure": [
+        {
+          "name": "Docker",
+          "status": "mastered"
+        },
+        {
+          "name": "Kubernetes",
+          "status": "locked"
+        },
+        {
+          "name": "AWS / GCP",
+          "status": "locked"
+        }
+      ],
+      "Concepts": [
+        {
+          "name": "System Design",
+          "status": "locked"
+        },
+        {
+          "name": "REST / gRPC",
+          "status": "mastered"
+        },
+        {
+          "name": "Message Queues",
+          "status": "locked"
+        },
+        {
+          "name": "Caching Patterns",
+          "status": "locked"
+        }
+      ]
+    },
+    "estimatedHours": 220,
+    "lcStats": {
+      "easy": 0,
+      "medium": 0,
+      "hard": 0
+    },
+    "lcBenchmarks": {
+      "easy": 60,
+      "medium": 150,
+      "hard": 40,
+      "verdict": "needs_work",
+      "insight": "Google expects LeetCode Hard fluency — aim for 150+ Mediums and 40+ Hards."
+    },
+    "proofOfWork": [
+      {
+        "title": "Distributed Key-Value Store",
+        "why": "Google SWEs build infrastructure at scale — this demonstrates you understand consistency, replication, and CAP theorem",
+        "what": "Build a single-node KV store in Go/Python with a REST API, then add write-ahead logging and a basic leader election protocol",
+        "signals": [
+          "Systems thinking",
+          "Distributed systems fundamentals",
+          "Low-level data structures"
+        ],
+        "difficulty": "advanced",
+        "estimatedHours": 40
+      },
+      {
+        "title": "PageRank Visualizer",
+        "why": "Directly relevant to Google's core — shows you can implement graph algorithms on real data",
+        "what": "Crawl 500 pages starting from a seed URL, build a directed graph, run PageRank, visualize with D3.js",
+        "signals": [
+          "Graph algorithms",
+          "Web crawling",
+          "Data visualization"
+        ],
+        "difficulty": "intermediate",
+        "estimatedHours": 25
+      },
+      {
+        "title": "Search Autocomplete System",
+        "why": "Mirrors Google Search internals — Trie + prefix ranking signals strong core CS fundamentals",
+        "what": "Implement a Trie-based autocomplete engine with frequency-weighted ranking, serve via REST, and build a clean search UI",
+        "signals": [
+          "Data structures",
+          "Algorithm optimization",
+          "Full-stack execution"
+        ],
+        "difficulty": "intermediate",
+        "estimatedHours": 20
+      }
+    ],
+    "resumeProjects": [
+      {
+        "title": "Full-Stack SaaS Starter (Next.js + Prisma)",
+        "stack": [
+          "Next.js",
+          "TypeScript",
+          "Prisma",
+          "PostgreSQL",
+          "Stripe"
+        ],
+        "description": "A production-ready SaaS boilerplate with auth, billing, and multi-tenancy. Users can subscribe to plans, manage billing, and access role-based features.",
+        "highlights": [
+          "Built multi-tenant SaaS with Stripe subscription billing; supports 3 pricing tiers",
+          "Implemented JWT + session-based auth with OAuth (GitHub/Google) using NextAuth.js",
+          "Achieved 95 Lighthouse performance score with Next.js ISR and image optimisation"
+        ],
+        "whyItMatters": "Demonstrates full product ownership — architecture, auth, payments, and deployment",
+        "difficulty": "advanced",
+        "estimatedHours": 50
+      },
+      {
+        "title": "CLI Dev Tool (Node.js)",
+        "stack": [
+          "Node.js",
+          "TypeScript",
+          "Commander.js",
+          "npm"
+        ],
+        "description": "A publishable CLI tool that solves a real developer problem (e.g., scaffolding, bulk file ops, Git automation). Published to npm with full test coverage.",
+        "highlights": [
+          "Published npm package with 200+ weekly downloads — demonstrates real-world adoption",
+          "Built interactive prompts using Inquirer.js; supports 8 sub-commands with full --help docs",
+          "Achieved 96% test coverage with Jest; CI pipeline runs on Node 18/20/22"
+        ],
+        "whyItMatters": "A published npm tool signals strong engineering fundamentals and product thinking — rare for new grads",
+        "difficulty": "intermediate",
+        "estimatedHours": 20
+      }
+    ],
+    "careerRoadmap": {
+      "summary": "To land a Software developer role at Google, you need to systematically close the skill gaps identified above while building proof-of-work that signals hiring-bar readiness. The path requires consistent daily work — expect 3–6 months depending on your current level. The most critical leverage point is building 1–2 strong projects and solving at least 80 medium LeetCode problems.",
+      "milestones": [
+        {
+          "label": "30 Days",
+          "goal": "Complete Phase 1 of the Execution Plan and solve 30 LeetCode Mediums",
+          "actions": [
+            "Solve 1 LeetCode problem daily (easy → medium)",
+            "Complete all Phase 1 tasks in your checklist",
+            "Pick one resume project and scaffold it"
+          ]
+        },
+        {
+          "label": "3 Months",
+          "goal": "Have 2 deployable projects on GitHub and reach 80 LeetCode Mediums",
+          "actions": [
+            "Ship your top-priority resume project with a README and live demo",
+            "Start Phase 2 of the execution plan",
+            "Do 2 mock interviews on Pramp or Interviewing.io",
+            "Apply to 5 companies to get interview reps"
+          ]
+        },
+        {
+          "label": "6 Months",
+          "goal": "Be fully interview-ready and have active applications at target companies",
+          "actions": [
+            "Complete execution plan (all phases)",
+            "Have 3 projects on GitHub with README + live demos",
+            "Solve 100+ mediums and 20+ hards on LeetCode",
+            "Apply to Google and 10 comparable companies"
+          ]
+        }
+      ],
+      "interviewStrategy": {
+        "overview": "Google's interview process is rigorous but follows a predictable structure. Prepare specifically for each round type — do not treat it as one monolithic \"coding test\".",
+        "rounds": [
+          "Recruiter screen (30 min): Background, motivation, compensation expectations. Know your resume cold.",
+          "Technical phone screen (45–60 min): 1–2 coding problems (medium difficulty). Focus on correctness first, then optimise.",
+          "Virtual onsite — Coding rounds (x2): Medium–hard LeetCode style. Think aloud, clarify before coding, test with examples.",
+          "Virtual onsite — System Design: Design a scalable system (e.g., URL shortener, news feed, rate limiter). Know CAP theorem, caching, load balancing.",
+          "Behavioural / Culture fit: STAR format stories. Prepare 5–7 situations covering leadership, conflict, failure, and impact."
+        ],
+        "tips": [
+          "Google values clarity of communication as much as correctness — talk through your thinking even when you're stuck",
+          "Always clarify constraints and edge cases before writing a single line of code — interviewers mark this positively",
+          "For system design, start with requirements, then capacity estimation, then high-level design — don't jump to databases first",
+          "Prepare questions to ask the interviewer — it signals genuine interest and product thinking"
+        ]
+      },
+      "doAndDont": {
+        "do": [
+          "Build and ship at least one end-to-end project that solves a real problem — not a tutorial clone",
+          "Practice explaining your code complexity (Big O) out loud, not just writing it",
+          "Research the team and product before each interview — mention specific features you find interesting",
+          "Apply to multiple companies simultaneously to create competing offers and reduce pressure"
+        ],
+        "dont": [
+          "Don't skip system design prep even for junior roles — it's increasingly tested earlier",
+          "Don't wait until you feel \"100% ready\" — apply when you hit 70% of the skill bar",
+          "Don't list skills on your resume you can't explain in depth under pressure",
+          "Don't ignore Google's engineering blog and tech talks — they reveal what the team values"
+        ]
+      }
+    },
+    "executionPlan": [
+      {
+        "phase": 1,
+        "title": "Databases & Caching",
+        "estimatedWeeks": 3,
+        "status": "completed",
+        "requiredSkills": [
+          "PostgreSQL",
+          "Redis"
+        ],
+        "tasks": [
+          {
+            "id": "p1t1",
+            "title": "Complete PostgreSQL performance tuning tutorial",
+            "timeEstimate": 6,
+            "isDone": true,
+            "skills": [
+              "PostgreSQL"
+            ]
+          },
+          {
+            "id": "p1t2",
+            "title": "Build a cache-aside pattern with Redis",
+            "timeEstimate": 5,
+            "isDone": true,
+            "skills": [
+              "Redis"
+            ]
+          },
+          {
+            "id": "p1t3",
+            "title": "Design a normalized schema for a social network",
+            "timeEstimate": 4,
+            "isDone": true,
+            "skills": [
+              "PostgreSQL"
+            ]
+          },
+          {
+            "id": "p1t4",
+            "title": "Implement rate limiting with Redis sliding window",
+            "timeEstimate": 4,
+            "isDone": true,
+            "skills": [
+              "Redis",
+              "REST / gRPC"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Docker & Microservices",
+        "estimatedWeeks": 3,
+        "status": "in-progress",
+        "requiredSkills": [
+          "Docker",
+          "System Design"
+        ],
+        "tasks": [
+          {
+            "id": "p2t1",
+            "title": "Containerize an existing Node.js API",
+            "timeEstimate": 4,
+            "isDone": true,
+            "skills": [
+              "Docker"
+            ]
+          },
+          {
+            "id": "p2t2",
+            "title": "Docker Compose: API + Postgres + Redis stack",
+            "timeEstimate": 5,
+            "isDone": true,
+            "skills": [
+              "Docker"
+            ]
+          },
+          {
+            "id": "p2t3",
+            "title": "Design a URL shortener (system design)",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "System Design"
+            ]
+          },
+          {
+            "id": "p2t4",
+            "title": "Set up message queue (BullMQ) for async jobs",
+            "timeEstimate": 5,
+            "isDone": false,
+            "skills": [
+              "Message Queues"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Kubernetes & Scale",
+        "estimatedWeeks": 4,
+        "status": "locked",
+        "requiredSkills": [
+          "Kubernetes",
+          "AWS / GCP"
+        ],
+        "tasks": [
+          {
+            "id": "p3t1",
+            "title": "Deploy microservice to Kubernetes (local k3s)",
+            "timeEstimate": 8,
+            "isDone": false,
+            "skills": [
+              "Kubernetes"
+            ]
+          },
+          {
+            "id": "p3t2",
+            "title": "Set up Horizontal Pod Autoscaler",
+            "timeEstimate": 4,
+            "isDone": false,
+            "skills": [
+              "Kubernetes"
+            ]
+          },
+          {
+            "id": "p3t3",
+            "title": "Design a distributed cache for 1M req/s",
+            "timeEstimate": 3,
+            "isDone": false,
+            "skills": [
+              "System Design",
+              "Caching Patterns"
+            ]
+          },
+          {
+            "id": "p3t4",
+            "title": "Deploy to AWS ECS + RDS",
+            "timeEstimate": 6,
+            "isDone": false,
+            "skills": [
+              "AWS / GCP"
+            ]
+          }
+        ]
+      }
+    ],
+    "streak": 1,
+    "lastActive": "Sun Apr 26 2026",
+    "completedToday": [
+      "p1t1",
+      "p1t2",
+      "p1t3",
+      "p1t4",
+      "p2t1",
+      "p2t2"
+    ],
+    "progressHistory": [
+      {
+        "date": "2026-04-26T14:24:19.112Z",
+        "event": "plan_created",
+        "nexusScore": 0,
+        "tasksCompleted": 0,
+        "note": "Roadmap generated for Software developer @ Google"
+      },
+      {
+        "date": "2026-04-26T15:10:42.166Z",
+        "event": "task_done",
+        "taskTitle": "Complete PostgreSQL performance tuning tutorial",
+        "nexusScore": 62,
+        "tasksCompleted": 1
+      },
+      {
+        "date": "2026-04-26T15:14:34.866Z",
+        "event": "task_done",
+        "taskTitle": "Build a cache-aside pattern with Redis",
+        "nexusScore": 95,
+        "tasksCompleted": 2
+      },
+      {
+        "date": "2026-04-26T15:14:35.716Z",
+        "event": "task_done",
+        "taskTitle": "Design a normalized schema for a social network",
+        "nexusScore": 159,
+        "tasksCompleted": 3
+      },
+      {
+        "date": "2026-04-26T15:14:36.718Z",
+        "event": "phase_completed",
+        "phaseTitle": "Databases & Caching",
+        "nexusScore": 254,
+        "tasksCompleted": 4,
+        "note": "Completed phase: Databases & Caching"
+      },
+      {
+        "date": "2026-04-26T15:14:38.071Z",
+        "event": "milestone",
+        "nexusScore": 288,
+        "tasksCompleted": 5,
+        "note": "5/12 tasks complete"
+      },
+      {
+        "date": "2026-04-26T15:14:38.729Z",
+        "event": "task_done",
+        "taskTitle": "Docker Compose: API + Postgres + Redis stack",
+        "nexusScore": 352,
+        "tasksCompleted": 6
+      }
+    ],
+    "nexusScore": 352,
+    "nexusBreakdown": {
+      "total": 352,
+      "skillCoverage": 123,
+      "executionProgress": 200,
+      "momentum": 29
+    },
+    "eta": {
+      "remainHours": 29,
+      "totalDays": 15,
+      "targetDate": "2026-05-11"
+    },
+    "hireReadiness": {
+      "total": 20,
+      "label": "Building Foundation",
+      "skillScore": 0,
+      "taskScore": 20,
+      "dsaScore": 0
+    },
+    "todaysFocus": [
+      {
+        "id": "p2t3",
+        "title": "Design a URL shortener (system design)",
+        "timeEstimate": 3,
+        "isDone": false,
+        "skills": [
+          "System Design"
+        ],
+        "phaseId": 2,
+        "phaseTitle": "Docker & Microservices"
+      }
+    ]
   }
 }

@@ -73,14 +73,14 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Register new user with email, password, and profile info
-  const register = useCallback(async ({ name, email, password, gender, focus, focusLabel }) => {
+  // Register new user with email, password, profile info, and optional phone/avatar
+  const register = useCallback(async ({ name, email, password, gender, focus, focusLabel, phone, avatar }) => {
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, gender, focus, focusLabel }),
+        body: JSON.stringify({ name, email, password, gender, focus, focusLabel, phone, avatar }),
       });
       const text = await res.text();
       let data = {};

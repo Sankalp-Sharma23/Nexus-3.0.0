@@ -470,7 +470,7 @@ const ExecutionPlan = memo(function ExecutionPlan({ executionPlan, onToggleTask 
                       <span className="ep-flat-task-title">{task.title}</span>
                       <div className="ep-flat-task-meta">
                         <span className="ep-flat-hours"><Clock size={10} /> {task.timeEstimate}h</span>
-                        {(task.skills || []).map(function(skill) {
+                        {(Array.isArray(task.skills) ? task.skills : [task.skills]).filter(Boolean).map(function(skill) {
                           return <span key={skill} className="ep-flat-skill">{skill}</span>;
                         })}
                       </div>

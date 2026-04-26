@@ -1,124 +1,57 @@
 import { useState, useEffect, useRef } from 'react';
-import boyImg  from '../assets/image/boy.jpg';
-import girlImg from '../assets/image/girl.png';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import boyImg  from '../assets/image/boy.jpg';
+import girlImg from '../assets/image/girl.png';
 import {
-  Layout, Database, GitBranch, FileText,
+  Layout, Database, FileText, GitBranch,
   Briefcase, BookOpen, Trophy, ArrowRight,
-  ChevronRight, Calendar, Zap,
-  Clock, CheckCircle2, Circle, TrendingUp,
-  Star, Layers, User, Cpu
+  ChevronRight, Plus, Target, Zap,
+  Clock, CheckCircle2, Circle, Code2,
+  TrendingUp
 } from 'lucide-react';
 import '../styles/Navbar.css';
 import '../styles/Dashboard.css';
 
-/* ── fallback data (shown when API is unreachable) ── */
-const STUDY_UPCOMING_FB = [
-  { id: 1, label: 'Graph BFS Review', done: false, dueDate: null },
-  { id: 2, label: 'System Design: CDN', done: false, dueDate: null },
-  { id: 3, label: 'Mock Interview Prep', done: false, dueDate: null },
-];
-const STUDY_DONE_COUNT_FB = 2;
-const STUDY_TOTAL_FB      = 5;
-
-const HACKATHONS_FB = [
-  { id:1, name:'MLH Global Hack Week', date:'Feb 28', daysUntil:2,  prize:'$50k', featured:true,  color:'#8b5cf6' },
-  { id:2, name:'HackMIT 2026',         date:'Mar 7',  daysUntil:9,  prize:'$25k', featured:false, color:'#3b82f6' },
-  { id:3, name:'ETHGlobal Waterloo',   date:'Mar 14', daysUntil:16, prize:'$30k', featured:true,  color:'#8b5cf6' },
-];
-
-const INTERNSHIPS_FB = [
-  { id:1, company:'Google',   role:'SWE Intern',  deadline:'Mar 1',  status:'Open', color:'#10b981' },
-  { id:2, company:'Meta',     role:'ML Intern',   deadline:'Mar 10', status:'Open', color:'#f59e0b' },
-  { id:3, company:'Stripe',   role:'Backend Eng', deadline:'Mar 18', status:'Open', color:'#3b82f6' },
-  { id:4, company:'Notion',   role:'FE Intern',   deadline:'Mar 22', status:'Open', color:'#8b5cf6' },
-];
-
-const JOBS_FB = [
-  { id:1, title:'Software Engineer', company:'Airbnb',  type:'Full-time', level:'Mid-level', color:'#f59e0b' },
-  { id:2, title:'Frontend Developer', company:'Stripe', type:'Full-time', level:'Junior',    color:'#3b82f6' },
-  { id:3, title:'Backend Engineer',   company:'Notion', type:'Full-time', level:'Mid-level', color:'#10b981' },
-];
 
 
-
-/* ── Progress Ring ── */
-function Ring({ done, total, color='#8b5cf6', size=72 }) {
-  const rad  = (size-10)/2, circ = 2*Math.PI*rad;
-  const dash = total > 0 ? (done / total) * circ : 0; // guard against ÷0 NaN
-  return (
-    <svg width={size} height={size}>
-      <circle cx={size/2} cy={size/2} r={rad} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5"/>
-      <circle cx={size/2} cy={size/2} r={rad} fill="none" stroke={color} strokeWidth="5"
-        strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
-        transform={`rotate(-90 ${size/2} ${size/2})`}
-        style={{transition:'stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1)'}}/>
-      <text x={size/2} y={size/2} textAnchor="middle" dominantBaseline="central"
-        fill="white" fontSize="12" fontWeight="700">{done}/{total}</text>
-    </svg>
-  );
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return { text: 'Good morning', emoji: '☀️' };
+  if (h < 17) return { text: 'Good afternoon', emoji: '⚡' };
+  return { text: 'Good evening', emoji: '🌙' };
 }
 
-/* ── Score Arc ── */
-function ScoreArc({ pct, color='#10b981', size=100 }) {
-  const r=38, circ=Math.PI*r, dash=(pct/100)*circ;
-  return (
-    <svg width={size} height={size/2+10} viewBox={`0 0 ${size} ${size/2+10}`}>
-      <path d={`M10,${size/2} A${r},${r} 0 0,1 ${size-10},${size/2}`}
-        fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" strokeLinecap="round"/>
-      <path d={`M10,${size/2} A${r},${r} 0 0,1 ${size-10},${size/2}`}
-        fill="none" stroke={color} strokeWidth="6" strokeLinecap="round"
-        strokeDasharray={`${dash} ${circ}`}
-        style={{transition:'stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)'}}/>
-      <text x={size/2} y={size/2-2} textAnchor="middle" fill="white" fontSize="22" fontWeight="800">{pct}</text>
-      <text x={size/2} y={size/2+13} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="9">READINESS</text>
-    </svg>
-  );
-}
-
-/* ───────────────────────────
-   MAIN DASHBOARD
-─────────────────────────── */
-export default function Dashboard({ children }) {
-  const [theme] = useState('dark');
+export default function Dashboard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const gridRef       = useRef(null);
+  const navigate  = useNavigate();
+  const pageRef   = useRef(null);
 
   const userId = user?._id || user?.id || user?.username
-                 || localStorage.getItem('nexus_guest_id') || 'guest';
+               || localStorage.getItem('nexus_guest_id') || 'guest';
 
   const [dashData, setDashData] = useState(null);
+  const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
     fetch(`/api/dashboard/${userId}`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setDashData(d); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [userId]);
 
-  const name = user?.name || 'Engineer';
-  const heroImg = user?.gender === 'female' ? girlImg : boyImg;
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  /* derived values */
+  const name     = user?.name || 'Engineer';
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  const greeting = getGreeting();
 
-  const hasStudyData  = (dashData?.study?.tasksTotal ?? 0) > 0;
-  const upcomingTasks = dashData?.study?.upcomingTasks?.length ? dashData.study.upcomingTasks : STUDY_UPCOMING_FB;
-  const overdueTasks  = dashData?.study?.overdueTasks || [];
-  const studyDone     = hasStudyData ? dashData.study.tasksDone   : STUDY_DONE_COUNT_FB;
-  const studyTotal    = hasStudyData ? dashData.study.tasksTotal  : STUDY_TOTAL_FB;
-  const readiness     = dashData?.aim?.hireReadiness ?? Math.round((studyDone / (studyTotal||1)) * 70 + 30);
-  const nexusScore    = dashData?.aim?.nexusScore   || 0;
-  const aimEta        = dashData?.aim?.eta          || null;
-  const aimRole       = dashData?.aim?.role         || '';
-  const hackathons    = dashData?.hackathons?.length  ? dashData.hackathons   : HACKATHONS_FB;
-  const featuredHacks = hackathons.filter(h => h.featured).slice(0, 3);
-  const displayHacks  = featuredHacks.length ? featuredHacks : hackathons.slice(0, 3);
-  const internships   = dashData?.internships?.length ? dashData.internships  : INTERNSHIPS_FB;
-  const jobs          = dashData?.jobs?.length        ? dashData.jobs         : JOBS_FB;
+  /* Avatar: uploaded image > gender-based image > initials fallback */
+  const avatarUrl = user?.avatar || null;
+  const genderImg = user?.gender === 'female' ? girlImg : boyImg;
 
   const FOCUS_TAGS = {
     swe:    ['React','Node.js','DSA','System Design'],
@@ -131,302 +64,401 @@ export default function Dashboard({ children }) {
     ? [user.focusLabel, 'DSA', 'System Design', 'Git']
     : (FOCUS_TAGS[user?.focus] || FOCUS_TAGS.swe);
 
-  useEffect(()=>{
-    const grid = gridRef.current;
-    if(!grid) return;
+  const tasks       = dashData?.study?.upcomingTasks || [];
+  const tasksDone   = dashData?.study?.tasksDone   ?? 0;
+  const tasksTotal  = dashData?.study?.tasksTotal  ?? 0;
+  const streak      = dashData?.study?.streak       ?? 0;
+  const focusMins   = dashData?.study?.todayFocusMinutes ?? 0;
+  const aimRole     = dashData?.aim?.role           || '';
+  const aimEta      = dashData?.aim?.eta            || null;
+  const readiness   = dashData?.aim?.hireReadiness  ?? 0;
+  const nexusScore  = dashData?.aim?.nexusScore     ?? 0;
+  const aimChecklist = dashData?.aim?.checklist     || [];
+  const hackathons  = dashData?.hackathons          || [];
+  const internships = dashData?.internships         || [];
+  const jobs        = dashData?.jobs                || [];
 
-    const ctx = gsap.context(()=>{
-      const tiles   = grid.querySelectorAll('.bt');
-      const icons   = grid.querySelectorAll('.bt-tool-icon');
-      const tags    = grid.querySelectorAll('.bt-tag');
-      const badges  = grid.querySelectorAll('.bt-days, .bt-int-status');
-      const bars    = grid.querySelectorAll('.bt-hack-bar');
+  /* Derive colour for a job card if the API doesn't provide one */
+  const JOB_COLORS = ['#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444','#ec4899'];
+  function jobColor(j, i) {
+    if (j.color) return j.color;
+    let h = 0;
+    for (const c of (j.company || '')) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+    return JOB_COLORS[h % JOB_COLORS.length];
+  }
 
-      /* reset so Strict-Mode double-run doesn't leave opacity:0 */
-      gsap.set(tiles,  { opacity:1, y:0, scale:1, clearProps:'all' });
-      gsap.set(icons,  { clearProps:'all' });
-      gsap.set(tags,   { clearProps:'all' });
-      gsap.set(badges, { clearProps:'all' });
-      gsap.set(bars,   { clearProps:'all' });
+  /* lcStats */
+  const lc      = user?.lcStats || {};
+  const lcEasy  = lc.easySolved   || 0;
+  const lcMed   = lc.mediumSolved || 0;
+  const lcHard  = lc.hardSolved   || 0;
 
-      const tl = gsap.timeline({ delay: 0.05 });
-
-      /* ── Stage 1: tile entrance ── */
-      tl.fromTo(tiles,
-        { opacity:0, y:32, scale:0.95 },
-        { opacity:1, y:0,  scale:1, duration:0.55, stagger:0.06, ease:'power3.out' }
-      )
-
-      /* ── Stage 2: tool icons spin-pop ── */
-      .fromTo(icons,
-        { rotation:-18, scale:0.5, opacity:0 },
-        { rotation:0,   scale:1,   opacity:1, duration:0.45, stagger:0.1,
-          ease:'back.out(2.2)', clearProps:'rotation,transform' },
-        '-=0.35'
-      )
-
-      /* ── Stage 3: hero tags slide in ── */
-      .fromTo(tags,
-        { x:-12, opacity:0 },
-        { x:0,   opacity:1, duration:0.3, stagger:0.06, ease:'power2.out' },
-        '-=0.28'
-      )
-
-      /* ── Stage 4: badges bounce in ── */
-      .fromTo(badges,
-        { scale:0.3, opacity:0 },
-        { scale:1,   opacity:1, duration:0.4, stagger:0.05, ease:'back.out(2.5)' },
-        '-=0.22'
-      )
-
-      /* ── Stage 5: hack bar colour accents ── */
-      .fromTo(bars,
-        { scaleY:0 },
-        { scaleY:1, duration:0.32, stagger:0.06, ease:'power2.out', transformOrigin:'top center' },
-        '-=0.28'
-      )
-
-      /* ── Stage 6: data-driven counters + bars (after tiles visible) ── */
-      .call(()=>{
-        /* progress bar fills */
-        grid.querySelectorAll('.bt-pb-fill').forEach(fill => {
-          const target = fill.style.width || '0%';
-          gsap.fromTo(fill, { width:'0%' }, { width:target, duration:1.0, ease:'power2.out' });
-        });
-
-        /* hero stat counters */
-        grid.querySelectorAll('.bt-hstat-n').forEach(el => {
-          const raw   = el.textContent.trim();
-          const isPct = raw.includes('%');
-          const end   = parseInt(raw, 10);
-          if (!isNaN(end) && end > 0) {
-            const proxy = { val:0 };
-            gsap.to(proxy, {
-              val:end, duration:1.4, ease:'power2.out',
-              onUpdate(){ el.textContent = Math.round(proxy.val) + (isPct ? '%' : ''); }
-            });
-          }
-        });
-
-        /* tracker column counts */
-        grid.querySelectorAll('.bt-tcol-count').forEach(el => {
-          const end = parseInt(el.textContent.trim(), 10);
-          if (!isNaN(end) && end > 0) {
-            const proxy = { val:0 };
-            gsap.to(proxy, {
-              val:end, duration:0.8, ease:'power2.out',
-              onUpdate(){ el.textContent = Math.round(proxy.val); }
-            });
-          }
-        });
-      }, '-=0.4');
-
-    }, grid);
-
+  /* GSAP entrance */
+  useEffect(() => {
+    if (loading) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.db-card',
+        { opacity: 0, y: 28, scale: 0.97 },
+        { opacity: 1, y: 0,  scale: 1, duration: 0.5, stagger: 0.07, ease: 'power3.out', delay: 0.1 }
+      );
+    }, pageRef);
     return () => ctx.revert();
-  },[]);
+  }, [loading]);
 
   return (
-    <div className="demo-layout" data-theme={theme}>
-      <Navbar theme={theme}/>
-      <main className="demo-content">
-        {children}
-        <div className="bento-page">
+    <div className="db-layout" ref={pageRef}>
+      <Navbar />
+      <main className="db-main">
+        <div className="db-page">
 
-          {/* top bar */}
-          <div className="bento-topbar">
-            <span className="bento-site-tag"><Zap size={12}/>NEXUS</span>
-            <span className="bento-date">{new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}</span>
+          {/* ══ TOP BAR ══ */}
+          <div className="db-topbar">
+            <span className="db-site-tag"><Zap size={11}/>NEXUS</span>
+            <span className="db-date">{new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}</span>
           </div>
-          {/* ── BENTO GRID ── */}
-          <div className="dash-grid" ref={gridRef}>
 
-            {/* 1. HERO — col 1-2, row 1-2 */}
-            <div className="bt bt-hero">
-              {/* image side */}
-              <div className="bt-hero-img-wrap">
-                <img src={heroImg} alt="hero" className="bt-hero-img" />
-                <div className="bt-hero-img-overlay" />
+          {/* ══ 1. PROFILE HERO ══ */}
+          <section className="db-card db-hero">
+            {/* image panel — 1/4 width, full height */}
+            <div className="db-hero-img-panel">
+              <img src={avatarUrl || genderImg} alt={name} className="db-hero-img"/>
+              <div className="db-hero-img-overlay"/>
+            </div>
+
+            {/* content */}
+            <div className="db-hero-right">
+              <div className="db-hero-name-row">
+                <h1 className="db-hero-name">{name}</h1>
+                <span className="db-online-badge"><span className="db-dot"/>Online</span>
+                {aimRole && <span className="db-aim-badge"><Target size={10}/>{aimRole}</span>}
               </div>
+              <p className="db-hero-greeting">
+                {greeting.emoji} {greeting.text}! What would you like to do today?
+              </p>
+              <div className="db-hero-stats">
+                <div className="db-stat"><span className="db-stat-n">{tasksDone}</span><span className="db-stat-l">Tasks Done</span></div>
+                <div className="db-stat-div"/>
+                <div className="db-stat"><span className="db-stat-n">{streak > 0 ? `${streak}🔥` : '—'}</span><span className="db-stat-l">Streak</span></div>
+                <div className="db-stat-div"/>
+                <div className="db-stat"><span className="db-stat-n">{readiness > 0 ? `${readiness}%` : '—'}</span><span className="db-stat-l">Readiness</span></div>
+                <div className="db-stat-div"/>
+                <div className="db-stat"><span className="db-stat-n">{focusMins > 0 ? `${focusMins}m` : '—'}</span><span className="db-stat-l">Focus Today</span></div>
+              </div>
+              <div className="db-skill-row">
+                <span className="db-skill-label">SKILLS</span>
+                {skillTags.map(t => <span key={t} className="db-skill-tag">{t}</span>)}
+              </div>
+            </div>
+          </section>
 
-              {/* text side */}
-              <div className="bt-hero-body">
-                <div className="bt-hero-top">
-                  <div className="bt-avatar">{initials}</div>
-                  <div className="bt-hero-meta">
-                    <span className="bt-online"><span className="bt-dot"/>Online</span>
-                  </div>
-                </div>
+          {/* ══ 2. MAIN MIDDLE GRID ══ */}
+          <div className="db-mid-grid">
 
-                <div className="bt-hero-welcome">
-                  <span className="bt-hero-greeting">
-                    {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'} 👋
-                  </span>
-                  <div className="bt-hero-name">
-                    <span className="bt-hi">Welcome back, </span>{name}
-                  </div>
-                  <p className="bt-hero-sub">
-                    {new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} &mdash; here&rsquo;s your career snapshot.
-                  </p>
+            {/* LEFT COLUMN — Whiteboard + Database Board */}
+            <div className="db-mid-left">
+              {/* Whiteboard */}
+              <div className="db-card db-tool-card db-whiteboard" onClick={() => navigate('/whiteboard')}>
+                <div className="db-tool-eyebrow"><Layout size={11}/>Whiteboard</div>
+                <div className="db-tool-body">
+                  <div className="db-tool-icon-wrap db-icon-blue"><Layout size={22}/></div>
+                  <p className="db-tool-desc">Brainstorm &amp; diagram ideas freely</p>
                 </div>
-
-                <div className="bt-hero-stats">
-                  <div className="bt-hstat"><span className="bt-hstat-n">{studyDone}</span><span className="bt-hstat-l">Tasks Done</span></div>
-                  <div className="bt-hstat"><span className="bt-hstat-n">{hackathons.length}</span><span className="bt-hstat-l">Hackathons</span></div>
-                  <div className="bt-hstat"><span className="bt-hstat-n">{readiness}%</span><span className="bt-hstat-l">Readiness</span></div>
+                <button className="db-tool-btn" onClick={e=>{e.stopPropagation();navigate('/whiteboard');}}><Plus size={13}/>New Board</button>
+                <span className="db-card-go"><ArrowRight size={12}/></span>
+              </div>
+              {/* Database Board */}
+              <div className="db-card db-tool-card db-dbboard" onClick={() => navigate('/whiteboard',{state:{autoTemplate:'schema'}})}>
+                <div className="db-tool-eyebrow"><Database size={11}/>Database Board</div>
+                <div className="db-tool-body">
+                  <div className="db-tool-icon-wrap db-icon-cyan"><Database size={22}/></div>
+                  <p className="db-tool-desc">Design schemas &amp; ER diagrams</p>
                 </div>
-
-                <div className="bt-tag-row">
-                  {skillTags.map(t=>(
-                    <span key={t} className="bt-tag">{t}</span>
-                  ))}
-                </div>
+                <button className="db-tool-btn" onClick={e=>{e.stopPropagation();navigate('/whiteboard',{state:{autoTemplate:'schema'}})}}><Plus size={13}/>New Schema</button>
+                <span className="db-card-go"><ArrowRight size={12}/></span>
               </div>
             </div>
 
-            {/* 2. WHITEBOARD — col 3-4, row 1 */}
-            <div className="bt bt-whiteboard" onClick={()=>navigate('/whiteboard')}>
-              <div className="bt-eyebrow"><Layout size={12}/>Blank Canvas</div>
-              <div className="bt-tool-icon bt-tool-blue"><Layout size={32}/></div>
-              <div className="bt-tool-name">Whiteboard</div>
-              <div className="bt-tool-desc">Brainstorm, diagram & visualise ideas freely.</div>
-              <span className="bt-go"><ArrowRight size={14}/></span>
+            {/* MIDDLE COLUMN — Resume */}
+            <div className="db-mid-center">
+              <div className="db-card db-resume-card" onClick={() => navigate('/resume-builder')}>
+                <div className="db-tool-eyebrow"><FileText size={11}/>Resume Builder</div>
+                <div className="db-resume-visual">
+                  <div className="db-resume-doc">
+                    <div className="db-rdoc-header"/>
+                    <div className="db-rdoc-line db-rdoc-short"/>
+                    <div className="db-rdoc-line"/>
+                    <div className="db-rdoc-line db-rdoc-short"/>
+                    <div className="db-rdoc-divider"/>
+                    <div className="db-rdoc-line"/>
+                    <div className="db-rdoc-line db-rdoc-med"/>
+                  </div>
+                </div>
+                <div className="db-resume-pills">
+                  {['PDF Export','ATS Score','Templates'].map(p => <span key={p} className="db-pill">{p}</span>)}
+                </div>
+                <button className="db-resume-btn"><FileText size={13}/>Make Resume</button>
+                <span className="db-card-go"><ArrowRight size={12}/></span>
+              </div>
             </div>
 
-            {/* 4. STUDY PLANNER — col 3-4, row 2 */}
-            <div className="bt bt-study" onClick={()=>navigate('/study-planner')}>
-              <div className="bt-eyebrow"><BookOpen size={12}/>Study Planner</div>
-              <div className="bt-study-row">
-                <Ring done={studyDone} total={studyTotal} color="#8b5cf6" size={68}/>
-                <div className="bt-study-tasks">
-                  {overdueTasks.length > 0 && overdueTasks.slice(0,2).map((t,i)=>(
-                    <div key={t._id||t.id||`od${i}`} className="bt-task bt-task-overdue">
-                      <Circle size={11} style={{color:'#ef4444'}}/>
-                      <span>{t.label}</span>
-                      <span className="bt-task-due-badge">Due</span>
+            {/* RIGHT COLUMN — Task (Study Planner) */}
+            <div className="db-mid-right">
+              <div className="db-card db-task-card" onClick={() => navigate('/study-planner')}>
+                <div className="db-tool-eyebrow"><BookOpen size={11}/>Task <span style={{marginLeft:4,opacity:.4}}>from Study Planner</span></div>
+                {/* Progress summary */}
+                <div className="db-task-progress-row">
+                  <div className="db-task-progress-info">
+                    <span className="db-task-done-count">{tasksDone}</span>
+                    <span className="db-task-sep">/</span>
+                    <span className="db-task-total-count">{tasksTotal}</span>
+                    <span className="db-task-label">tasks completed</span>
+                  </div>
+                  <div className="db-task-track">
+                    <div className="db-task-fill" style={{width: tasksTotal > 0 ? `${(tasksDone/tasksTotal)*100}%` : '0%'}}/>
+                  </div>
+                </div>
+                {/* Task list */}
+                <div className="db-task-list">
+                  {tasks.slice(0,4).map((t,i) => (
+                    <div key={t._id||t.id||i} className={`db-task-item${t.done?' db-task-done':''}`}>
+                      {t.done
+                        ? <CheckCircle2 size={13} className="db-task-check-done"/>
+                        : <Circle size={13} className="db-task-check"/>}
+                      <span className="db-task-text">{t.label}</span>
+                      {t.subject && <span className="db-task-sub">{t.subject}</span>}
                     </div>
                   ))}
-                  {upcomingTasks.slice(0, overdueTasks.length > 0 ? 2 : 4).map((t,i)=>(
-                    <div key={t._id||t.id||`up${i}`} className={`bt-task${t.done?' done':''}`}>
-                      {t.done?<CheckCircle2 size={11} style={{color:'#8b5cf6'}}/>:<Circle size={11} style={{color:'rgba(255,255,255,0.2)'}}/>}
-                      <span>{t.label}</span>
-                      {t.dueDate && <span className="bt-task-date">{new Date(t.dueDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>}
-                    </div>
-                  ))}
-                  {(overdueTasks.length + upcomingTasks.length) === 0 && (
-                    <div className="bt-task" style={{opacity:0.4}}><Circle size={11}/><span>No tasks yet — add in Planner</span></div>
+                  {tasks.length === 0 && (
+                    <div className="db-task-empty">No tasks yet — add some in Study Planner</div>
                   )}
                 </div>
+                <span className="db-card-go"><ArrowRight size={12}/></span>
               </div>
             </div>
+          </div>
 
-            {/* 5. HACKATHONS — col 1, row 3-4 */}
-            <div className="bt bt-hack" onClick={()=>navigate('/hackathons')}>
-              <div className="bt-eyebrow"><Trophy size={12}/>Hackathons{featuredHacks.length>0&&<span className="bt-featured-badge">Featured</span>}</div>
-              {displayHacks.length > 0 ? (
-                <div className="bt-hack-list">
-                  {displayHacks.map((h,i)=>(
-                    <div key={h._id||h.id||i} className="bt-hack-item" onClick={e=>{e.stopPropagation();navigate('/hackathons',{state:{openId:h._id||h.id}});}}>
-                      <div className="bt-hack-bar" style={{background:h.color}}/>
-                      <div className="bt-hack-info">
-                        <div className="bt-hack-name">{h.name}</div>
-                        <div className="bt-hack-sub">
-                          <Clock size={9}/> {h.date}
-                          {h.prize && <>&nbsp;·&nbsp;<Star size={9}/> {h.prize}</>}
+          {/* ══ 3. SECONDARY GRID ══ */}
+          <div className="db-sec-grid">
+
+            {/* React Board */}
+            <div className="db-card db-tool-card db-reactboard" onClick={() => navigate('/whiteboard',{state:{autoTemplate:'react'}})}>
+              <div className="db-tool-eyebrow"><GitBranch size={11}/>React Board</div>
+              <div className="db-tool-body">
+                <div className="db-tool-icon-wrap db-icon-purple"><GitBranch size={22}/></div>
+                <div className="db-comp-preview">
+                  <div className="db-cp-root">App</div>
+                  <div className="db-cp-children">
+                    <div className="db-cp-node db-cpn-blue">Nav</div>
+                    <div className="db-cp-node db-cpn-purple">Page</div>
+                    <div className="db-cp-node db-cpn-green">Footer</div>
+                  </div>
+                </div>
+              </div>
+              <button className="db-tool-btn" onClick={e=>{e.stopPropagation();navigate('/whiteboard',{state:{autoTemplate:'react'}})}}><Plus size={13}/>New Tree</button>
+              <span className="db-card-go"><ArrowRight size={12}/></span>
+            </div>
+
+            {/* Practice Hub */}
+            <div className="db-card db-practice-card" onClick={() => navigate('/practice')}>
+              <div className="db-tool-eyebrow"><Code2 size={11}/>Practice Hub</div>
+              <p className="db-practice-sub">LeetCode Progress</p>
+              <div className="db-lc-stats">
+                <div className="db-lc-stat db-lc-hard">
+                  <span className="db-lc-n">{lcHard}</span>
+                  <span className="db-lc-l">HARD</span>
+                  <div className="db-lc-bar"><div className="db-lc-fill" style={{width:`${Math.min(lcHard/50*100,100)}%`}}/></div>
+                </div>
+                <div className="db-lc-stat db-lc-med">
+                  <span className="db-lc-n">{lcMed}</span>
+                  <span className="db-lc-l">MEDIUM</span>
+                  <div className="db-lc-bar"><div className="db-lc-fill" style={{width:`${Math.min(lcMed/100*100,100)}%`}}/></div>
+                </div>
+                <div className="db-lc-stat db-lc-easy">
+                  <span className="db-lc-n">{lcEasy}</span>
+                  <span className="db-lc-l">EASY</span>
+                  <div className="db-lc-bar"><div className="db-lc-fill" style={{width:`${Math.min(lcEasy/150*100,100)}%`}}/></div>
+                </div>
+              </div>
+              <div className="db-lc-total">
+                <TrendingUp size={11}/>
+                Total Solved: <strong>{lcEasy + lcMed + lcHard}</strong>
+              </div>
+              <span className="db-card-go"><ArrowRight size={12}/></span>
+            </div>
+
+          </div>
+
+          {/* ══ 4. AIM TASK ══ */}
+          <div className="db-card db-aim-card" onClick={() => navigate('/aim')}>
+
+            {/* LEFT: conditional — checklist or CTA */}
+            <div className="db-aim-left">
+              <div className="db-tool-eyebrow"><Target size={11}/>AIM Task
+                {aimRole && <span style={{marginLeft:6,opacity:.4,fontWeight:400}}>{aimRole}</span>}
+              </div>
+
+              {aimRole ? (
+                /* ── has AIM set ── */
+                <>
+                  <div className="db-aim-phase-label">
+                    {aimChecklist[0]?.phase || 'Execution Plan'}
+                  </div>
+                  <div className="db-aim-checklist">
+                    {aimChecklist.length > 0 ? (
+                      aimChecklist.map((t, i) => (
+                        <div key={t.id || i} className={`db-aim-task${t.isDone ? ' db-aim-task-done' : ''}`}
+                             onClick={e => { e.stopPropagation(); navigate('/aim'); }}>
+                          {t.isDone
+                            ? <CheckCircle2 size={13} className="db-aim-check-done"/>
+                            : <Circle size={13} className="db-aim-check"/>}
+                          <span className="db-aim-task-title">{t.title}</span>
                         </div>
+                      ))
+                    ) : (
+                      <div className="db-aim-cta-text" style={{margin:'8px 0'}}>
+                        Click 'Full Roadmap' to generate your personalized AI execution plan.
                       </div>
-                      {h.daysUntil != null && <span className="bt-days" style={{color:h.color,borderColor:`${h.color}50`,background:`${h.color}15`}}>{h.daysUntil}d</span>}
+                    )}
+                  </div>
+                  {aimEta && (
+                    <div className="db-aim-eta">
+                      <Clock size={11}/>
+                      Target: {new Date(aimEta).toLocaleDateString('en-US',{month:'short',year:'numeric'})}
                     </div>
-                  ))}
-                </div>
+                  )}
+                  <button className="db-aim-btn" onClick={e=>{e.stopPropagation();navigate('/aim');}}>
+                    Full Roadmap <ArrowRight size={13}/>
+                  </button>
+                </>
               ) : (
-                <div className="bt-hack-empty">
-                  <Trophy size={28} style={{opacity:0.2,margin:'0 auto 8px'}}/>
-                  <p>No featured hackathons right now</p>
-                  <button className="bt-hack-empty-btn" onClick={e=>{e.stopPropagation();navigate('/hackathons');}}>Browse All <ChevronRight size={12}/></button>
-                </div>
+                /* ── no AIM set ── */
+                <>
+                  <div className="db-aim-title">Set your career target</div>
+                  <p className="db-aim-cta-text">Use AIM to generate a personalized AI roadmap to your dream role — skill gaps, execution plan &amp; more.</p>
+                  <button className="db-aim-btn">
+                    Set Your Goal <ArrowRight size={13}/>
+                  </button>
+                </>
               )}
-              <div className="bt-hack-cta">View all <ChevronRight size={12}/></div>
-              <div className="bt-bg-icon"><Trophy size={80}/></div>
             </div>
 
-            {/* 6. PLACEMENT PORTAL — col 2-3, row 3 */}
-            <div className="bt bt-placement" onClick={()=>navigate('/placement-portal')}>
-              <div className="bt-eyebrow"><Briefcase size={12}/>Jobs{aimRole&&<span className="bt-role-badge">{aimRole}</span>}</div>
-              <div className="bt-jobs-list">
-                {jobs.map((j,i)=>(
-                  <div key={j._id||j.id||i} className="bt-job-row" onClick={e=>{e.stopPropagation();navigate('/placement-portal',{state:{openJobId:j._id||j.id}});}}>
-                    <div className="bt-job-left">
-                      <div className="bt-job-title">{j.title}</div>
-                      <div className="bt-job-company">{j.company}</div>
+            {/* RIGHT: Nexus Score — always visible */}
+            <div className="db-aim-right">
+              <div className="db-aim-ring-wrap">
+                <svg viewBox="0 0 120 120" width="120" height="120">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8"/>
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="#8b5cf6" strokeWidth="8"
+                    strokeDasharray={`${(readiness/100)*314} 314`} strokeLinecap="round"
+                    transform="rotate(-90 60 60)"
+                    style={{transition:'stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)'}}/>
+                  {nexusScore > 0 ? (
+                    <>
+                      <text x="60" y="52" textAnchor="middle" fill="#a78bfa" fontSize="24" fontWeight="800">{nexusScore}</text>
+                      <text x="60" y="70" textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="8">NEXUS SCORE</text>
+                      <text x="60" y="85" textAnchor="middle" fill="white" fontSize="14" fontWeight="700">{readiness}%</text>
+                      <text x="60" y="98" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="7">READINESS</text>
+                    </>
+                  ) : (
+                    <>
+                      <text x="60" y="51" textAnchor="middle" fill="white" fontSize="20" fontWeight="800">{readiness}</text>
+                      <text x="60" y="66" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="8">READINESS</text>
+                    </>
+                  )}
+                </svg>
+              </div>
+              <div className="db-aim-score-label">Nexus Score</div>
+            </div>
+
+          </div>
+
+          {/* ══ 5. OPPORTUNITIES ══ */}
+          <div className="db-opp-grid">
+
+            {/* Internships */}
+            <div className="db-card db-intern-card">
+              <div className="db-tool-eyebrow" style={{cursor:'pointer'}} onClick={() => navigate('/internships')}>
+                <Briefcase size={11}/>Internship
+                <span className="db-see-all" onClick={e=>{e.stopPropagation();navigate('/internships');}}>See all <ChevronRight size={10}/></span>
+              </div>
+              <div className="db-opp-list">
+                {internships.slice(0,4).map((item,i) => (
+                  <div key={item._id||item.id||i} className="db-opp-row" onClick={() => navigate('/internships',{state:{openId:String(item._id||item.id)}})}>
+                    <span className="db-opp-dot" style={{background:item.color}}/>
+                    <div className="db-opp-info">
+                      <span className="db-opp-co" style={{color:item.color}}>{item.company}</span>
+                      <span className="db-opp-role">{item.role}</span>
                     </div>
-                    <div className="bt-job-right">
-                      <span className="bt-job-type">{j.type}</span>
-                      {j.salary && <span className="bt-job-salary">{j.salary}</span>}
+                    <div className="db-opp-meta">
+                      {item.stipend && <span className="db-opp-stipend">{item.stipend}</span>}
+                      <span className="db-opp-dead">{item.deadline}</span>
                     </div>
-                    <ChevronRight size={12} style={{opacity:0.3,flexShrink:0}}/>
                   </div>
                 ))}
-                {jobs.length===0&&<div className="bt-job-empty">No jobs found — set your role in AIM</div>}
+                {internships.length === 0 && <div className="db-opp-empty">No open internships right now</div>}
               </div>
             </div>
 
-            {/* 7. RESUME BUILDER — col 4, row 3 */}
-            <div className="bt bt-resume" onClick={()=>navigate('/resume-builder')}>
-              <div className="bt-eyebrow"><FileText size={12}/>Resume Builder</div>
-              <div className="bt-tool-icon bt-tool-amber"><FileText size={28}/></div>
-              <div className="bt-tool-name">Resume</div>
-              <div className="bt-resume-pills">
-                {['PDF Export','ATS Score','Templates'].map(p=>(
-                  <span key={p} className="bt-pill">{p}</span>
-                ))}
+            {/* Hackathons */}
+            <div className="db-card db-hack-card">
+              <div className="db-tool-eyebrow" style={{cursor:'pointer'}} onClick={() => navigate('/hackathons')}>
+                <Trophy size={11}/>Hackathon
+                <span className="db-see-all" onClick={e=>{e.stopPropagation();navigate('/hackathons');}}>See all <ChevronRight size={10}/></span>
               </div>
-              <span className="bt-go"><ArrowRight size={14}/></span>
-            </div>
-
-            {/* 8. DATABASE BOARD — col 2, row 4 */}
-            <div className="bt bt-dbboard" onClick={()=>navigate('/whiteboard',{state:{autoTemplate:'schema'}})}>
-              <div className="bt-eyebrow"><Database size={12}/>Database Board</div>
-              <div className="bt-tool-icon bt-tool-cyan"><Database size={26}/></div>
-              <div className="bt-tool-name">DB Designer</div>
-              <div className="bt-tool-desc">Design schemas & ER diagrams visually.</div>
-              <span className="bt-go"><ArrowRight size={14}/></span>
-            </div>
-
-            {/* 9. COMPONENT ARCHITECT — col 3-4, row 4 */}
-            <div className="bt bt-component" onClick={()=>navigate('/whiteboard',{state:{autoTemplate:'react'}})}>
-              <div className="bt-eyebrow"><GitBranch size={12}/>Component Architect</div>
-              <div className="bt-comp-visual">
-                <div className="bt-comp-tree">
-                  <div className="bt-ct-root">App</div>
-                  <div className="bt-ct-children">
-                    <div className="bt-ct-node bt-ct-blue">Header</div>
-                    <div className="bt-ct-node bt-ct-purple">Router</div>
-                    <div className="bt-ct-node bt-ct-green">Footer</div>
-                  </div>
-                </div>
-              </div>
-              <div className="bt-comp-meta">Design React component trees, auto-layout & export boilerplate.</div>
-              <span className="bt-go"><ArrowRight size={14}/></span>
-            </div>
-
-            {/* 10. INTERNSHIPS — col 1-2, row 5 */}
-            <div className="bt bt-internships">
-              <div className="bt-eyebrow" onClick={()=>navigate('/internships')} style={{cursor:'pointer'}}><Briefcase size={12}/>Internships <ChevronRight size={10}/></div>
-              <div className="bt-int-list">
-                {internships.map((i,idx)=>(
-                  <div key={i._id||i.id||idx} className="bt-int-row" onClick={()=>navigate('/internships',{state:{openId:String(i._id||i.id)}})}>
-                    <div className="bt-int-co" style={{color:i.color}}>{i.company}</div>
-                    <div className="bt-int-role">{i.role}</div>
-                    <div className="bt-int-dead"><Calendar size={9}/> {i.deadline}</div>
-                    <span className="bt-int-status" style={{color:i.color,borderColor:`${i.color}50`,background:`${i.color}12`}}>{i.status||'Open'}</span>
+              <div className="db-opp-list">
+                {hackathons.slice(0,4).map((h,i) => (
+                  <div key={h._id||h.id||i} className="db-opp-row" onClick={() => navigate('/hackathons',{state:{openId:h._id||h.id}})}>
+                    <div className="db-hack-bar-accent" style={{background:h.color}}/>
+                    <div className="db-opp-info">
+                      <span className="db-opp-co" style={{color:h.color}}>{h.name}</span>
+                      <span className="db-opp-role">{h.date}{h.prize && ` · ${h.prize}`}</span>
+                    </div>
+                    {h.daysUntil != null && (
+                      <span className="db-days-badge" style={{color:h.color,borderColor:`${h.color}50`,background:`${h.color}15`}}>{h.daysUntil}d</span>
+                    )}
                   </div>
                 ))}
-                {internships.length===0&&<div style={{opacity:0.4,fontSize:'12px',padding:'8px 0'}}>No open internships right now</div>}
+                {hackathons.length === 0 && <div className="db-opp-empty">No upcoming hackathons</div>}
               </div>
             </div>
 
-          </div>{/* /dash-grid */}
+          </div>
+
+          {/* ══ 6. JOBS ══ */}
+          <div className="db-card db-jobs-card" onClick={() => navigate('/placement-portal')}>
+            <div className="db-jobs-header">
+              <div className="db-tool-eyebrow"><Briefcase size={11}/>Jobs{aimRole && <span className="db-role-badge">{aimRole}</span>}</div>
+              <button className="db-jobs-view-btn" onClick={e=>{e.stopPropagation();navigate('/placement-portal');}}>View All <ChevronRight size={12}/></button>
+            </div>
+            {jobs.length > 0 ? (
+              <div className="db-jobs-grid">
+                {jobs.slice(0, 8).map((j, i) => (
+                  <div key={j._id||j.id||i} className="db-job-card" onClick={e=>{e.stopPropagation();navigate('/placement-portal',{state:{openJobId:j._id||j.id}});}}>
+                    <div className="db-job-accent" style={{background: jobColor(j,i)}}/>
+                    <div className="db-job-body">
+                      <div className="db-job-title">{j.title}</div>
+                      <div className="db-job-company">{j.company}{j.location && <span className="db-job-loc"> · {j.location}</span>}</div>
+                      <div className="db-job-tags">
+                        <span className="db-job-tag db-tag-type">{j.type||'Full-time'}</span>
+                        {j.level && <span className="db-job-tag db-tag-level">{j.level}</span>}
+                        {j.source && <span className="db-job-tag db-tag-src">{j.source}</span>}
+                      </div>
+                    </div>
+                    {j.salary && <div className="db-job-salary">{j.salary}</div>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="db-jobs-empty-state">
+                <Briefcase size={36} style={{opacity:.15, margin:'0 auto 12px', display:'block'}}/>
+                <p>No job listings right now.</p>
+                <p className="db-jobs-empty-sub">Set your target role in AIM to get personalised matches, or check back soon as we scrape new listings daily.</p>
+                <button className="db-aim-btn" style={{margin:'12px auto 0'}} onClick={e=>{e.stopPropagation();navigate('/aim');}}>Set Role in AIM <ArrowRight size={13}/></button>
+              </div>
+            )}
+          </div>
+
+
+
         </div>
       </main>
       <Footer/>

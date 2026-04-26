@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from './Toast';
-import AuthShell from './AuthShell';
 import '../styles/Auth.css';
 
 export default function LoginPage() {
@@ -17,6 +16,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError]       = useState('');
     const [loading, setLoading]   = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated) navigate('/dashboard', { replace: true });
@@ -48,59 +48,97 @@ export default function LoginPage() {
         }
     };
 
-    const formPanel = (
-        <div className="auth-login-form-panel">
-            <div className="auth-logo-wrap">
-                <div className="auth-logo-icon">N</div>
-            </div>
-            <div className="auth-header">
-                <h1 className="auth-title">Welcome Back</h1>
-                <p className="auth-subtitle">Sign in to your Nexus account</p>
-            </div>
-            <form className="auth-form" onSubmit={handleSubmit}>
-                <div className="auth-field">
-                    <span className="auth-field-icon"><Mail size={18} /></span>
-                    <input
-                        type="email" className="auth-input" placeholder="Email address"
-                        value={email} onChange={e => setEmail(e.target.value)}
-                        required autoComplete="email"
-                    />
-                </div>
-                <div className="auth-field">
-                    <span className="auth-field-icon"><Lock size={18} /></span>
-                    <input
-                        type="password" className="auth-input" placeholder="Password"
-                        value={password} onChange={e => setPassword(e.target.value)}
-                        onKeyDown={e => { if (e.key === ' ') e.preventDefault(); }}
-                        required autoComplete="current-password"
-                    />
-                </div>
-                <div className="auth-forgot-row">
-                    <a href="#" className="auth-forgot" onClick={e => { e.preventDefault(); alert('Password reset coming soon!'); }}>
-                        Forgot Password?
-                    </a>
-                </div>
-                {error && (
-                    <div className="auth-error">
-                        <AlertCircle size={16} /><span>{error}</span>
+    return (
+        <div className="auth-new-wrapper">
+            <div className="auth-new-bg"></div>
+            <div className="auth-new-gradient-1"></div>
+            <div className="auth-new-gradient-2"></div>
+            
+            <div className="auth-new-container">
+                <div className="auth-new-card">
+                    <div className="auth-new-header">
+                        <div className="auth-new-logo">N</div>
+                        <h1 className="auth-new-title">Welcome Back</h1>
+                        <p className="auth-new-subtitle">Sign in to your Nexus account</p>
                     </div>
-                )}
-                <div className="auth-submit-wrap">
-                    <button type="submit" className="auth-submit" disabled={loading}>
-                        <div className="auth-submit-bg" />
-                        <span className="auth-submit-content">
-                            <span>{loading ? 'Signing in…' : 'Sign In'}</span>
-                            {!loading && <ArrowRight size={18} className="auth-submit-arrow" />}
-                        </span>
-                    </button>
+
+                    <form className="auth-new-form" onSubmit={handleSubmit}>
+                        <div className="auth-new-field-group">
+                            <label className="auth-new-label">Email Address</label>
+                            <div className="auth-new-input-wrapper">
+                                <Mail size={20} className="auth-new-input-icon" />
+                                <input
+                                    type="email"
+                                    className="auth-new-input"
+                                    placeholder="your@email.com"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    required
+                                    autoComplete="email"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="auth-new-field-group">
+                            <label className="auth-new-label">Password</label>
+                            <div className="auth-new-input-wrapper">
+                                <Lock size={20} className="auth-new-input-icon" />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="auth-new-input"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    onKeyDown={e => { if (e.key === ' ') e.preventDefault(); }}
+                                    required
+                                    autoComplete="current-password"
+                                />
+                                <button
+                                    type="button"
+                                    className="auth-new-show-pwd"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="auth-new-error">
+                                <AlertCircle size={18} />
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        <button type="submit" className="auth-new-submit" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <span className="auth-new-spinner"></span>
+                                    <span>Signing in…</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Sign In</span>
+                                    <ArrowRight size={20} className="auth-new-arrow" />
+                                </>
+                            )}
+                        </button>
+
+                        <p className="auth-new-footer-text">
+                            Don't have an account?{' '}
+                            <a href="/signup" className="auth-new-link">
+                                Create Account
+                            </a>
+                        </p>
+                    </form>
                 </div>
-                <p className="auth-signup-link">
-                    Don't have an account?{' '}
-                    <a href="/signup" data-auth-nav className="auth-footer-link">Create Account</a>
-                </p>
-            </form>
+
+                <div className="auth-new-side-decoration">
+                    <div className="auth-decoration-circle auth-decoration-circle-1"></div>
+                    <div className="auth-decoration-circle auth-decoration-circle-2"></div>
+                    <div className="auth-decoration-circle auth-decoration-circle-3"></div>
+                </div>
+            </div>
         </div>
     );
-
-    return <AuthShell mode="login" formPanel={formPanel} />;
 }

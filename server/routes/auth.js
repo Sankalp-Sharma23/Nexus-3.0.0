@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
     return res.status(503).json({ error: 'Database not connected. Please try again shortly.' });
   }
 
-  const { name, email, password, gender, focus, focusLabel } = req.body;
+  const { name, email, password, gender, focus, focusLabel, phone, avatar } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email, and password are required.' });
@@ -53,6 +53,8 @@ router.post('/register', async (req, res) => {
       gender: gender || 'other',
       focus: focus || 'swe',
       focusLabel: focusLabel || null,
+      phone: phone || '',
+      avatar: avatar || null,
       lastLoginAt: new Date(),
     });
 
@@ -74,7 +76,14 @@ router.post('/register', async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('[auth] register error:', err.message);
+    console.error('[auth] register error:', err.message, err.code);
+    // Provide more specific error messages for common MongoDB errors
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Email already registered.' });
+    }
+    if (err.message.includes('validation failed')) {
+      return res.status(400).json({ error: 'Invalid data provided.' });
+    }
     res.status(500).json({ error: 'Registration failed. Please try again.' });
   }
 });
@@ -124,7 +133,11 @@ router.post('/login', async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('[auth] login error:', err.message);
+    console.error('[auth] login error:', err.message, err.code);
+    // More specific error messages
+    if (err.name === 'MongooseError' || err.message.includes('connection')) {
+      return res.status(503).json({ error: 'Database temporarily unavailable.' });
+    }
     res.status(500).json({ error: 'Login failed. Please try again.' });
   }
 });
@@ -190,7 +203,10 @@ router.put('/profile', requireAuth, async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('[auth] profile update error:', err.message);
+    console.error('[auth] profile update error:', err.message, err.code);
+    if (err.message.includes('validation failed')) {
+      return res.status(400).json({ error: 'Invalid data provided.' });
+    }
     res.status(500).json({ error: 'Failed to update profile.' });
   }
 });

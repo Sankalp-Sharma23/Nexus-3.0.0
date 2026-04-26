@@ -85,6 +85,28 @@ function internshipsFromCache(limit = 6) {
   } catch { return []; }
 }
 
+/* ── jobs fallback (cache file) ────────────────────────────── */
+const JOBS_CACHE = path.join(__dirname, '..', 'data', 'jobs-cache.json');
+function jobsFromCache(limit = 8) {
+  try {
+    const raw  = JSON.parse(fs.readFileSync(JOBS_CACHE, 'utf8'));
+    const list = raw.jobs || raw.items || [];
+    return list
+      .slice(0, limit)
+      .map(j => ({
+        _id:      j._id || j.uid,
+        title:    j.title,
+        company:  j.company,
+        type:     j.type,
+        level:    j.level,
+        location: j.location,
+        salary:   j.salary,
+        url:      j.url,
+        source:   j.source
+      }));
+  } catch { return []; }
+}
+
 /* ═══════════════════════════════════════════════════════════
    GET /api/dashboard/:userId
    Returns full dashboard snapshot
@@ -126,21 +148,43 @@ router.get('/:userId', async (req, res) => {
 
     // ── 2. AIM readiness ───────────────────────────────────
     let nexusScore = 0, hireReadiness = 0, aimEta = null, aimRole = '';
+    let aimChecklist = []; // flat list of incomplete tasks from the active phase
     let aimDoc = null;
     if (mongoReady()) {
       aimDoc = await AimPlan.findOne({ userId }).lean();
-      if (aimDoc?.plan) {
-        const raw     = aimDoc.plan.hireReadiness;
-        nexusScore    = aimDoc.plan.nexusScore?.total ?? aimDoc.plan.nexusScore ?? 0;
-        hireReadiness = (typeof raw === 'object' && raw !== null) ? (raw.total ?? 0) : (raw || 0);
-        aimEta        = aimDoc.plan.eta?.targetDate || aimDoc.plan.eta || null;
-        aimRole       = aimDoc.plan.target?.role || aimDoc.plan.role || '';
+    } else {
+      try {
+        const aimCachePath = path.join(__dirname, '..', 'data', 'aim-plans.json');
+        const aimDb = JSON.parse(fs.readFileSync(aimCachePath, 'utf8'));
+        aimDoc = { plan: aimDb[userId] };
+      } catch (err) {}
+    }
+
+    if (aimDoc?.plan) {
+      const raw     = aimDoc.plan.hireReadiness;
+      nexusScore    = aimDoc.plan.nexusScore?.total ?? aimDoc.plan.nexusScore ?? 0;
+      hireReadiness = (typeof raw === 'object' && raw !== null) ? (raw.total ?? 0) : (raw || 0);
+      aimEta        = aimDoc.plan.eta?.targetDate || aimDoc.plan.eta || null;
+      aimRole       = aimDoc.plan.target?.role || aimDoc.plan.role || '';
+
+      // Build checklist: take up to 6 tasks from the first non-completed phase
+      const phases = aimDoc.plan.executionPlan || [];
+      const activePhase = phases.find(p => p.status !== 'completed') || phases[0];
+      if (activePhase) {
+        aimChecklist = (activePhase.tasks || []).slice(0, 6).map(t => ({
+          id:       t.id,
+          title:    t.title,
+          isDone:   t.isDone || false,
+          skills:   t.skills || [],
+          phase:    activePhase.title || `Phase ${activePhase.phase}`,
+        }));
       }
     }
     // Compute readiness from study tasks if no AIM plan
     if (!hireReadiness && tasksTotal > 0) {
       hireReadiness = Math.round((tasksDone / tasksTotal) * 70 + 30);
     }
+
 
     // ── 3. Upcoming hackathons ─────────────────────────────
     let hackathons = [];
@@ -218,9 +262,12 @@ router.get('/:userId', async (req, res) => {
         } catch { /* text index may not exist */ }
       }
       if (!jobs.length) {
-        const jDocs = await Job.find({}).sort({ postedAt: -1 }).limit(5).lean();
+        const jDocs = await Job.find({}).sort({ postedAt: -1 }).limit(8).lean();
         jobs = jDocs.map(j => ({ _id: String(j._id), title: j.title, company: j.company, type: j.type, level: j.level, location: j.location, salary: j.salary, url: j.url, source: j.source }));
       }
+    }
+    if (!jobs.length) {
+      jobs = jobsFromCache(8);
     }
 
     res.json({
@@ -235,8 +282,9 @@ router.get('/:userId', async (req, res) => {
       aim: {
         nexusScore,
         hireReadiness,
-        eta:  aimEta,
-        role: aimRole,
+        eta:       aimEta,
+        role:      aimRole,
+        checklist: aimChecklist,
       },
       hackathons,
       internships,
