@@ -25,43 +25,117 @@ const LC_FILE  = path.join(__dirname, 'data', 'lc-problems.json');
 
 /* ═══════════════════════════════════════════════════
    MONGODB CONNECTION  (if MONGODB_URI is set in .env)
+   
+   Robust connection with:
+   - Auto-reconnect on disconnect (exponential backoff)
+   - Connection event monitoring & logging
+   - KeepAlive / heartbeat to prevent idle drops
+   - Retry reads & writes for transient failures
 ═══════════════════════════════════════════════════ */
+
+// Tracks whether we should attempt reconnection
+let _reconnectTimer = null;
+let _reconnectAttempt = 0;
+const MAX_RECONNECT_DELAY = 30000; // cap at 30 seconds
+
 // Connect to MongoDB if connection string is provided
 if (process.env.MONGODB_URI) {
   const mongoose = require('mongoose');
-  // Attempt to connect with timeout settings
-  mongoose.connect(process.env.MONGODB_URI, {
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS:          45000,
-  })
-    .then(async () => {
-      console.log('[db] MongoDB connected ✓');
-      // Auto-seed LcProblems collection if it is empty
-      try {
-        const LcProblem = require('./models/LcProblem');
-        // Check if LeetCode problems collection is empty
-        const count = await LcProblem.estimatedDocumentCount();
-        if (count === 0) {
-          console.log('[db] LcProblem collection empty — seeding from lc-problems.json…');
-          // Load problems from local JSON file
-          const raw = JSON.parse(fs.readFileSync(LC_FILE, 'utf8'));
-          const probs = raw.problems ?? [];
-          if (probs.length > 0) {
-            // Use bulk write to insert all problems efficiently
-            const ops = probs.map(p => ({
-              updateOne: { filter: { title_slug: p.title_slug }, update: { $set: p }, upsert: true },
-            }));
-            await LcProblem.bulkWrite(ops, { ordered: false });
-            console.log(`[db] Seeded ${probs.length} problems into MongoDB ✓`);
-          }
-        } else {
-          console.log(`[db] LcProblem collection has ${count} problems ✓`);
+
+  // ── Connection options ───────────────────────────────────────────────────
+  const MONGO_OPTIONS = {
+    serverSelectionTimeoutMS: 15000,  // wait up to 15s to find a server (was 5s — too aggressive)
+    socketTimeoutMS:          90000,  // 90s socket timeout (was 45s)
+    heartbeatFrequencyMS:     10000,  // ping the server every 10s to detect drops early
+    maxIdleTimeMS:            120000, // close idle sockets after 2 min to avoid stale connections
+    retryWrites:              true,   // auto-retry failed write operations
+    retryReads:               true,   // auto-retry failed read operations
+    maxPoolSize:              10,     // max 10 connections in the pool
+    minPoolSize:              2,      // keep at least 2 connections warm
+    connectTimeoutMS:         20000,  // 20s initial connection timeout
+  };
+
+  // ── Seed LcProblems (called after each successful connect) ──────────────
+  async function seedLcProblems() {
+    try {
+      const LcProblem = require('./models/LcProblem');
+      // Check if LeetCode problems collection is empty
+      const count = await LcProblem.estimatedDocumentCount();
+      if (count === 0) {
+        console.log('[db] LcProblem collection empty — seeding from lc-problems.json…');
+        // Load problems from local JSON file
+        const raw = JSON.parse(fs.readFileSync(LC_FILE, 'utf8'));
+        const probs = raw.problems ?? [];
+        if (probs.length > 0) {
+          // Use bulk write to insert all problems efficiently
+          const ops = probs.map(p => ({
+            updateOne: { filter: { title_slug: p.title_slug }, update: { $set: p }, upsert: true },
+          }));
+          await LcProblem.bulkWrite(ops, { ordered: false });
+          console.log(`[db] Seeded ${probs.length} problems into MongoDB ✓`);
         }
-      } catch (e) {
-        console.warn('[db] LcProblem seed failed:', e.message);
+      } else {
+        console.log(`[db] LcProblem collection has ${count} problems ✓`);
       }
-    })
-    .catch(err => console.warn('[db] MongoDB connection failed (using JSON fallback):', err.message));
+    } catch (e) {
+      console.warn('[db] LcProblem seed failed:', e.message);
+    }
+  }
+
+  // ── Attempt to connect / reconnect ──────────────────────────────────────
+  function connectWithRetry() {
+    console.log(`[db] Connecting to MongoDB… (attempt ${_reconnectAttempt + 1})`);
+    mongoose.connect(process.env.MONGODB_URI, MONGO_OPTIONS)
+      .then(async () => {
+        console.log('[db] MongoDB connected ✓');
+        _reconnectAttempt = 0; // reset backoff on success
+        await seedLcProblems();
+      })
+      .catch(err => {
+        console.warn('[db] MongoDB connection failed:', err.message);
+        scheduleReconnect();
+      });
+  }
+
+  // ── Schedule a reconnect with exponential backoff ───────────────────────
+  function scheduleReconnect() {
+    if (_reconnectTimer) return; // already scheduled
+    _reconnectAttempt++;
+    const delay = Math.min(1000 * Math.pow(2, _reconnectAttempt - 1), MAX_RECONNECT_DELAY);
+    console.log(`[db] Will retry connection in ${(delay / 1000).toFixed(1)}s…`);
+    _reconnectTimer = setTimeout(() => {
+      _reconnectTimer = null;
+      connectWithRetry();
+    }, delay);
+  }
+
+  // ── Connection event listeners ──────────────────────────────────────────
+  mongoose.connection.on('connected', () => {
+    console.log('[db] Event: MongoDB connected');
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    console.warn('[db] Event: MongoDB disconnected — will attempt reconnection');
+    scheduleReconnect();
+  });
+
+  mongoose.connection.on('error', (err) => {
+    console.error('[db] Event: MongoDB connection error:', err.message);
+    // Mongoose doesn't always fire 'disconnected' after an error,
+    // so proactively schedule a reconnect if we're not connected
+    if (mongoose.connection.readyState !== 1) {
+      scheduleReconnect();
+    }
+  });
+
+  mongoose.connection.on('reconnected', () => {
+    console.log('[db] Event: MongoDB reconnected ✓');
+    _reconnectAttempt = 0;
+  });
+
+  // ── Initial connect ─────────────────────────────────────────────────────
+  connectWithRetry();
+
 } else {
   console.log('[db] MONGODB_URI not set — using JSON flat-file store');
 }
@@ -134,6 +208,26 @@ function jInsertMany(nu, slugs) {
 function mongoReady() {
   try { const m = require('mongoose'); return m.connection.readyState === 1; } catch { return false; }
 }
+
+/**
+ * Waits up to `ms` milliseconds for MongoDB to become ready.
+ * Returns true if connected, false if timed out.
+ * Routes should use this before DB operations to handle the window
+ * right after a disconnect/reconnect or server restart.
+ */
+function waitForMongo(ms = 10000) {
+  if (mongoReady()) return Promise.resolve(true);
+  return new Promise(resolve => {
+    const start = Date.now();
+    const check = () => {
+      if (mongoReady()) return resolve(true);
+      if (Date.now() - start >= ms) return resolve(false);
+      setTimeout(check, 250);
+    };
+    check();
+  });
+}
+
 // Validate if a string is a valid MongoDB ObjectId
 function isObjectId(v) {
   try { const m = require('mongoose'); return m.Types.ObjectId.isValid(v) && String(new (require('mongoose').Types.ObjectId)(v)) === v; } catch { return false; }
@@ -338,6 +432,8 @@ const VALID_SLUGS = new Set(problems.map(p => p.title_slug));
 
 // Export all public API functions and data structures
 module.exports = {
+  mongoReady, // Check if MongoDB connection is active
+  waitForMongo, // Wait for MongoDB to become ready (async, with timeout)
   problems, // Pre-loaded problems data
   VALID_SLUGS, // Set of valid problem slugs for validation
   getUser, // Retrieve user by ID

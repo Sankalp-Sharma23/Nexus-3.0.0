@@ -12,7 +12,7 @@ const express  = require('express');
 const fs       = require('fs');
 const path     = require('path');
 const fetch    = require('node-fetch');
-const mongoose = require('mongoose');
+const { mongoReady } = require('../db');
 
 const router     = express.Router();
 const CACHE_FILE = path.join(__dirname, '..', 'data', 'winners-cache.json');
@@ -20,9 +20,7 @@ const CACHE_FILE = path.join(__dirname, '..', 'data', 'winners-cache.json');
 /* ─────────────────────────────────────────────────────────
    MONGO HELPERS
 ───────────────────────────────────────────────────────── */
-function mongoReady() {
-  try { return mongoose.connection.readyState === 1; } catch { return false; }
-}
+// mongoReady() is imported from ../db
 function getModel() { return require('../models/PastWinner'); }
 
 /* ─────────────────────────────────────────────────────────

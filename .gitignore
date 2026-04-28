@@ -1,5 +1,5 @@
 # dependencies
-/node_modules
+node_modules/
 
 # production build
 /dist
@@ -8,6 +8,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+server-out.txt
+server-err.txt
 
 # environment variables
 .env
@@ -15,8 +17,16 @@ yarn-error.log*
 .env.*.local
 server/.env
 
+# server runtime data (regenerated at runtime)
+server/data/*-cache.json
+server/data/nexus-db.json
+server/data/wb-rooms.json
+server/data/aim-plans.json
+server/data/study-data.json
+
 # editor files
 .vscode/
 
 # OS files
 .DS_Store
+Thumbs.db

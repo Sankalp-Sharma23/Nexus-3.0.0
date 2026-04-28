@@ -45,6 +45,7 @@ const internshipsRouter = require('./routes/internships');
 const aimRouter         = require('./routes/aim');
 const studyRouter       = require('./routes/study');
 const dashboardRouter   = require('./routes/dashboard');
+const resumeRouter      = require('./routes/resume');
 app.use('/api/auth',        authRouter);
 app.use('/api/practice',    practiceRouter);
 app.use('/api/jobs',        jobsRouter);
@@ -53,11 +54,18 @@ app.use('/api/internships', internshipsRouter);
 app.use('/api/aim',         aimRouter);
 app.use('/api/study',       studyRouter);
 app.use('/api/dashboard',   dashboardRouter);
+app.use('/api/resume',      resumeRouter);
 
-// Health check
+// Health check — includes MongoDB connection status details
 app.get('/api/health', (_req, res) => {
-  const isMongo = mongoose.connection.readyState === 1;
-  res.json({ status: 'ok', time: new Date().toISOString(), source: isMongo ? 'MongoDB' : 'JSON' });
+  const readyState = mongoose.connection.readyState;
+  const stateNames = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  res.json({
+    status: 'ok',
+    time: new Date().toISOString(),
+    source: readyState === 1 ? 'MongoDB' : 'JSON',
+    mongoState: stateNames[readyState] || 'unknown',
+  });
 });
 
 // ── 404 for unknown API routes ──────────────────────────────────────────── //
@@ -75,7 +83,7 @@ registerStudySocket(io);
 
 // ── Start ────────────────────────────────────────────────────────────────── //
 server.listen(PORT, () => {
-  console.log(`\n  ✓  Nexus server running → http://localhost:${PORT}`);
+  console.log(`\n    Nexus server running → http://localhost:${PORT}`);
   console.log(`     /api/auth         – Authentication endpoints`);
   console.log(`     /api/practice     – Practice Hub endpoints`);
   console.log(`     /api/jobs         – Placement Portal job listings`);

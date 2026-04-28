@@ -22,9 +22,7 @@ const SCRAPE_TTL   = 3 * 60 * 60 * 1000;   // 3 hours
 const MIN_ITEMS    = 5;
 
 /* ── helpers ───────────────────────────────────────────────── */
-function mongoReady() {
-  try { const m = require('mongoose'); return m.connection.readyState === 1; } catch { return false; }
-}
+const { mongoReady } = require('../db');
 
 function writeCacheFile(items) {
   try {

@@ -16,6 +16,7 @@ const express  = require('express');
 const mongoose = require('mongoose');
 const fs       = require('fs');
 const path     = require('path');
+const { mongoReady } = require('../db');
 
 const router             = express.Router();
 const UserApplication    = require('../models/UserApplication');
@@ -27,9 +28,7 @@ const Internship         = require('../models/Internship');
 const Job                = require('../models/Job');
 
 /* ── helpers ──────────────────────────────────────────────── */
-function mongoReady() {
-  return mongoose.connection.readyState === 1;
-}
+// mongoReady() is imported from ../db
 
 function daysUntil(date) {
   if (!date) return null;

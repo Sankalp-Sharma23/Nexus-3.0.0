@@ -33,7 +33,9 @@ const PracticeHub     = lazy(() => import('./components/PracticeHub.jsx'));  // 
 const LoginPage       = lazy(() => import('./components/LoginPage.jsx'));  // User login
 const SignupPage      = lazy(() => import('./components/SignupPage.jsx'));  // User registration
 const ProfilePage     = lazy(() => import('./pages/ProfilePage.jsx'));  // User profile
-const ResumeBuilder   = lazy(() => import('./components/ResumeBuilder.jsx'));  // Resume creation tool
+const ResumeBuilder   = lazy(() => import('./components/ResumeBuilder.jsx'));  // Resume creation tool (legacy view)
+const ResumeDashboard = lazy(() => import('./components/ResumeDashboard.jsx'));  // Resume dashboard and creation
+const ResumeWizard    = lazy(() => import('./components/ResumeWizard.jsx'));  // Multi-step resume wizard
 
 /* Loading fallback component shown while a route chunk is being downloaded */
 function PageLoader() {
@@ -91,7 +93,11 @@ function App() {
           {/* Redirect old practice-hub URL to new /practice route */}
           <Route path="/practice-hub"    element={<Navigate to="/practice" replace />} />
           <Route path="/profile"         element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/resume-builder"  element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
+          
+          {/* Resume Builder Routes */}
+          <Route path="/resume-builder"        element={<ProtectedRoute><ResumeDashboard /></ProtectedRoute>} />
+          <Route path="/resume-builder/:id"    element={<ProtectedRoute><ResumeWizard /></ProtectedRoute>} />
+          <Route path="/resume-old/:id"        element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
 
           {/* 404 catch-all: Matches any route not defined above */}
           <Route path="*" element={<NotFoundPage />} />

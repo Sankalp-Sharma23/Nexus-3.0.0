@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Download, RefreshCw, Zap, Plus, Trash2, ChevronDown,
@@ -456,6 +457,8 @@ const ResumePreviewMinimal = ({ data }) => (
    MAIN PAGE COMPONENT
 ═══════════════════════════════════════════════════════════ */
 export default function ResumeBuilder() {
+  const { id } = useParams();
+
   /* ── State ─────────────────────────────────────────── */
   const [resumeData, setResumeData] = useState(() => {
     try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : EMPTY_RESUME; }
@@ -463,15 +466,45 @@ export default function ResumeBuilder() {
   });
   const [template, setTemplate] = useState('classic');
   const [openSection, setOpenSection] = useState('personal');
-  const [syncStatus, setSyncStatus] = useState(null); // null | 'syncing' | 'synced' | 'error'
   const [toast, setToast] = useState(null);
   const [showGapPanel, setShowGapPanel] = useState(false);
   const printRef = useRef(null);
 
-  /* ── Persist ────────────────────────────────────────── */
+  /* ── Fetch Initial Data (if missing from localStorage) ── */
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/resume/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('nexus_token')}` },
+      })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => {
+          if (data.resume) {
+            setResumeData(prev => ({ ...prev, ...data.resume }));
+          }
+        })
+        .catch(err => console.warn('[ResumeBuilder] Failed to load from backend', err));
+    }
+  }, [id]);
+
+  /* ── Persist & Backend Sync ─────────────────────────── */
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(resumeData));
-  }, [resumeData]);
+    
+    // Auto-save to backend if we have a valid ID
+    if (id) {
+      const timer = setTimeout(() => {
+        fetch(`/api/resume/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('nexus_token')}`
+          },
+          body: JSON.stringify(resumeData),
+        }).catch(err => console.warn('[ResumeBuilder] Auto-save failed', err));
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [resumeData, id]);
 
   /* ── ATS Score ──────────────────────────────────────── */
   const atsResult = useMemo(() => calculateATSScore(resumeData, resumeData.targetJD), [resumeData]);
@@ -515,85 +548,20 @@ export default function ResumeBuilder() {
     }));
   }, []);
 
-  /* ── Sync with Aim Page ─────────────────────────────── */
-  const syncWithAim = useCallback(async () => {
-    setSyncStatus('syncing');
-    await new Promise(r => setTimeout(r, 1200));
-    try {
-      const raw = localStorage.getItem(AIM_KEY);
-      if (!raw) throw new Error('No Aim Page data found. Please generate a roadmap in the Aim Page first.');
-      const aim = JSON.parse(raw);
 
-      const roadmapData = aim.roadmapData || {};
-      const acquired = roadmapData.acquired_skills || aim.acquired_skills || [];
-      const target = aim.target || {};
-      const role = target.role || '';
-      const company = target.company || '';
-
-      // Smart JD construction
-      const jdKeywords = acquired.join(', ');
-      const jdText = company
-        ? `Position: ${role} at ${company}\nCore Requirements: ${jdKeywords}\nSeeking a candidate with strong proficiency in ${acquired.slice(0, 5).join(', ')}.`
-        : (role ? `Target Role: ${role}\nRequired Skills: ${jdKeywords}` : prev => prev.targetJD);
-
-      setResumeData(prev => {
-        const existingSkills = new Set(prev.skills);
-        acquired.forEach(s => existingSkills.add(s));
-
-        return {
-          ...prev,
-          skills: Array.from(existingSkills),
-          targetJD: typeof jdText === 'function' ? jdText(prev) : (jdText || prev.targetJD)
-        };
-      });
-
-      // Also offer to import roadmap steps as projects
-      const roadmapSteps = roadmapData.roadmap || [];
-      if (roadmapSteps.length > 0 && window.confirm(`Found ${roadmapSteps.length} roadmap steps. Would you like to import completed steps as experience?`)) {
-        const completedNodeIds = new Set(aim.completedNodes || []);
-        const projectsToImport = roadmapSteps
-          .filter(step => completedNodeIds.has(step.id))
-          .map(step => ({
-            id: Date.now() + Math.random(),
-            title: step.title,
-            company: company || 'Nexus Learning Path',
-            date: 'Completed',
-            tech: acquired.slice(0, 3).join(', '),
-            description: step.desc,
-            optimized: false
-          }));
-
-        if (projectsToImport.length > 0) {
-          setResumeData(prev => ({
-            ...prev,
-            projects: [...prev.projects, ...projectsToImport]
-          }));
-          setToast({ msg: `✅ Synced! Imported ${acquired.length} skills and ${projectsToImport.length} completed steps.`, type: 'success' });
-        } else {
-          setToast({ msg: `✅ Synced skills! (No completed roadmap steps to import)`, type: 'success' });
-        }
-      } else {
-        setToast({ msg: `✅ Synced ${acquired.length} skills from Aim Page`, type: 'success' });
-      }
-
-      setSyncStatus('synced');
-      setTimeout(() => setSyncStatus(null), 3000);
-    } catch (err) {
-      setSyncStatus('error');
-      setToast({ msg: `⚠ ${err.message}`, type: 'error' });
-      setTimeout(() => setSyncStatus(null), 3000);
-    }
-  }, []);
 
   /* ── Nexus Project Import ────────────────────────────── */
-  const importNexusProject = useCallback(() => {
+  const importNexusProject = useCallback(async () => {
     try {
-      const raw = localStorage.getItem(AIM_KEY);
-      if (!raw) { setToast({ msg: '⚠ No Aim Page data. Generate a roadmap first.', type: 'error' }); return; }
-      const aim = JSON.parse(raw);
-      const roadmap = aim.roadmapData?.roadmap || [];
-      const skills = aim.roadmapData?.acquired_skills || [];
-      const target = aim.target || {};
+      const res = await fetch('/api/resume/import-aim', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('nexus_token')}` },
+      });
+      const data = await res.json();
+      if (!res.ok) { setToast({ msg: `⚠ ${data.error || 'No Aim Page data. Generate a roadmap first.'}`, type: 'error' }); return; }
+      
+      const roadmap = data.executionPlan.flatMap(p => p.tasks || []) || [];
+      const skills = data.acquiredSkills || [];
+      const target = { role: data.targetRole, company: data.targetCompany };
 
       const newProject = {
         id: Date.now(),
@@ -670,18 +638,7 @@ export default function ResumeBuilder() {
         </div>
 
         <div className="rb-topbar-right">
-          <button
-            className={`rb-btn rb-btn--secondary ${syncStatus === 'syncing' ? 'rb-btn--loading' : ''} ${syncStatus === 'synced' ? 'rb-btn--success' : ''}`}
-            onClick={syncWithAim}
-            disabled={syncStatus === 'syncing'}
-          >
-            {syncStatus === 'syncing'
-              ? <><RefreshCw size={14} className="spin" /> Syncing…</>
-              : syncStatus === 'synced'
-                ? <><CheckCircle2 size={14} /> Synced!</>
-                : <><Zap size={14} /> Sync with Aim Page</>
-            }
-          </button>
+
           <button className="rb-btn rb-btn--primary" onClick={downloadPDF}>
             <Download size={14} /> Download PDF
           </button>

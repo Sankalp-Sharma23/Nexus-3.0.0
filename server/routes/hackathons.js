@@ -33,9 +33,7 @@ const SCRAPE_MIN_HACKS = 5;
 /* ─────────────────────────────────────────────────────────────────────────
    MONGO HELPERS
 ───────────────────────────────────────────────────────────────────────── */
-function mongoReady() {
-  try { const m = require('mongoose'); return m.connection.readyState === 1; } catch { return false; }
-}
+const { mongoReady } = require('../db');
 function getModel() { return require('../models/Hackathon'); }
 
 /* ─────────────────────────────────────────────────────────────────────────
