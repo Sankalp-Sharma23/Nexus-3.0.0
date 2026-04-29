@@ -151,13 +151,18 @@ export default function ResumeDashboard() {
   };
 
   useEffect(() => {
+    console.log('[ResumeDashboard] mounting, user:', user);
     const token = localStorage.getItem('nexus_token');
+    console.log('[ResumeDashboard] token:', token ? 'exists' : 'MISSING');
+
     fetch('/api/resume', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async r => {
+        console.log('[ResumeDashboard] response status:', r.status);
         // 401 = token expired → redirect to login
         if (r.status === 401) {
+          console.log('[ResumeDashboard] 401 - redirecting to login');
           navigate('/login');
           return null;
         }
@@ -166,6 +171,7 @@ export default function ResumeDashboard() {
           console.warn('[ResumeDashboard] list error:', r.status, data);
           return null;
         }
+        console.log('[ResumeDashboard] data:', data);
         return data;
       })
       .then(d => {

@@ -1,1 +1,175 @@
-{}
+{
+  "PZ0UJ4M3": {
+    "hostUserId": "69e62262b5914ef3b6f3aadb",
+    "template": "schema",
+    "members": {
+      "69e62262b5914ef3b6f3aadb": {
+        "displayName": "SANKALP SHARMA",
+        "color": "#8b5cf6"
+      }
+    },
+    "strokes": [],
+    "textEls": [],
+    "boardData": {
+      "tables": [
+        {
+          "id": "id_1",
+          "name": "users",
+          "x": 120,
+          "y": 140,
+          "color": "#8b5cf6",
+          "columns": [
+            {
+              "id": "id_2",
+              "name": "id",
+              "type": "UUID",
+              "isPK": true,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_3",
+              "name": "username",
+              "type": "VARCHAR(255)",
+              "isPK": false,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_4",
+              "name": "email",
+              "type": "VARCHAR(255)",
+              "isPK": false,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_5",
+              "name": "created_at",
+              "type": "TIMESTAMP",
+              "isPK": false,
+              "isFK": false,
+              "isNotNull": false,
+              "refTable": null,
+              "refCol": null
+            }
+          ]
+        },
+        {
+          "id": "id_6",
+          "name": "posts",
+          "x": 460,
+          "y": 40,
+          "color": "#3b82f6",
+          "columns": [
+            {
+              "id": "id_7",
+              "name": "id",
+              "type": "UUID",
+              "isPK": true,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_8",
+              "name": "title",
+              "type": "VARCHAR(255)",
+              "isPK": false,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_9",
+              "name": "body",
+              "type": "TEXT",
+              "isPK": false,
+              "isFK": false,
+              "isNotNull": false,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_10",
+              "name": "user_id",
+              "type": "UUID",
+              "isPK": false,
+              "isFK": true,
+              "isNotNull": true,
+              "refTable": "users",
+              "refCol": "id"
+            }
+          ]
+        },
+        {
+          "id": "id_11",
+          "name": "comments",
+          "x": 440,
+          "y": 360,
+          "color": "#10b981",
+          "columns": [
+            {
+              "id": "id_12",
+              "name": "id",
+              "type": "UUID",
+              "isPK": true,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_13",
+              "name": "body",
+              "type": "TEXT",
+              "isPK": false,
+              "isFK": false,
+              "isNotNull": true,
+              "refTable": null,
+              "refCol": null
+            },
+            {
+              "id": "id_14",
+              "name": "post_id",
+              "type": "UUID",
+              "isPK": false,
+              "isFK": true,
+              "isNotNull": true,
+              "refTable": "posts",
+              "refCol": "id"
+            },
+            {
+              "id": "id_15",
+              "name": "user_id",
+              "type": "UUID",
+              "isPK": false,
+              "isFK": true,
+              "isNotNull": true,
+              "refTable": "users",
+              "refCol": "id"
+            }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "id": "id_16",
+          "fromTableId": "id_1",
+          "toTableId": "id_6",
+          "cardinality": "1:1"
+        }
+      ]
+    },
+    "createdAt": "2026-04-29T13:24:42.052Z",
+    "lastActive": 1777469090760
+  }
+}
