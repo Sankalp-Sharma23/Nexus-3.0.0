@@ -1,21 +1,3 @@
-/**
- * server/scraper/ScraperForHackathons.js
- *
- * Responsible ONLY for fetching hackathon data from external sources,
- * normalising it into a flat schema, and deduplicating.
- *
- * Exports:
- *   scrapeHackathons() → Promise<NormalisedHackathon[]>
- *
- * Sources  (all fail gracefully – errors logged and silently skipped):
- *   1. Devpost       https://devpost.com/api/hackathons        (JSON API)
- *   2. MLH           https://mlh.io/seasons/2026/events        (HTML scrape)
- *   3. HackerEarth   https://www.hackerearth.com/chrome-extension/events/  (JSON)
- *   4. Devfolio      https://api.devfolio.co/api/hackathons    (JSON API)
- *   5. Unstop        https://unstop.com/api/public/…           (JSON API – Indian)
- *   6. DoraHacks     https://dorahacks.io/api/hackathon/list/  (JSON API – Web3)
- *   7. Lablab.ai     https://lablab.ai/api/get-events          (JSON API – AI)
- */
 
 'use strict';
 

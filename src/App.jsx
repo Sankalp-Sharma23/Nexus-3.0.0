@@ -71,7 +71,7 @@ function App() {
           <Route path="/login"  element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
-          {/* Protected routes - redirect to /login if not authenticated */}
+          {/* Protected routes - redirect to /login if not authenticated   :)      */}
           <Route path="/dashboard"        element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/placement-portal" element={<ProtectedRoute><PlacementPortal /></ProtectedRoute>} />
           <Route path="/whiteboard"       element={<ProtectedRoute><Whiteboard /></ProtectedRoute>} />

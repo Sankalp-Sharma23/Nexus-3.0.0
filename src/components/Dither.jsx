@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unknown-property */
+// animation file for the hackathon page :)
 import { useRef, useEffect, forwardRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { EffectComposer, wrapEffect } from '@react-three/postprocessing';

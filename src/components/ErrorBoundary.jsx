@@ -1,14 +1,5 @@
 import { Component } from 'react';
 
-/**
- * ErrorBoundary — catches render-phase errors in child components
- * and shows a graceful fallback instead of a white screen.
- *
- * Usage:
- *   <ErrorBoundary>
- *     <App />
- *   </ErrorBoundary>
- */
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);

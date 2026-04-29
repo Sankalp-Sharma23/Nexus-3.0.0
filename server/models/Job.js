@@ -1,10 +1,3 @@
-/**
- * models/Job.js  –  Mongoose schema for scraped job listings
- *
- * uid  → composite dedup key  (e.g. "rem-123", "jcy-456", "abn-slug")
- *         used as upsert filter so the same job from the same source is
- *         never stored twice even if the scraper runs multiple times.
- */
 
 const mongoose = require('mongoose');
 

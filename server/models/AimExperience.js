@@ -1,7 +1,4 @@
-/**
- * models/AimExperience.js  –  Community interview & placement experiences
- * shared by users on the AIM page.
- */
+
 
 const mongoose = require('mongoose');
 

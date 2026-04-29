@@ -1,10 +1,3 @@
-/**
- * models/LcProblem.js  –  One document per LeetCode problem.
- *
- * title_slug is the natural unique key (e.g. "two-sum").
- * The collection is populated once via POST /api/practice/problems/refresh
- * and then only read at runtime — never written on every request.
- */
 
 const mongoose = require('mongoose');
 

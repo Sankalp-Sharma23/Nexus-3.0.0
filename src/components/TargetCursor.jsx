@@ -1,3 +1,4 @@
+// animation files for the bento box dashbaord at the home page  :)
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { gsap } from 'gsap';
 

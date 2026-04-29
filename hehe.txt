@@ -1,0 +1,4 @@
+how does the flow of whiteboard page work ?
+Jane draws → emit draw_stroke → Backend stores → Broadcast to John → John sees stroke
+
+where it is stored ?

@@ -1,9 +1,4 @@
-/**
- * models/PastWinner.js  –  Mongoose schema for past hackathon winners
- *
- * Stores winning project showcases — seeded via Gemini AI generation
- * and optionally curated/approved by admins.
- */
+
 
 const mongoose = require('mongoose');
 

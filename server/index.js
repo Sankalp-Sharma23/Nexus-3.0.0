@@ -1,9 +1,5 @@
 /**
- * server/index.js  –  Nexus backend entry point
- *
- * Run:  node index.js          (production)
- *       nodemon index.js       (development)
- *
+ * server/index.js  –  ////////Nexus backend entry point/////////
  * Listens on PORT 3001 – Vite proxies /api/* → http://localhost:3001
  */
 

@@ -1,11 +1,4 @@
-/**
- * routes/auth.js  –  Authentication endpoints
- *
- * POST /api/auth/register  — create account (name, email, password, gender, focus)
- * POST /api/auth/login     — email + password → JWT + user object
- * GET  /api/auth/me        — verify token, return current user
- * PUT  /api/auth/profile   — update profile fields (name, phone, location, bio, avatar)
- */
+
 
 const express  = require('express');
 const jwt      = require('jsonwebtoken');

@@ -1,4 +1,4 @@
-/**
+/** IMPORTANT NOTE:
  * server/socket/WhiteboardSocket.js  –  Real-time Whiteboard collaboration
  *
  * Rooms are persisted to data/wb-rooms.json so they survive server restarts.

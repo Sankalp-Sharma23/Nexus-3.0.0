@@ -1,12 +1,3 @@
-/**
- * db.js  –  Data-access layer
- *
- * Mongo-first: when MONGODB_URI is set and connection succeeds, all operations
- * use Mongoose models. Otherwise falls back to the legacy JSON flat-file store
- * so the dev server keeps working before Atlas is configured.
- *
- * All exported functions are ASYNC.
- */
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -23,15 +14,6 @@ const DB_FILE  = path.join(__dirname, 'data', 'nexus-db.json');
 // Path to the JSON file storing LeetCode problems
 const LC_FILE  = path.join(__dirname, 'data', 'lc-problems.json');
 
-/* ═══════════════════════════════════════════════════
-   MONGODB CONNECTION  (if MONGODB_URI is set in .env)
-   
-   Robust connection with:
-   - Auto-reconnect on disconnect (exponential backoff)
-   - Connection event monitoring & logging
-   - KeepAlive / heartbeat to prevent idle drops
-   - Retry reads & writes for transient failures
-═══════════════════════════════════════════════════ */
 
 // Tracks whether we should attempt reconnection
 let _reconnectTimer = null;

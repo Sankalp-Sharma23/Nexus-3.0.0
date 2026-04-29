@@ -1,21 +1,10 @@
-/**
- * middleware/auth.js  –  JWT authentication middleware
- *
- * Usage:
- *   const { requireAuth, optionalAuth } = require('../middleware/auth');
- *   router.get('/private', requireAuth, handler);
- *   router.get('/public',  optionalAuth, handler);
- *
- * On success, attaches `req.userId` (string) from the decoded JWT.
- */
+// This is the authentication API endpoints file. It handles:
 
-const jwt = require('jsonwebtoken');
+// User registration (create account)
+// Login (email + password)
+// Get current user profile
+// Update user profile
 
-const JWT_SECRET = process.env.JWT_SECRET || 'nexus_super_secret_change_me';
-
-/**
- * requireAuth — rejects with 401 if no valid token.
- */
 function requireAuth(req, res, next) {
   const header = req.headers.authorization;
   if (!header || !header.startsWith('Bearer ')) {

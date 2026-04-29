@@ -1,27 +1,4 @@
-/**
- * server/scraper/scraper.js
- *
- * Responsible ONLY for fetching job data from external sources,
- * normalising it into a flat schema, and deduplicating.
- *
- * Exports:
- *   scrapeAll() → Promise<NormalisedJob[]>
- *
- * Sources:
- *   1.  Remotive    https://remotive.com/api/remote-jobs
- *   2.  Jobicy      https://jobicy.com/api/v2/remote-jobs
- *   3.  Arbeitnow   https://www.arbeitnow.com/api/job-board-api
- *   4.  LinkedIn    https://linkedin.com/jobs-guest  (HTML scrape)
- *   5.  Indeed      https://indeed.com/rss           (often blocked)
- *   6.  Wellfound   https://wellfound.com            (often blocked)
- *   7.  Naukri      https://naukri.com/jobapi        (often blocked)
- *   8.  Foundit     https://foundit.in/middleware    (often blocked)
- *   9.  The Muse    https://www.themuse.com/api/public/jobs
- *  10.  JSearch     https://jsearch.p.rapidapi.com   (needs RAPIDAPI_KEY)
- *  11.  Adzuna      https://api.adzuna.com           (needs ADZUNA_APP_ID/KEY)
- *
- * All scrapers fail gracefully – errors are logged and silently skipped.
- */
+
 
 'use strict';
 

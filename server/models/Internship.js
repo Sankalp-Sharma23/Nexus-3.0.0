@@ -1,9 +1,3 @@
-/**
- * models/Internship.js  –  Mongoose schema for scraped internship listings
- *
- * uid → composite dedup key (e.g. "unstop-internship-12345", "internshala-98765")
- *        used as upsert filter so the same listing is never duplicated.
- */
 
 const mongoose = require('mongoose');
 

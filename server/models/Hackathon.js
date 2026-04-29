@@ -1,9 +1,3 @@
-/**
- * models/Hackathon.js  –  Mongoose schema for scraped hackathon listings
- *
- * uid → composite dedup key (e.g. "devpost-42501", "mlh-hackny-2026")
- *        used as upsert filter so the same event is never duplicated.
- */
 
 const mongoose = require('mongoose');
 

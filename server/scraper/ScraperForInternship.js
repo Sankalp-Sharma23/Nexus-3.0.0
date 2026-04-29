@@ -1,17 +1,4 @@
-/**
- * server/scraper/ScraperForInternship.js
- *
- * Scrapes internship listings from multiple Indian & global platforms,
- * normalises them into a flat schema, deduplicates, and upserts to MongoDB.
- *
- * Exports:
- *   scrapeInternships() → Promise<NormalisedInternship[]>
- *
- * Sources (all fail gracefully):
- *   1. Unstop        https://unstop.com/api/public/...  (JSON API – 10 000+ results)
- *   2. Internshala   https://internshala.com/internships/ajax/{offset}  (HTML scrape)
- *   3. HackerEarth   https://www.hackerearth.com/chrome-extension/events/  (JSON)
- */
+
 
 'use strict';
 

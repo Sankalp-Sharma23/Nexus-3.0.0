@@ -2,11 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Auth.css';
 
-/* ─────────────────────────────────────────────────────────────
-   Art panel — shared between login and signup, never unmounts.
-   mode: 'login'  → art on right, purple
-   mode: 'signup' → art on left,  cyan
-───────────────────────────────────────────────────────────── */
+
+
+//   not using this now :( 
+
 function ArtPanel({ mode }) {
     return (
         <div className={`auth-art-panel auth-art-panel--${mode}`}>
@@ -39,14 +38,6 @@ function ArtPanel({ mode }) {
     );
 }
 
-/* ─────────────────────────────────────────────────────────────
-   AuthShell — wrapper used by both LoginPage and SignupPage.
-   Keeps the art panel alive and transitions it on mode switch.
-
-   Props:
-     mode      : 'login' | 'signup'
-     formPanel : JSX of the form (left col when login, right when signup)
-───────────────────────────────────────────────────────────── */
 export default function AuthShell({ mode, formPanel }) {
     const canvasRef  = useRef(null);
     const navigate   = useNavigate();

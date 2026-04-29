@@ -1,10 +1,4 @@
-/**
- * models/PracticeSolved.js  –  Tracks which LC problems a user has solved.
- *
- * One document per (userId, slug) pair.
- * userId is stored as a String so it works with both ObjectId references
- * and legacy nexus_username strings from the JSON fallback layer.
- */
+
 
 const mongoose = require('mongoose');
 

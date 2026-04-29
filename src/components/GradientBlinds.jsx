@@ -1,7 +1,4 @@
-/**
- * components/GradientBlinds.jsx
- * Source: https://reactbits.dev/r/GradientBlinds-JS-TW
- */
+// animation file for the resume page :)
 import { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
 
