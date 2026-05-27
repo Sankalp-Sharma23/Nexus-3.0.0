@@ -12,3 +12,9 @@ const socket = io(SOCKET_URL, {
 });
 
 export default socket;
+
+
+//it creates a Socket.IO client that connects the frontend to the backend 
+// for real‑time communication (uses VITE_SOCKET_URL 
+// or http://localhost:3001, falls back to polling if websocket 
+// isn't available).

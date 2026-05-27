@@ -1,0 +1,46 @@
+3.3 DATASETS
+
+3.3.1 DSA Problem Dataset
+- Source & Blueprint: Mapped from curated industry-standard problem sets (e.g.,LeetCode-style blueprints) and internal curation to ensure coverage of core topics and edge cases.
+- Data Fields / Schema:
+  - Problem_ID: Unique identifier (UUID or integer).
+  - Title: Short descriptive name (e.g., Graph BFS Review).
+  - Category_Topic: Primary topic(s) (Arrays, Strings, Graphs, DP, etc.).
+  - Difficulty_Level: Easy | Medium | Hard.
+  - Problem_Statement: Full prompt text.
+  - Test_Cases: Canonical input/output pairs and hidden test suite.
+  - Constraints: Limits (time, memory).
+  - Sample_Input_Output: Example(s) for quick validation.
+- Application: Populates the Practice Hub database, drives user progress tracking, completion metrics, scoring consistency, and adaptive problem recommendations.
+
+3.3.2 Skill Gap & Career Goal Assessment Dataset
+- Source & Blueprint: Derived from role taxonomies, trending tech-stack analyses, and career-path curricula (modeled after professional learning platforms).
+- Data Fields / Schema:
+  - Target_Role: Job/role name (Software Engineer, Frontend Developer, etc.).
+  - Required_Skills_Matrix: Skills list with proficiency levels (e.g., React: Intermediate, System Design: Basic).
+  - Industry_Benchmark_Score: Numeric benchmark per role (percentile or score) sourced from market data.
+  - Recommended_Learning_Path (optional): Ordered modules or micro-goals to close gaps.
+- Application: Drives the Aim Page—compares user profiles to market benchmarks, identifies missing skills, and generates prioritized learning plans.
+
+3.3.3 Internship & Hackathon Opportunity Dataset
+- Source & Blueprint: Aggregated from public opportunity feeds, community calendars, and major hackathon listings (MLH, ETHGlobal, company career pages).
+- Data Fields / Schema:
+  - Event_Title: Name (MLH Global Hack Week).
+  - Organization_Host: Host organization or company.
+  - Timeline_Duration: Dates, deadlines, days remaining.
+  - Category: Full-Time | Internship | Hackathon | Contract.
+  - Location_Mode: Remote | On-site | Hybrid.
+  - Eligibility_Requirements (optional): Required experience, region, or student status.
+- Application: Feeds the Experience Hub and Placement Portal to match users with live opportunities based on readiness and interests.
+
+3.3.4 Professional Resume Template & ATS Parser Dataset
+- Source & Blueprint: Designed around ATS formatting rules and recruiter optimization best practices.
+- Data Fields / Schema:
+  - Template_Style_ID: Template identifier (Minimal, Modern, Technical).
+  - Section_Weights: Relative importance/ordering for sections (Education, Skills, Projects, Experience).
+  - Keyword_Match_Dictionary: Role-specific keywords and synonyms used for scoring and bullet optimization.
+  - Parsing_Rules: Patterns and heuristics for extracting user data from uploads (name, contact, sections).
+  - Scoring_Rules: ATS-fit scoring logic and thresholds.
+- Application: Powers the AI Resume Builder to format user data into recruiter-ready PDFs, grade/optimize bullet points, and provide ATS-compatibility feedback.
+
+End of 3.3

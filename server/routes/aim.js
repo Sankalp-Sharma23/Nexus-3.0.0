@@ -41,8 +41,7 @@ function writeDB(data) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   LC BENCHMARK TABLE  — minimum problems to show conceptual
-   understanding per company tier / role type
+   LC BENCHMARK TABLE  — minimum problems to show conceptual understanding per company tier / role type
    ═══════════════════════════════════════════════════════════ */
 const LC_BENCHMARKS_KB = {
   // FAANG / top-tier
@@ -79,13 +78,10 @@ function getLcBenchmarks(role, company) {
 
 /* ════════════════════════════════════════════════════════════
    JOB SEARCH LAYER
-   Priority: 1) Adzuna API  2) company knowledge base  3) null
+   Priority: 1) Adzuna API  2) company knowledge base  3) null    :)
    ═══════════════════════════════════════════════════════════ */
 
-/**
- * Curated knowledge base for top tech companies.
- * Maps  lowercasedCompanyAlias → { roles: [ { pattern, requiredSkills, niceToHave, description } ] }
- */
+
 const COMPANY_KB = {
   google: {
     name: 'Google',
@@ -409,7 +405,7 @@ router.get('/lc-stats/:userId', async (req, res) => {
 });
 
 /* ────────────────────────────────────────────────────────────
-   AI Integration — Gemini REST (falls back to rich mock)
+   AI Integration — Gemini 2.0
    ──────────────────────────────────────────────────────────── */
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
